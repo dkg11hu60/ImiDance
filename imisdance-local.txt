@@ -1,0 +1,751 @@
+PS C:\Users\gabor\Projects\ImiDance> Get-ChildItem -Recurse -File | Select-String "@imisdance.local"
+
+.history\update_from_excel_20260816135009.py:60:        return "user@imisdance.local"
+.history\update_from_excel_20260816135009.py:67:    return f"{safe_name.lower()}@imisdance.local"
+.history\update_from_excel_20260816135010.py:60:        return "user@imisdance.local"
+.history\update_from_excel_20260816135010.py:67:    return f"{safe_name.lower()}@imisdance.local"
+.history\update_from_excel_20260816135138.py:60:        return "user@imisdance.local"
+.history\update_from_excel_20260816135138.py:66:    return f"{safe_name.lower()}@imisdance.local"
+.history\update_from_excel_20260816135428.py:61:        return "user@imisdance.local"
+.history\update_from_excel_20260816135428.py:67:    return f"{safe_name.lower()}@imisdance.local"
+.history\app\api\notify-event-cancelled\route_20260818075609.ts:7:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\app\api\notify-event-cancelled\route_20260818163405.ts:49:        if (!email || email.endsWith('@imisdan
+ce.local')) {
+.history\app\api\notify-event-cancelled\route_20260818163953.ts:56:      const fromEmail = process.env.SMTP_FROM 
+|| process.env.SMTP_USER || 'no-reply@imisdance.local'
+.history\app\api\notify-event-cancelled\route_20260818163953.ts:62:        if (!email || email.endsWith('@imisdan
+ce.local')) {
+.history\app\api\notify-event-cancelled\route_20260818163954.ts:56:      const fromEmail = process.env.SMTP_FROM 
+|| process.env.SMTP_USER || 'no-reply@imisdance.local'
+.history\app\api\notify-event-cancelled\route_20260818163954.ts:62:        if (!email || email.endsWith('@imisdan
+ce.local')) {
+.history\app\api\notify-event-cancelled\route_20260818164551.ts:61:      const fromEmail = process.env.SMTP_FROM 
+|| smtpUser || 'no-reply@imisdance.local'
+.history\app\api\notify-event-cancelled\route_20260818164551.ts:83:        if (!email || email.endsWith('@imisdan
+ce.local')) {
+.history\app\api\notify-event-cancelled\route_20260818170130.ts:61:      const fromEmail = process.env.SMTP_FROM 
+|| smtpUser || 'no-reply@imisdance.local'
+.history\app\api\notify-event-cancelled\route_20260818170130.ts:86:        if (!email || email.endsWith('@imisdan
+ce.local')) {
+.history\components\admin\EmailTester_20260819161456.tsx:22:          !p.email.endsWith('@imisdance.local') &&
+.history\components\admin\EmailTester_20260819161457.tsx:22:          !p.email.endsWith('@imisdance.local') &&
+.history\components\events\EventManageList_20260818082329.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818082328.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090800.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090809.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090811.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090812.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090814.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090904.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818090944.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818162457.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818162459.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818164938.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818164949.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818164950.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818165002.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818165005.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818165007.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260818165008.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260821110135.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\components\teacher\EventManageList_20260821110136.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+.history\scripts\clean_and_import_auth_20260816210330.py:27:    email = f"{base}@imisdance.local"
+.history\scripts\clean_and_import_auth_20260816210330.py:30:        email = f"{base}{counter}@imisdance.local"
+.history\scripts\create_auth_only_20260816211434.py:38:    email = f"{base}@imisdance.local"
+.history\scripts\create_auth_only_20260816211434.py:41:        email = f"{base}{counter}@imisdance.local"
+.history\scripts\direct_sql_purge_and_import_20260816210517.py:33:    email = f"{base}@imisdance.local"
+.history\scripts\direct_sql_purge_and_import_20260816210517.py:36:        email = f"{base}{counter}@imisdance.loc
+al"
+.history\scripts\direct_sql_purge_and_import_20260816210524.py:33:    email = f"{base}@imisdance.local"
+.history\scripts\direct_sql_purge_and_import_20260816210524.py:36:        email = f"{base}{counter}@imisdance.loc
+al"
+.history\scripts\direct_sql_purge_and_import_20260816210609.py:27:    email = f"{base}@imisdance.local"
+.history\scripts\direct_sql_purge_and_import_20260816210609.py:30:        email = f"{base}{counter}@imisdance.loc
+al"
+.history\scripts\direct_sql_purge_and_import_20260816210610.py:27:    email = f"{base}@imisdance.local"
+.history\scripts\direct_sql_purge_and_import_20260816210610.py:30:        email = f"{base}{counter}@imisdance.loc
+al"
+.history\scripts\generate_auth_from_profiles_20260816205610.py:20:        return "tancos@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205610.py:27:    return f"{clean_name}@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205726.py:20:        return "tancos@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205726.py:27:    return f"{clean_name}@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205726.py:79:        # Ha teljesen tisztázni akarjuk @imisda
+nce.local-ra, azt is megtehetjük:
+.history\scripts\generate_auth_from_profiles_20260816205727.py:20:        return "tancos@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205727.py:27:    return f"{clean_name}@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205727.py:79:        # Ha teljesen tisztázni akarjuk @imisda
+nce.local-ra, azt is megtehetjük:
+.history\scripts\generate_auth_from_profiles_20260816205815.py:20:        return "tancos@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205815.py:26:    return f"{clean_name}@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205815.py:76:        # Ha régi külső email van benne, egység
+esítjük a @imisdance.local címmel
+.history\scripts\generate_auth_from_profiles_20260816205958.py:20:        return "tancos@imisdance.local"
+.history\scripts\generate_auth_from_profiles_20260816205958.py:25:    return f"{clean_name}@imisdance.local"
+.history\scripts\import_only_20260816210750.py:27:    email = f"{base}@imisdance.local"
+.history\scripts\import_only_20260816210750.py:30:        email = f"{base}{counter}@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210114.py:20:        return "tancos@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210114.py:25:    return f"{clean_name}@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210223.py:20:        return "tancos@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210223.py:25:    return f"{clean_name}@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210224.py:20:        return "tancos@imisdance.local"
+.history\scripts\purge_and_regenerate_auth_20260816210224.py:25:    return f"{clean_name}@imisdance.local"
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:11948:O�._A.lis�Rp)=>pɡ׬
+                                                                                �.endsWith('@imisd
+ance.local') && p.�3 !=�?       �Y    }6%
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:56373:��35((p2  ptJ: &&!�.endsWith('@imisdan
+ce.local')6%p.�4 !=&$�
+                      !  ~�) ("%p.)4 ||�4:7 })U?�U(list�a       ��$},6
+                                                                      �sendTe
+stI^X�/PV  tryw�5resL�fetch('/api/test-(',6�  method: 'POST',^B    MN~I'Content-Type':
+ 'applic_ �/json' }<�body: JSON.��ify({ to:��gi}��Ejson��res.json\
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:60830:function dA() {| _s5��const [e�Q, set/] = (
+0,�S�_ [��State"])(''�qloading�L
+                                ��Zfalse�aresult�R
+                                                  ��Jnull�qmembers�M
+                                                                    ��[�W�// Valo
+s Y�-cimu, nem letiltott tagok a gyorsvalasztohoz�}�`Effect~�.$:�'easync ����
+�{ data } = await��/$["��"].from('profiles').select('full_name,�, is_active').order%�@list��
+�|| []).filter(O�._.T�": (p)=>p.�S && !
+                                       �.endsWith('@imisdance.local'))%p.�Q !== �/}[�o
+]).map�3F�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:98394:  const [eQ, set$0] =��G('')*qloading,L
+
+.Xfalse1!0R/�<any>(null3qmembers4M
+                                        5�{ full_name: string; �� }[]>([])e�  // Valos%�-cimu
+, nem letiltott tagok a gyorsvalasztohoz?�b(() =>:v  async^�^b�{ data } = await �`.��('
+profilesv�.select('�,��, is_active0Worder/��list = (�1|| *l� il#p(p: any�A  p.k8 &&!
+�.endsWith('@imisdance.local')4%p.�Q !== <UH.map�) (%p.4 ||�$�%})SZ(
+                                                                    }}  �
+"},"
+
+    �@sendS�S(true[��T  tryM�5res$�fetch('/api/test-�&',4�  method: 'POST',��heade
+rs: { 'Content-Type': 'applica/�7' }:�body: JSON.]�ify({ to:u# }� 
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:147944:^�^b { � } = await �`.��('
+profilesv�.select('�,�R, is_�   0Worder/��list = (�1|| *l� il#p(p: any�A  p.k8 &&!�
+.endsWith('@imisdance.local')4%p.�Q !== <UH.map�) (%p.4 ||�$�%})SZ(
+                                                                   }}   �"}
+,"
+
+  �@sendS�S(true[��T  tryM�5res$qfetch('�Qtest-�&',4�  method: 'POST',�@�
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:149711:�function �A() {��const [e�Q, set%] = (0,�
+�b�State"])('');�qloading�L
+                           ��ZfalsearesultR
+                                           ��Jnull�qmembers�M
+                                                             �[��    // Valos �
+�-cimu, nem letiltott tagok a gyorsvalasztohoz=�`Effecteasync @+$@H�{ data } = await
+AO,$["'�"].from('profiles').select('full_name,��, is_active').order%0�@list%��|| []).filter((
+p)=>p.ZS && !
+             �.endsWith('@imisdance.local'))%p.�R !== �B.mapT(�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000001.sst:164856:const PLACEHOLDER_DOMAIN = '@imisdance.local'/�  i
+sRealEmail = (email)=>{�Re� || '').toString().trim().toLowerCas��+    return e.length > 0 && e.includes('
+@') && !e.endsWith(��);
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000002.sst:46464:�function �A() {��const [e�Q, set%] = (0,��
+b["useState"])('');�qloading�L
+                              ��ZfalsearesultR
+                                              ��Jnull�qmembers�M
+                                                                �[��    // Valos �
+�-cimu, nem letiltott tagok a gyorsvalasztohoz=�`Effecteasync @+$@H�{ data } = awai
+tAO,$["'�"].from('profiles').select('full_name,��, is_active').order%0�@list%��|| []).filter(
+(p)=>p.ZS && !
+              �.endsWith('@imisdance.local'))%p.�R !== �B.mapT(�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:21903:�const PLACEHOLDER_DOMAIN = '@imisdance.local'/
+�       isRealEmail = (email)=>{Re�T || '').toString().trim().toLowerCase();
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:25947:�Effect } from 'reac/-�supabase"�../../lib/
+const PLACEHOLDER_DOMAIN = '@imisdance.local'/�isRealEmail = (e �       : any): boolean => {
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:33716:aresultR
+                                                                      ���;��EZ��Xs�AE�// Va
+los �a-cimu,�Qletil�t#�� gyorsva�1hozS  eG��/�$@OEEz�1D�,�R, is_mU1').:�%'/�
+�list = (data�C)u�Rp)=>pC�t�
+                            �.endsWith('@imisdance.local') && p.�3 !=xB)�Dp�C�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:61985:�y3�((p: any) =>2  pFJ: &&!�.endsWith('@i
+misdance.local')6%p.�4 !=$�
+                           !  m�) ("%p.)4 ||�4:7 })UzU(list�a   ��$},6
+                                                                      �sen
+dTestI0X�/�
+e': 'applicN �/json' }<�body: JSON.��ify({ to:�ggi}��Ejson��res.json\
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:94704:�const PLACEHOLDER_DOMAIN = '@imisdance.local'/
+�       isRealEmail = (email)=>{Re�T || '').toString().trim().toLowerCase();
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000003.sst:103424:function dA() {| _s5��const [e�Q, set/] = 
+(0,�S�_ �["useState"])(''�qloading�L
+                                    ��Zfalse�aresult�R
+                                                      ��Jnull�qmembers�M
+                                                                        ��[�W�// V
+alos Y�-cimu, nem letiltott tagok a gyorsvalasztohoz�}�`Effect~�.$:�'easync ����
+��{ data } = await��/$["��"].from('profiles').select('full_name,�, is_active').order%�@list�
+��|| []).filter(O�._.T�": (p)=>p.�S && !
+                                        �.endsWith('@imisdance.local'))%p.�Q !== �/}[�
+o]).map�3F�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000004.sst:36732:�Effect } from 'reac/-�supabase"�../../lib/
+const PLACEHOLDER_DOMAIN = '@imisdance.local'/�isRealEmail = (e �       : any): boolean => {
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000004.sst:106858:const PLACEHOLDER_DOMAIN = '@imisdance.local'/�  i
+sRealEmail = (email)=>{�Re� || '').toString().trim().toLowerCas��+    return e.length > 0 && e.includes('
+@') && !e.endsWith(��);
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:35680:aresultR
+                                                                      ��W<R�[��Ys�F�// Va
+los �a-cimu,��Qletilֻt� gyorsva�1hozS    4H�����$@O�E�Ez��Dϩ,�R, is_<V1').       �%'/��li
+st = (data`D)D�Rp)=>p�C�
+                        �.endsWith('@imisdance.local') && p.�3 !=2C)CEp�D�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:37891:�54�((p: any) =>2  pK: &&!�.endsWith('@i
+misdance.local')6%p.�4 !=�$�
+                            !  �) ("%p.)4 ||�4:7 })UzU(listLb   ��$},6
+                                                                      �sen
+dTestI�X�/�PV  tryw�5resL�fetch('/api/test-(',6�  method: 'POST',^B    �N
+                                                                         J'Content-Typ
+e': 'applic!�/json' }<�body: JSON.��ify({ to:�% }� 
+                                                   �Ejson��res.json\
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:50468:O�._A.lis�Rp)=>p����
+                                                                                  �.endsWith('@imi
+sdance.local') && p.�3 !=f@     �Y    }�%
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:55803:�c45((p�2  p0K: &&!�.endsWith('@imisdan
+ce.local')6%p.�4 !=�$�
+                      !  "�) ("%p.)4 ||�4:7 })U�?�mbers(list�b  ��$},6
+                                                                      �send
+TestIY�/�PV  tryw�5resL�fetch('/api/test-(',6�  method: 'POST',^B       O:J'Content-Type
+': 'applic!�/json' }<�body: JSON.��ify({ to:�% }� 
+                                                  �Ejson��res.json\
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:57330:function dA() {| _s5��const [e�Q, set/] = (
+0,�S�_ [��State"])(''�qloading�L
+                                ��Zfalse�aresult�R
+                                                  ��Jnull�qmembers�M
+                                                                    ��[�W�// Valo
+s Y�-cimu, nem letiltott tagok a gyorsvalasztohoz�}�`Effect~�.$:�'easync ����
+�{ data } = await��/$["��"].from('profiles').select('full_name,�, is_active').order%�@list��
+�|| []).filter(O�._.T�": (p)=>p.�S && !
+                                       �.endsWith('@imisdance.local'))%p.�Q !== �/}[�o
+]).map�3F�E: p.
+.next\dev\cache\turbopack\v16.3.1-3d32eb87\00000013.sst:82876:const PLACEHOLDER_DOMAIN = '@imisdance.local'/�   is
+RealEmail = (email)=>{�Re� || '').toString().trim().toLowerCas��+    return e.length > 0 && e.includes('@
+') && !e.endsWith(��);
+.next\dev\server\chunks\ssr\_12fa01e._.js:767:            const list = (data || []).filter((p)=>p.email && !p.ema
+il.endsWith('@imisdance.local') && p.is_active !== false).map((p)=>({
+.next\dev\server\chunks\ssr\_12fa01e._.js:4854:const PLACEHOLDER_DOMAIN = '@imisdance.local';
+.next\dev\server\chunks\ssr\_12fa01e._.js.map:8:    {"offset": {"line": 746, "column": 0}, "map": {"version":3,"s
+ources":["file:///C:/Users/gabor/Projects/ImiDance/components/admin/EmailTester.tsx"],"sourcesContent":["'use cli
+ent'\r\n\r\nimport { useState, useEffect } from 'react'\r\nimport { supabase } from '../../lib/supabase'\r\n\r\ne
+xport function EmailTester() {\r\n  const [email, setEmail] = useState('')\r\n  const [loading, setLoading] = use
+State(false)\r\n  const [result, setResult] = useState<any>(null)\r\n  const [members, setMembers] = useState<{ f
+ull_name: string; email: string }[]>([])\r\n\r\n  // Valos email-cimu, nem letiltott tagok a gyorsvalasztohoz\r\n
+  useEffect(() => {\r\n    async function loadMembers() {\r\n      const { data } = await supabase\r\n        .fr
+om('profiles')\r\n        .select('full_name, email, is_active')\r\n        .order('full_name')\r\n      const li
+st = (data || [])\r\n        .filter((p: any) =>\r\n          p.email &&\r\n          !p.email.endsWith('@imisdan
+ce.local') &&\r\n          p.is_active !== false\r\n        )\r\n        .map((p: any) => ({ full_name: p.full_na
+me || p.email, email: p.email }))\r\n      setMembers(list)\r\n    }\r\n    loadMembers()\r\n  }, [])\r\n\r\n  as
+ync function sendTest() {\r\n    setLoading(true)\r\n    setResult(null)\r\n    try {\r\n      const res = await 
+fetch('/api/test-email', {\r\n        method: 'POST',\r\n        headers: { 'Content-Type': 'application/json' },
+\r\n        body: JSON.stringify({ to: email })\r\n      })\r\n      const json = await res.json()\r\n      setRe
+sult(json)\r\n    } catch (e: any) {\r\n      setResult({ error: e?.message || 'Hálózati hiba történt.' })\r\n   
+ } finally {\r\n      setLoading(false)\r\n    }\r\n  }\r\n\r\n  return (\r\n    <div className=\"p-4 bg-white bo
+rder border-zinc-200 rounded-2xl space-y-3\">\r\n      <h3 className=\"font-bold text-zinc-900 text-base\">SMTP E
+-mail tesztelése</h3>\r\n      <p className=\"text-xs text-zinc-500\">\r\n        Próba levél küldése az eseménye
+k inaktiválása nélkül.\r\n      </p>\r\n\r\n      {/* Gyorsvalaszto: valos email-cimu tagok. A valasztas kitolti 
+a mezot, de az szabadon atirhato. */}\r\n      <select\r\n        value=\"\"\r\n        onChange={e => { if (e.ta
+rget.value) setEmail(e.target.value) }}\r\n        className=\"w-full p-2 border border-zinc-300 rounded-lg text-
+sm bg-white cursor-pointer\"\r\n      >\r\n        <option value=\"\">— Tag választása a listából ({members.lengt
+h}) —</option>\r\n        {members.map(m => (\r\n          <option key={m.email} value={m.email}>\r\n            
+{m.full_name} ({m.email})\r\n          </option>\r\n        ))}\r\n      </select>\r\n\r\n      <div className=\"
+flex gap-2\">\r\n        <input\r\n          type=\"email\"\r\n          placeholder=\"Címzett e-mail (üresen hag
+yva: SMTP_USER)\"\r\n          value={email}\r\n          onChange={e => setEmail(e.target.value)}\r\n          c
+lassName=\"flex-1 p-2 border border-zinc-300 rounded-lg text-sm\"\r\n        />\r\n        <button\r\n          o
+nClick={sendTest}\r\n          disabled={loading}\r\n          className=\"px-4 py-2 bg-indigo-600 text-white rou
+nded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50\"\r\n        >\r\n          {loading ? 'Kül
+dés...' : 'Teszt levél küldése'}\r\n        </button>\r\n      </div>\r\n\r\n      {result && (\r\n        <div c
+lassName={`p-3 rounded-lg text-xs font-mono ${result.success ? 'bg-green-50 text-green-800 border border-green-20
+0' : 'bg-red-50 text-red-800 border border-red-200'}`}>\r\n          {result.success ? (\r\n            <p>Sikere
+s teszt! Levél elküldve ide: <strong>{result.recipient}</strong> (ID: {result.messageId})</p>\r\n          ) : (\
+r\n            <div className=\"space-y-1\">\r\n              <p className=\"font-bold\">Sikertelen teszt:</p>\r\
+n              <p>{result.error}</p>\r\n              {result.code && <p>Kód: {result.code}</p>}\r\n            <
+/div>\r\n          )}\r\n        </div>\r\n      )}\r\n    </div>\r\n  )\r\n}"],"names":["EmailTester","email","s
+etEmail","loading","setLoading","result","setResult","members","setMembers","loadMembers","data","from","select",
+"order","list","filter","p","endsWith","is_active","map","full_name","sendTest","res","fetch","method","headers",
+"body","JSON","stringify","to","json","e","error","message","className","value","onChange","target","length","m",
+"type","placeholder","onClick","disabled","success","recipient","messageId","code"],"mappings":";;;;;AAEA;AACA;AA
+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
+AAOlD"}},
+.next\dev\server\chunks\ssr\_12fa01e._.js.map:22:    {"offset": {"line": 4842, "column": 0}, "map": {"version":3,
+"sources":["file:///C:/Users/gabor/Projects/ImiDance/components/teacher/EventManageList.tsx"],"sourcesContent":["
+'use client'\r\n\r\nimport { useState, useEffect } from 'react'\r\nimport { supabase } from '../../lib/supabase'\
+r\n\r\nconst PLACEHOLDER_DOMAIN = '@imisdance.local'\r\nconst isRealEmail = (email: any): boolean => {\r\n  const
+ e = (email || '').toString().trim().toLowerCase()\r\n  return e.length > 0 && e.includes('@') && !e.endsWith(PLA
+CEHOLDER_DOMAIN)\r\n}\r\n\r\nexport function EventManageList() {\r\n  const [events, setEvents] = useState<any[]>
+([])\r\n  const [locationMap, setLocationMap] = useState<Map<string, string>>(new Map())\r\n  const [loading, set
+Loading] = useState(true)\r\n\r\n  const [modalEvent, setModalEvent] = useState<any>(null)\r\n  const [recipients
+, setRecipients] = useState<{ name: string; email: string }[]>([])\r\n  const [noEmail, setNoEmail] = useState<{ 
+name: string }[]>([])\r\n  const [subject, setSubject] = useState('')\r\n  const [body, setBody] = useState('')\r
+\n  const [ack, setAck] = useState(false)\r\n  const [prepping, setPrepping] = useState(false)\r\n  const [sendin
+g, setSending] = useState(false)\r\n  const [result, setResult] = useState<any>(null)\r\n\r\n  useEffect(() => {\
+r\n    async function load() {\r\n      const [evRes, locRes] = await Promise.all([\r\n        supabase.from('eve
+nts').select('*').order('event_date', { ascending: true }),\r\n        supabase.from('locations').select('*')\r\n
+      ])\r\n      setEvents(evRes.data || [])\r\n      setLocationMap(new Map((locRes.data || []).map((l: any) =>
+ [l.id, l.name])))\r\n      setLoading(false)\r\n    }\r\n    load()\r\n  }, [])\r\n\r\n  const fmtDate = (ts: an
+y): string => {\r\n    if (!ts) return 'Ismeretlen dátum'\r\n    const d = new Date(ts)\r\n    if (isNaN(d.getTim
+e())) return ts.toString().split('T')[0]\r\n    return d.toLocaleDateString('hu-HU', { year: 'numeric', month: '2
+-digit', day: '2-digit' })\r\n  }\r\n  const fmtTime = (t: any): string => (t ? t.toString().slice(0, 5) : '')\r\
+n  const locName = (ev: any): string => locationMap.get(ev.location_id) || 'Helyszín nélkül'\r\n\r\n  async funct
+ion openModal(ev: any) {\r\n    setModalEvent(ev)\r\n    setResult(null)\r\n    setAck(false)\r\n    setPrepping(
+true)\r\n    setRecipients([])\r\n    setNoEmail([])\r\n\r\n    const { data: atts } = await supabase\r\n      .f
+rom('attendances').select('profile_id').eq('event_id', ev.id)\r\n    const ids = Array.from(new Set((atts || []).
+map((a: any) => a.profile_id).filter(Boolean)))\r\n\r\n    const recs: { name: string; email: string }[] = []\r\n
+    const none: { name: string }[] = []\r\n    if (ids.length > 0) {\r\n      const { data: profs } = await supab
+ase\r\n        .from('profiles').select('id, full_name, email').in('id', ids)\r\n      for (const p of profs || [
+]) {\r\n        const name = p.full_name || 'Táncos'\r\n        if (isRealEmail(p.email)) recs.push({ name, email
+: p.email.trim() })\r\n        else none.push({ name })\r\n      }\r\n    }\r\n    setRecipients(recs)\r\n    set
+NoEmail(none)\r\n\r\n    const dateStr = fmtDate(ev.event_date)\r\n    const loc = locName(ev)\r\n    const start
+Str = fmtTime(ev.start_time)\r\n    const endStr = fmtTime(ev.end_time)\r\n    const timeStr = startStr && endStr
+ ? `${startStr}–${endStr}` : (startStr || '')\r\n\r\n    setSubject(`[IMI TÁRSASTÁNC] ELMARAD – ${dateStr}${start
+Str ? ` ${startStr}` : ''} | ${loc}`)\r\n    setBody(\r\n      `Kedves {{nev}}!\\n\\n` +\r\n      `Az alábbi tánc
+alkalom ELMARAD:\\n\\n` +\r\n      `• Időpont: ${dateStr}${timeStr ? `, ${timeStr}` : ''}\\n` +\r\n      `• Helys
+zín: ${loc}\\n` +\r\n      (ev.title ? `• Megnevezés: ${ev.title}\\n` : '') +\r\n      `\\nErre az alkalomra jele
+ntkezni már nem lehet.\\n\\n` +\r\n      `Üdvözlettel:\\n\\nImi`\r\n    )\r\n    setPrepping(false)\r\n  }\r\n\r\
+n  function closeModal() {\r\n    setModalEvent(null)\r\n    setResult(null)\r\n  }\r\n\r\n  async function final
+ize() {\r\n    if (!modalEvent || !ack) return\r\n    setSending(true)\r\n    setResult(null)\r\n    try {\r\n   
+   const { data: { user } } = await supabase.auth.getUser()\r\n      if (!user) {\r\n        setResult({ error: '
+Hiányzó userId. Kérjük, jelentkezz be újra!' })\r\n        return\r\n      }\r\n\r\n      const res = await fetch
+('/api/notify-event-cancelled', {\r\n        method: 'POST',\r\n        headers: { 'Content-Type': 'application/j
+son' },\r\n        body: JSON.stringify({\r\n          eventId: modalEvent.id,\r\n          userId: user.id,\r\n 
+         subject,\r\n          body\r\n        })\r\n      })\r\n      const json = await res.json()\r\n      if 
+(!res.ok) {\r\n        setResult({ error: json.error || 'Ismeretlen hiba.' })\r\n      } else {\r\n        setRes
+ult(json)\r\n        setEvents(prev => prev.map(e => e.id === modalEvent.id ? { ...e, is_active: false } : e))\r\
+n      }\r\n    } catch (e: any) {\r\n      setResult({ error: (e?.message || 'Hálózati hiba').toString() })\r\n 
+   } finally {\r\n      setSending(false)\r\n    }\r\n  }\r\n\r\n  if (loading) return <div className=\"text-zinc
+-500 p-6\">Alkalmak betöltése...</div>\r\n\r\n  return (\r\n    <div className=\"space-y-4\">\r\n      <h2 classN
+ame=\"text-xl font-bold\">Alkalmak kezelése</h2>\r\n\r\n      <div className=\"space-y-3\">\r\n        {events.ma
+p(ev => {\r\n          const inactive = ev.is_active === false\r\n          return (\r\n            <div\r\n     
+         key={ev.id}\r\n              className={`rounded-2xl border p-3.5 bg-white ${inactive ? 'border-red-200 
+overflow-hidden' : 'border-zinc-200'}`}\r\n            >\r\n              {inactive && (\r\n                <div 
+className=\"mb-2.5 -mx-3.5 -mt-3.5 px-3.5 py-1 bg-red-600\">\r\n                  <span className=\"text-white fo
+nt-extrabold text-xs tracking-wider uppercase\">TÖRÖLVE</span>\r\n                </div>\r\n              )}\r\n 
+             <div className=\"flex items-center justify-between gap-3\">\r\n                <div className={`min-
+w-0 flex-1 ${inactive ? 'line-through opacity-60' : ''}`}>\r\n                  <p className=\"font-bold text-sm 
+sm:text-base text-zinc-900 leading-snug\">{fmtDate(ev.event_date)}</p>\r\n                  <p className=\"text-x
+s sm:text-sm text-zinc-600\">\r\n                    {fmtTime(ev.start_time)}{ev.end_time ? `–${fmtTime(ev.end_ti
+me)}` : ''} · {locName(ev)}\r\n                  </p>\r\n                  {ev.title && <p className=\"text-xs te
+xt-zinc-500 truncate\">{ev.title}</p>}\r\n                </div>\r\n                {!inactive && (\r\n          
+        <button\r\n                    onClick={() => openModal(ev)}\r\n                    className=\"px-3 py-1
+.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 whitespace-nowrap shrink-0 transition-
+colors\"\r\n                  >\r\n                    Inaktiválás\r\n                  </button>\r\n            
+    )}\r\n              </div>\r\n            </div>\r\n          )\r\n        })}\r\n        {events.length === 
+0 && <p className=\"text-zinc-500\">Nincs esemény.</p>}\r\n      </div>\r\n\r\n      {modalEvent && (\r\n        
+<div className=\"fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50\">\r\n          <div classNa
+me=\"bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4\">\r\n            <h3 classN
+ame=\"text-lg font-bold text-red-700\">Alkalom inaktiválása</h3>\r\n\r\n            <div className=\"p-3 bg-red-5
+0 border border-red-200 rounded-lg text-sm text-red-800\">\r\n              Ez a művelet <strong>nem visszavonhat
+ó</strong>. Az inaktiválás után az alkalom\r\n              „TÖRÖLVE” állapotba kerül, és nem lehet rá többé jele
+ntkezni.\r\n            </div>\r\n\r\n            <div className=\"text-sm\">\r\n              <p className=\"fon
+t-semibold\">{fmtDate(modalEvent.event_date)} · {locName(modalEvent)}</p>\r\n              <p className=\"text-zi
+nc-600\">\r\n                {fmtTime(modalEvent.start_time)}{modalEvent.end_time ? `–${fmtTime(modalEvent.end_ti
+me)}` : ''}\r\n              </p>\r\n            </div>\r\n\r\n            {prepping ? (\r\n              <p clas
+sName=\"text-zinc-500 text-sm\">Jelentkezők betöltése...</p>\r\n            ) : (\r\n              <>\r\n        
+        <div className=\"space-y-2\">\r\n                  <p className=\"text-sm font-semibold\">Értesítendő jel
+entkezők ({recipients.length} fő)</p>\r\n                  {recipients.length > 0 ? (\r\n                    <ul 
+className=\"text-xs text-zinc-700 max-h-32 overflow-y-auto border rounded p-2 space-y-0.5\">\r\n                 
+     {recipients.map((r, i) => (\r\n                        <li key={i}>{r.name} <span className=\"text-zinc-400\
+">&lt;{r.email}&gt;</span></li>\r\n                      ))}\r\n                    </ul>\r\n                  ) 
+: (\r\n                    <p className=\"text-xs text-zinc-500\">Nincs e-mailben értesíthető jelentkező.</p>\r\n
+                  )}\r\n\r\n                  {noEmail.length > 0 && (\r\n                    <div className=\"te
+xt-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2\">\r\n                      <p className=\"f
+ont-semibold\">Nincs e-mail címük ({noEmail.length} fő) — kézzel értesítendő:</p>\r\n                      <p>{no
+Email.map(n => n.name).join(', ')}</p>\r\n                    </div>\r\n                  )}\r\n                <
+/div>\r\n\r\n                <div className=\"space-y-2\">\r\n                  <label className=\"block text-sm 
+font-semibold\">Tárgy</label>\r\n                  <input\r\n                    value={subject}\r\n             
+       onChange={e => setSubject(e.target.value)}\r\n                    className=\"w-full p-2 border rounded te
+xt-sm\"\r\n                  />\r\n                  <label className=\"block text-sm font-semibold\">Levél szöve
+ge</label>\r\n                  <p className=\"text-[11px] text-zinc-500\">\r\n                    A <code>{'{{ne
+v}}'}</code> helyére minden címzettnél a saját neve kerül.\r\n                  </p>\r\n                  <textar
+ea\r\n                    value={body}\r\n                    onChange={e => setBody(e.target.value)}\r\n        
+            rows={10}\r\n                    className=\"w-full p-2 border rounded text-sm font-mono\"\r\n       
+           />\r\n                </div>\r\n\r\n                <label className=\"flex items-start gap-2 text-sm\
+">\r\n                  <input type=\"checkbox\" checked={ack} onChange={e => setAck(e.target.checked)} className
+=\"mt-1\" />\r\n                  <span>Tudomásul veszem, hogy az inaktiválás <strong>végleges és nem visszavonha
+tó</strong>.</span>\r\n                </label>\r\n\r\n                {result && (\r\n                  result.e
+rror ? (\r\n                    <div className=\"text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2
+\">{result.error}</div>\r\n                  ) : (\r\n                    <div className=\"text-sm text-green-800
+ bg-green-50 border border-green-200 rounded p-2 space-y-1\">\r\n                      <p>Az alkalom inaktiválva.
+</p>\r\n                      <p>Kiküldött e-mail: {result.sent?.length ?? 0} db.</p>\r\n                      {r
+esult.skipped_no_email?.length > 0 && (\r\n                        <p>E-mail nélkül (kézzel): {result.skipped_no_
+email.map((s: any) => s.name).join(', ')}</p>\r\n                      )}\r\n                      {result.failed
+?.length > 0 && (\r\n                        <div className=\"text-red-700 bg-red-50 p-2 rounded text-xs space-y-
+1\">\r\n                          <p className=\"font-bold\">Sikertelen küldés:</p>\r\n                          
+{result.failed.map((f: any, i: number) => (\r\n                            <p key={i}>• {f.email}: <span classNam
+e=\"font-mono text-[11px]\">{f.error}</span></p>\r\n                          ))}\r\n                        </di
+v>\r\n                      )}\r\n                      {result.warning && <p className=\"text-amber-700\">{resul
+t.warning}</p>}\r\n                    </div>\r\n                  )\r\n                )}\r\n\r\n               
+ <div className=\"flex gap-2 pt-2\">\r\n                  {(!result || result.error) ? (\r\n                    <
+>\r\n                      <button\r\n                        onClick={finalize}\r\n                        disab
+led={!ack || sending}\r\n                        className=\"flex-1 py-2 bg-red-600 text-white rounded-lg font-se
+mibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-red-700\"\r\n                      >\r\n         
+               {sending ? 'Küldés...' : 'Végleges inaktiválás és értesítés'}\r\n                      </button>\r
+\n                      <button onClick={closeModal} className=\"px-4 py-2 border rounded-lg text-sm\">Mégse</but
+ton>\r\n                    </>\r\n                  ) : (\r\n                    <button onClick={closeModal} cl
+assName=\"flex-1 py-2 border rounded-lg\">Bezárás</button>\r\n                  )}\r\n                </div>\r\n 
+             </>\r\n            )}\r\n          </div>\r\n        </div>\r\n      )}\r\n    </div>\r\n  )\r\n}"],
+"names":["PLACEHOLDER_DOMAIN","isRealEmail","email","e","toString","trim","toLowerCase","length","includes","ends
+With","EventManageList","events","setEvents","locationMap","setLocationMap","Map","loading","setLoading","modalEv
+ent","setModalEvent","recipients","setRecipients","noEmail","setNoEmail","subject","setSubject","body","setBody",
+"ack","setAck","prepping","setPrepping","sending","setSending","result","setResult","load","evRes","locRes","Prom
+ise","all","from","select","order","ascending","data","map","l","id","name","fmtDate","ts","d","Date","isNaN","ge
+tTime","split","toLocaleDateString","year","month","day","fmtTime","t","slice","locName","ev","get","location_id"
+,"openModal","atts","eq","ids","Array","Set","a","profile_id","filter","Boolean","recs","none","profs","in","p","
+full_name","push","dateStr","event_date","loc","startStr","start_time","endStr","end_time","timeStr","title","clo
+seModal","finalize","user","auth","getUser","error","res","fetch","method","headers","JSON","stringify","eventId"
+,"userId","json","ok","prev","is_active","message","className","inactive","onClick","r","i","n","join","value","o
+nChange","target","rows","type","checked","sent","skipped_no_email","s","failed","f","warning","disabled"],"mappi
+ngs":"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"}},
+.next\dev\static\chunks\_040n15k._.js:812:                    "EmailTester.useEffect.loadMembers.list": (p)=>p.em
+ail && !p.email.endsWith('@imisdance.local') && p.is_active !== false
+.next\dev\static\chunks\_040n15k._.js:5070:const PLACEHOLDER_DOMAIN = '@imisdance.local';
+.next\dev\static\chunks\_040n15k._.js.map:8:    {"offset": {"line": 787, "column": 0}, "map": {"version":3,"sourc
+es":["file:///C:/Users/gabor/Projects/ImiDance/components/admin/EmailTester.tsx"],"sourcesContent":["'use client'
+\r\n\r\nimport { useState, useEffect } from 'react'\r\nimport { supabase } from '../../lib/supabase'\r\n\r\nexpor
+t function EmailTester() {\r\n  const [email, setEmail] = useState('')\r\n  const [loading, setLoading] = useStat
+e(false)\r\n  const [result, setResult] = useState<any>(null)\r\n  const [members, setMembers] = useState<{ full_
+name: string; email: string }[]>([])\r\n\r\n  // Valos email-cimu, nem letiltott tagok a gyorsvalasztohoz\r\n  us
+eEffect(() => {\r\n    async function loadMembers() {\r\n      const { data } = await supabase\r\n        .from('
+profiles')\r\n        .select('full_name, email, is_active')\r\n        .order('full_name')\r\n      const list =
+ (data || [])\r\n        .filter((p: any) =>\r\n          p.email &&\r\n          !p.email.endsWith('@imisdance.l
+ocal') &&\r\n          p.is_active !== false\r\n        )\r\n        .map((p: any) => ({ full_name: p.full_name |
+| p.email, email: p.email }))\r\n      setMembers(list)\r\n    }\r\n    loadMembers()\r\n  }, [])\r\n\r\n  async 
+function sendTest() {\r\n    setLoading(true)\r\n    setResult(null)\r\n    try {\r\n      const res = await fetc
+h('/api/test-email', {\r\n        method: 'POST',\r\n        headers: { 'Content-Type': 'application/json' },\r\n
+        body: JSON.stringify({ to: email })\r\n      })\r\n      const json = await res.json()\r\n      setResult
+(json)\r\n    } catch (e: any) {\r\n      setResult({ error: e?.message || 'Hálózati hiba történt.' })\r\n    } f
+inally {\r\n      setLoading(false)\r\n    }\r\n  }\r\n\r\n  return (\r\n    <div className=\"p-4 bg-white border
+ border-zinc-200 rounded-2xl space-y-3\">\r\n      <h3 className=\"font-bold text-zinc-900 text-base\">SMTP E-mai
+l tesztelése</h3>\r\n      <p className=\"text-xs text-zinc-500\">\r\n        Próba levél küldése az események in
+aktiválása nélkül.\r\n      </p>\r\n\r\n      {/* Gyorsvalaszto: valos email-cimu tagok. A valasztas kitolti a me
+zot, de az szabadon atirhato. */}\r\n      <select\r\n        value=\"\"\r\n        onChange={e => { if (e.target
+.value) setEmail(e.target.value) }}\r\n        className=\"w-full p-2 border border-zinc-300 rounded-lg text-sm b
+g-white cursor-pointer\"\r\n      >\r\n        <option value=\"\">— Tag választása a listából ({members.length}) 
+—</option>\r\n        {members.map(m => (\r\n          <option key={m.email} value={m.email}>\r\n            {m.f
+ull_name} ({m.email})\r\n          </option>\r\n        ))}\r\n      </select>\r\n\r\n      <div className=\"flex
+ gap-2\">\r\n        <input\r\n          type=\"email\"\r\n          placeholder=\"Címzett e-mail (üresen hagyva:
+ SMTP_USER)\"\r\n          value={email}\r\n          onChange={e => setEmail(e.target.value)}\r\n          class
+Name=\"flex-1 p-2 border border-zinc-300 rounded-lg text-sm\"\r\n        />\r\n        <button\r\n          onCli
+ck={sendTest}\r\n          disabled={loading}\r\n          className=\"px-4 py-2 bg-indigo-600 text-white rounded
+-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50\"\r\n        >\r\n          {loading ? 'Küldés.
+..' : 'Teszt levél küldése'}\r\n        </button>\r\n      </div>\r\n\r\n      {result && (\r\n        <div class
+Name={`p-3 rounded-lg text-xs font-mono ${result.success ? 'bg-green-50 text-green-800 border border-green-200' :
+ 'bg-red-50 text-red-800 border border-red-200'}`}>\r\n          {result.success ? (\r\n            <p>Sikeres te
+szt! Levél elküldve ide: <strong>{result.recipient}</strong> (ID: {result.messageId})</p>\r\n          ) : (\r\n 
+           <div className=\"space-y-1\">\r\n              <p className=\"font-bold\">Sikertelen teszt:</p>\r\n   
+           <p>{result.error}</p>\r\n              {result.code && <p>Kód: {result.code}</p>}\r\n            </div
+>\r\n          )}\r\n        </div>\r\n      )}\r\n    </div>\r\n  )\r\n}"],"names":["EmailTester","email","setEm
+ail","loading","setLoading","result","setResult","members","setMembers","loadMembers","data","from","select","ord
+er","list","filter","p","endsWith","is_active","map","full_name","sendTest","res","fetch","method","headers","bod
+y","JSON","stringify","to","json","e","error","message","className","value","onChange","target","length","m","typ
+e","placeholder","onClick","disabled","success","recipient","messageId","code"],"mappings":";;;;;AAEA;AACA;;;AAHA
+;;;AAKO,SAASA;;IACd,MAAM,CAACC,OAAOC,SAAS,GAAG,IAAA,yKAAQ,EAAC;IACnC,MAAM,CAACC,SAASC,WAAW,GAAG,IAAA,yKAAQ,EAAC;I
+ACvC,MAAM,CAACC,QAAQC,UAAU,GAAG,IAAA,yKAAQ,EAAM;IAC1C,MAAM,CAACC,SAASC,WAAW,GAAG,IAAA,yKAAQ,EAAyC,EAAE;IAEjF,2DAA
+2D;IAC3D,IAAA,0KAAS;iCAAC;YACR,eAAeC;gBACb,MAAM,EAAEC,IAAI,EAAE,GAAG,MAAM,8HAAQ,CAC5BC,IAAI,CAAC,YACLC,MAAM,CAAC,
++BACPC,KAAK,CAAC;gBACT,MAAMC,OAAO,CAACJ,QAAQ,EAAE,EACrBK,MAAM;8DAAC,CAACC,IACPA,EAAEf,KAAK,IACP,CAACe,EAAEf,KAAK,
+CAACgB,QAAQ,CAAC,uBAClBD,EAAEE,SAAS,KAAK;6DAEjBC,GAAG;8DAAC,CAACH,IAAW,CAAC;4BAAEI,WAAWJ,EAAEI,SAAS,IAAIJ,EAAEf,K
+AAK;4BAAEA,OAAOe,EAAEf,KAAK;wBAAC,CAAC;;gBACzEO,WAAWM;YACb;YACAL;QACF;gCAAG,EAAE;IAEL,eAAeY;QACbjB,WAAW;QACXE,UAA
+U;QACV,IAAI;YACF,MAAMgB,MAAM,MAAMC,MAAM,mBAAmB;gBACzCC,QAAQ;gBACRC,SAAS;oBAAE,gBAAgB;gBAAmB;gBAC9CC,MAAMC,KAAKC,S
+AAS,CAAC;oBAAEC,IAAI5B;gBAAM;YACnC;YACA,MAAM6B,OAAO,MAAMR,IAAIQ,IAAI;YAC3BxB,UAAUwB;QACZ,EAAE,OAAOC,GAAQ;YACfzB,U
+AAU;gBAAE0B,OAAOD,GAAGE,WAAW;YAAyB;QAC5D,SAAU;YACR7B,WAAW;QACb;IACF;IAEA,qBACE,6LAAC;QAAI8B,WAAU;;0BACb,6LAAC;gBA
+AGA,WAAU;0BAAoC;;;;;;0BAClD,6LAAC;gBAAEA,WAAU;0BAAwB;;;;;;0BAKrC,6LAAC;gBACCC,OAAM;gBACNC,UAAUL,CAAAA;oBAAO,IAAIA
+,EAAEM,MAAM,CAACF,KAAK,EAAEjC,SAAS6B,EAAEM,MAAM,CAACF,KAAK;gBAAE;gBAC9DD,WAAU;;kCAEV,6LAAC;wBAAOC,OAAM;;4BAAG;4BA
+A8B5B,QAAQ+B,MAAM;4BAAC;;;;;;;oBAC7D/B,QAAQY,GAAG,CAACoB,CAAAA,kBACX,6LAAC;4BAAqBJ,OAAOI,EAAEtC,KAAK;;gCACjCsC,EA
+AEnB,SAAS;gCAAC;gCAAGmB,EAAEtC,KAAK;gCAAC;;2BADbsC,EAAEtC,KAAK;;;;;;;;;;;0BAMxB,6LAAC;gBAAIiC,WAAU;;kCACb,6LAAC;w
+BACCM,MAAK;wBACLC,aAAY;wBACZN,OAAOlC;wBACPmC,UAAUL,CAAAA,IAAK7B,SAAS6B,EAAEM,MAAM,CAACF,KAAK;wBACtCD,WAAU;;;;;;kC
+AEZ,6LAAC;wBACCQ,SAASrB;wBACTsB,UAAUxC;wBACV+B,WAAU;kCAET/B,UAAU,cAAc;;;;;;;;;;;;YAI5BE,wBACC,6LAAC;gBAAI6B,WAAW,
+CAAC,iCAAiC,EAAE7B,OAAOuC,OAAO,GAAG,uDAAuD,gDAAgD;0BACzKvC,OAAOuC,OAAO,iBACb,6LAAC;;wBAAE;sCAAmC,6LAAC;sCAAQvC,OA
+AOwC,SAAS;;;;;;wBAAU;wBAAOxC,OAAOyC,SAAS;wBAAC;;;;;;yCAEjG,6LAAC;oBAAIZ,WAAU;;sCACb,6LAAC;4BAAEA,WAAU;sCAAY;;;;;;
+sCACzB,6LAAC;sCAAG7B,OAAO2B,KAAK;;;;;;wBACf3B,OAAO0C,IAAI,kBAAI,6LAAC;;gCAAE;gCAAM1C,OAAO0C,IAAI;;;;;;;;;;;;;;;;;
+;;;;;;;AAOlD;GAhGgB/C;KAAAA"}},
+.next\dev\static\chunks\_040n15k._.js.map:22:    {"offset": {"line": 5057, "column": 0}, "map": {"version":3,"sou
+rces":["file:///C:/Users/gabor/Projects/ImiDance/components/teacher/EventManageList.tsx"],"sourcesContent":["'use
+ client'\r\n\r\nimport { useState, useEffect } from 'react'\r\nimport { supabase } from '../../lib/supabase'\r\n\
+r\nconst PLACEHOLDER_DOMAIN = '@imisdance.local'\r\nconst isRealEmail = (email: any): boolean => {\r\n  const e =
+ (email || '').toString().trim().toLowerCase()\r\n  return e.length > 0 && e.includes('@') && !e.endsWith(PLACEHO
+LDER_DOMAIN)\r\n}\r\n\r\nexport function EventManageList() {\r\n  const [events, setEvents] = useState<any[]>([])
+\r\n  const [locationMap, setLocationMap] = useState<Map<string, string>>(new Map())\r\n  const [loading, setLoad
+ing] = useState(true)\r\n\r\n  const [modalEvent, setModalEvent] = useState<any>(null)\r\n  const [recipients, se
+tRecipients] = useState<{ name: string; email: string }[]>([])\r\n  const [noEmail, setNoEmail] = useState<{ name
+: string }[]>([])\r\n  const [subject, setSubject] = useState('')\r\n  const [body, setBody] = useState('')\r\n  
+const [ack, setAck] = useState(false)\r\n  const [prepping, setPrepping] = useState(false)\r\n  const [sending, s
+etSending] = useState(false)\r\n  const [result, setResult] = useState<any>(null)\r\n\r\n  useEffect(() => {\r\n 
+   async function load() {\r\n      const [evRes, locRes] = await Promise.all([\r\n        supabase.from('events'
+).select('*').order('event_date', { ascending: true }),\r\n        supabase.from('locations').select('*')\r\n    
+  ])\r\n      setEvents(evRes.data || [])\r\n      setLocationMap(new Map((locRes.data || []).map((l: any) => [l.
+id, l.name])))\r\n      setLoading(false)\r\n    }\r\n    load()\r\n  }, [])\r\n\r\n  const fmtDate = (ts: any): 
+string => {\r\n    if (!ts) return 'Ismeretlen dátum'\r\n    const d = new Date(ts)\r\n    if (isNaN(d.getTime())
+) return ts.toString().split('T')[0]\r\n    return d.toLocaleDateString('hu-HU', { year: 'numeric', month: '2-dig
+it', day: '2-digit' })\r\n  }\r\n  const fmtTime = (t: any): string => (t ? t.toString().slice(0, 5) : '')\r\n  c
+onst locName = (ev: any): string => locationMap.get(ev.location_id) || 'Helyszín nélkül'\r\n\r\n  async function 
+openModal(ev: any) {\r\n    setModalEvent(ev)\r\n    setResult(null)\r\n    setAck(false)\r\n    setPrepping(true
+)\r\n    setRecipients([])\r\n    setNoEmail([])\r\n\r\n    const { data: atts } = await supabase\r\n      .from(
+'attendances').select('profile_id').eq('event_id', ev.id)\r\n    const ids = Array.from(new Set((atts || []).map(
+(a: any) => a.profile_id).filter(Boolean)))\r\n\r\n    const recs: { name: string; email: string }[] = []\r\n    
+const none: { name: string }[] = []\r\n    if (ids.length > 0) {\r\n      const { data: profs } = await supabase\
+r\n        .from('profiles').select('id, full_name, email').in('id', ids)\r\n      for (const p of profs || []) {
+\r\n        const name = p.full_name || 'Táncos'\r\n        if (isRealEmail(p.email)) recs.push({ name, email: p.
+email.trim() })\r\n        else none.push({ name })\r\n      }\r\n    }\r\n    setRecipients(recs)\r\n    setNoEm
+ail(none)\r\n\r\n    const dateStr = fmtDate(ev.event_date)\r\n    const loc = locName(ev)\r\n    const startStr 
+= fmtTime(ev.start_time)\r\n    const endStr = fmtTime(ev.end_time)\r\n    const timeStr = startStr && endStr ? `
+${startStr}–${endStr}` : (startStr || '')\r\n\r\n    setSubject(`[IMI TÁRSASTÁNC] ELMARAD – ${dateStr}${startStr 
+? ` ${startStr}` : ''} | ${loc}`)\r\n    setBody(\r\n      `Kedves {{nev}}!\\n\\n` +\r\n      `Az alábbi táncalka
+lom ELMARAD:\\n\\n` +\r\n      `• Időpont: ${dateStr}${timeStr ? `, ${timeStr}` : ''}\\n` +\r\n      `• Helyszín:
+ ${loc}\\n` +\r\n      (ev.title ? `• Megnevezés: ${ev.title}\\n` : '') +\r\n      `\\nErre az alkalomra jelentke
+zni már nem lehet.\\n\\n` +\r\n      `Üdvözlettel:\\n\\nImi`\r\n    )\r\n    setPrepping(false)\r\n  }\r\n\r\n  f
+unction closeModal() {\r\n    setModalEvent(null)\r\n    setResult(null)\r\n  }\r\n\r\n  async function finalize(
+) {\r\n    if (!modalEvent || !ack) return\r\n    setSending(true)\r\n    setResult(null)\r\n    try {\r\n      c
+onst { data: { user } } = await supabase.auth.getUser()\r\n      if (!user) {\r\n        setResult({ error: 'Hián
+yzó userId. Kérjük, jelentkezz be újra!' })\r\n        return\r\n      }\r\n\r\n      const res = await fetch('/a
+pi/notify-event-cancelled', {\r\n        method: 'POST',\r\n        headers: { 'Content-Type': 'application/json'
+ },\r\n        body: JSON.stringify({\r\n          eventId: modalEvent.id,\r\n          userId: user.id,\r\n     
+     subject,\r\n          body\r\n        })\r\n      })\r\n      const json = await res.json()\r\n      if (!re
+s.ok) {\r\n        setResult({ error: json.error || 'Ismeretlen hiba.' })\r\n      } else {\r\n        setResult(
+json)\r\n        setEvents(prev => prev.map(e => e.id === modalEvent.id ? { ...e, is_active: false } : e))\r\n   
+   }\r\n    } catch (e: any) {\r\n      setResult({ error: (e?.message || 'Hálózati hiba').toString() })\r\n    }
+ finally {\r\n      setSending(false)\r\n    }\r\n  }\r\n\r\n  if (loading) return <div className=\"text-zinc-500
+ p-6\">Alkalmak betöltése...</div>\r\n\r\n  return (\r\n    <div className=\"space-y-4\">\r\n      <h2 className=
+\"text-xl font-bold\">Alkalmak kezelése</h2>\r\n\r\n      <div className=\"space-y-3\">\r\n        {events.map(ev
+ => {\r\n          const inactive = ev.is_active === false\r\n          return (\r\n            <div\r\n         
+     key={ev.id}\r\n              className={`rounded-2xl border p-3.5 bg-white ${inactive ? 'border-red-200 over
+flow-hidden' : 'border-zinc-200'}`}\r\n            >\r\n              {inactive && (\r\n                <div clas
+sName=\"mb-2.5 -mx-3.5 -mt-3.5 px-3.5 py-1 bg-red-600\">\r\n                  <span className=\"text-white font-e
+xtrabold text-xs tracking-wider uppercase\">TÖRÖLVE</span>\r\n                </div>\r\n              )}\r\n     
+         <div className=\"flex items-center justify-between gap-3\">\r\n                <div className={`min-w-0 
+flex-1 ${inactive ? 'line-through opacity-60' : ''}`}>\r\n                  <p className=\"font-bold text-sm sm:t
+ext-base text-zinc-900 leading-snug\">{fmtDate(ev.event_date)}</p>\r\n                  <p className=\"text-xs sm
+:text-sm text-zinc-600\">\r\n                    {fmtTime(ev.start_time)}{ev.end_time ? `–${fmtTime(ev.end_time)}
+` : ''} · {locName(ev)}\r\n                  </p>\r\n                  {ev.title && <p className=\"text-xs text-z
+inc-500 truncate\">{ev.title}</p>}\r\n                </div>\r\n                {!inactive && (\r\n              
+    <button\r\n                    onClick={() => openModal(ev)}\r\n                    className=\"px-3 py-1.5 b
+g-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 whitespace-nowrap shrink-0 transition-colo
+rs\"\r\n                  >\r\n                    Inaktiválás\r\n                  </button>\r\n                
+)}\r\n              </div>\r\n            </div>\r\n          )\r\n        })}\r\n        {events.length === 0 &&
+ <p className=\"text-zinc-500\">Nincs esemény.</p>}\r\n      </div>\r\n\r\n      {modalEvent && (\r\n        <div
+ className=\"fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50\">\r\n          <div className=\
+"bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-4\">\r\n            <h3 className=
+\"text-lg font-bold text-red-700\">Alkalom inaktiválása</h3>\r\n\r\n            <div className=\"p-3 bg-red-50 bo
+rder border-red-200 rounded-lg text-sm text-red-800\">\r\n              Ez a művelet <strong>nem visszavonható</s
+trong>. Az inaktiválás után az alkalom\r\n              „TÖRÖLVE” állapotba kerül, és nem lehet rá többé jelentke
+zni.\r\n            </div>\r\n\r\n            <div className=\"text-sm\">\r\n              <p className=\"font-se
+mibold\">{fmtDate(modalEvent.event_date)} · {locName(modalEvent)}</p>\r\n              <p className=\"text-zinc-6
+00\">\r\n                {fmtTime(modalEvent.start_time)}{modalEvent.end_time ? `–${fmtTime(modalEvent.end_time)}
+` : ''}\r\n              </p>\r\n            </div>\r\n\r\n            {prepping ? (\r\n              <p classNam
+e=\"text-zinc-500 text-sm\">Jelentkezők betöltése...</p>\r\n            ) : (\r\n              <>\r\n            
+    <div className=\"space-y-2\">\r\n                  <p className=\"text-sm font-semibold\">Értesítendő jelentk
+ezők ({recipients.length} fő)</p>\r\n                  {recipients.length > 0 ? (\r\n                    <ul clas
+sName=\"text-xs text-zinc-700 max-h-32 overflow-y-auto border rounded p-2 space-y-0.5\">\r\n                     
+ {recipients.map((r, i) => (\r\n                        <li key={i}>{r.name} <span className=\"text-zinc-400\">&l
+t;{r.email}&gt;</span></li>\r\n                      ))}\r\n                    </ul>\r\n                  ) : (\
+r\n                    <p className=\"text-xs text-zinc-500\">Nincs e-mailben értesíthető jelentkező.</p>\r\n    
+              )}\r\n\r\n                  {noEmail.length > 0 && (\r\n                    <div className=\"text-x
+s text-amber-700 bg-amber-50 border border-amber-200 rounded p-2\">\r\n                      <p className=\"font-
+semibold\">Nincs e-mail címük ({noEmail.length} fő) — kézzel értesítendő:</p>\r\n                      <p>{noEmai
+l.map(n => n.name).join(', ')}</p>\r\n                    </div>\r\n                  )}\r\n                </div
+>\r\n\r\n                <div className=\"space-y-2\">\r\n                  <label className=\"block text-sm font
+-semibold\">Tárgy</label>\r\n                  <input\r\n                    value={subject}\r\n                 
+   onChange={e => setSubject(e.target.value)}\r\n                    className=\"w-full p-2 border rounded text-s
+m\"\r\n                  />\r\n                  <label className=\"block text-sm font-semibold\">Levél szövege</
+label>\r\n                  <p className=\"text-[11px] text-zinc-500\">\r\n                    A <code>{'{{nev}}'
+}</code> helyére minden címzettnél a saját neve kerül.\r\n                  </p>\r\n                  <textarea\r
+\n                    value={body}\r\n                    onChange={e => setBody(e.target.value)}\r\n            
+        rows={10}\r\n                    className=\"w-full p-2 border rounded text-sm font-mono\"\r\n           
+       />\r\n                </div>\r\n\r\n                <label className=\"flex items-start gap-2 text-sm\">\r
+\n                  <input type=\"checkbox\" checked={ack} onChange={e => setAck(e.target.checked)} className=\"m
+t-1\" />\r\n                  <span>Tudomásul veszem, hogy az inaktiválás <strong>végleges és nem visszavonható</
+strong>.</span>\r\n                </label>\r\n\r\n                {result && (\r\n                  result.error
+ ? (\r\n                    <div className=\"text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2\">{
+result.error}</div>\r\n                  ) : (\r\n                    <div className=\"text-sm text-green-800 bg-
+green-50 border border-green-200 rounded p-2 space-y-1\">\r\n                      <p>Az alkalom inaktiválva.</p>
+\r\n                      <p>Kiküldött e-mail: {result.sent?.length ?? 0} db.</p>\r\n                      {resul
+t.skipped_no_email?.length > 0 && (\r\n                        <p>E-mail nélkül (kézzel): {result.skipped_no_emai
+l.map((s: any) => s.name).join(', ')}</p>\r\n                      )}\r\n                      {result.failed?.le
+ngth > 0 && (\r\n                        <div className=\"text-red-700 bg-red-50 p-2 rounded text-xs space-y-1\">
+\r\n                          <p className=\"font-bold\">Sikertelen küldés:</p>\r\n                          {res
+ult.failed.map((f: any, i: number) => (\r\n                            <p key={i}>• {f.email}: <span className=\"
+font-mono text-[11px]\">{f.error}</span></p>\r\n                          ))}\r\n                        </div>\r
+\n                      )}\r\n                      {result.warning && <p className=\"text-amber-700\">{result.wa
+rning}</p>}\r\n                    </div>\r\n                  )\r\n                )}\r\n\r\n                <di
+v className=\"flex gap-2 pt-2\">\r\n                  {(!result || result.error) ? (\r\n                    <>\r\
+n                      <button\r\n                        onClick={finalize}\r\n                        disabled=
+{!ack || sending}\r\n                        className=\"flex-1 py-2 bg-red-600 text-white rounded-lg font-semibo
+ld disabled:opacity-40 disabled:cursor-not-allowed hover:bg-red-700\"\r\n                      >\r\n             
+           {sending ? 'Küldés...' : 'Végleges inaktiválás és értesítés'}\r\n                      </button>\r\n  
+                    <button onClick={closeModal} className=\"px-4 py-2 border rounded-lg text-sm\">Mégse</button>
+\r\n                    </>\r\n                  ) : (\r\n                    <button onClick={closeModal} classN
+ame=\"flex-1 py-2 border rounded-lg\">Bezárás</button>\r\n                  )}\r\n                </div>\r\n     
+         </>\r\n            )}\r\n          </div>\r\n        </div>\r\n      )}\r\n    </div>\r\n  )\r\n}"],"nam
+es":["PLACEHOLDER_DOMAIN","isRealEmail","email","e","toString","trim","toLowerCase","length","includes","endsWith
+","EventManageList","events","setEvents","locationMap","setLocationMap","Map","loading","setLoading","modalEvent"
+,"setModalEvent","recipients","setRecipients","noEmail","setNoEmail","subject","setSubject","body","setBody","ack
+","setAck","prepping","setPrepping","sending","setSending","result","setResult","load","evRes","locRes","Promise"
+,"all","from","select","order","ascending","data","map","l","id","name","fmtDate","ts","d","Date","isNaN","getTim
+e","split","toLocaleDateString","year","month","day","fmtTime","t","slice","locName","ev","get","location_id","op
+enModal","atts","eq","ids","Array","Set","a","profile_id","filter","Boolean","recs","none","profs","in","p","full
+_name","push","dateStr","event_date","loc","startStr","start_time","endStr","end_time","timeStr","title","closeMo
+dal","finalize","user","auth","getUser","error","res","fetch","method","headers","JSON","stringify","eventId","us
+erId","json","ok","prev","is_active","message","className","inactive","onClick","r","i","n","join","value","onCha
+nge","target","rows","type","checked","sent","skipped_no_email","s","failed","f","warning","disabled"],"mappings"
+:"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"}},
+app\api\activate-members\route.ts:27:      if (!id || !email || email.endsWith("@imisdance.local")) {
+app\api\activate-members\route.ts:39:      if (currentEmail.endsWith("@imisdance.local")) {
+app\api\notify-event-cancelled\route.ts:61:      const fromEmail = process.env.SMTP_FROM || smtpUser || 'no-reply
+@imisdance.local'
+app\api\notify-event-cancelled\route.ts:86:        if (!email || email.endsWith('@imisdance.local')) {
+components\admin\EmailTester.tsx:22:          !p.email.endsWith('@imisdance.local') &&
+components\teacher\EventManageList.tsx:6:const PLACEHOLDER_DOMAIN = '@imisdance.local'
+scripts\clean_and_import_auth.py:27:    email = f"{base}@imisdance.local"
+scripts\clean_and_import_auth.py:30:        email = f"{base}{counter}@imisdance.local"
+scripts\create_auth_only.py:38:    email = f"{base}@imisdance.local"
+scripts\create_auth_only.py:41:        email = f"{base}{counter}@imisdance.local"
+scripts\direct_sql_purge_and_import.py:27:    email = f"{base}@imisdance.local"
+scripts\direct_sql_purge_and_import.py:30:        email = f"{base}{counter}@imisdance.local"
+scripts\generate_auth_from_profiles.py:20:        return "tancos@imisdance.local"
+scripts\generate_auth_from_profiles.py:25:    return f"{clean_name}@imisdance.local"
+scripts\import_only.py:27:    email = f"{base}@imisdance.local"
+scripts\import_only.py:30:        email = f"{base}{counter}@imisdance.local"
+scripts\purge_and_regenerate_auth.py:20:        return "tancos@imisdance.local"
+scripts\purge_and_regenerate_auth.py:25:    return f"{clean_name}@imisdance.local"
+scripts\update_from_excel.py:61:        return "user@imisdance.local"
+scripts\update_from_excel.py:67:    return f"{safe_name.lower()}@imisdance.local"

@@ -77,7 +77,7 @@ export function LoginForm({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   return (
     <div className="max-w-md w-full bg-white/20 p-8 rounded-2xl shadow-sm border border-zinc-200 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Imis Társastánc</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Imi Társastánc csoportja</h1>
         <p className="text-sm text-zinc-500">{isResetMode ? 'Add meg az e-mail címed' : 'Jelentkezz be'}</p>
       </div>
 

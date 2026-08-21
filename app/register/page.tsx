@@ -81,7 +81,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md backdrop-blur-sm rounded-2xl border border-zinc-200 shadow-sm p-8 space-y-6 bg-white/80">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-zinc-900">Regisztráció</h1>
-          <p className="text-sm text-zinc-500">Csatlakozz az Imis Társastánc csoport alkalmazásához</p>
+          <p className="text-sm text-zinc-500">Csatlakozz az Imi Társastánc csoport alkalmazásához</p>
         </div>
 
         {errorMsg && (

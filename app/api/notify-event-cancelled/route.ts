@@ -2,88 +2,108 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import nodemailer from 'nodemailer'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+interface AttendanceRecord {
+  profile_id?: string | null
+  user_id?: string | null
+}
+
+interface ProfileRecord {
+  id: string
+  full_name?: string | null
+  email?: string | null
+}
+
+const isValidEmail = (email?: string | null): boolean => {
+  if (!email) return false
+  const e = email.trim().toLowerCase()
+  return e.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
+}
 
 export async function POST(req: Request) {
   try {
     const { eventId, subject, body } = await req.json()
 
     if (!eventId) {
-      return NextResponse.json({ error: 'A feladathoz hiányzik az eventId azonosító.' }, { status: 400 })
+      return NextResponse.json({ error: 'Missing required field: eventId.' }, { status: 400 })
     }
 
-    // 1. Az esemény inaktiválása az adatbázisban
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !serviceKey) {
+      return NextResponse.json({ error: 'Server configuration missing: Supabase admin key.' }, { status: 500 })
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey)
+
+    // 1. Deactivate the event in the database
     const { error: dbError } = await supabaseAdmin
       .from('events')
       .update({ is_active: false })
       .eq('id', eventId)
 
     if (dbError) {
-      return NextResponse.json({ error: `Adatbázis frissítési hiba: ${dbError.message}` }, { status: 500 })
+      return NextResponse.json({ error: `Database update error: ${dbError.message}` }, { status: 500 })
     }
 
-    // 2. Jelentkezők lekérdezése
-    const { data: atts, error: attsErr } = await supabaseAdmin
+    // 2. Query attendance records filtered directly by eventId
+    const { data: eventAtts, error: attsErr } = await supabaseAdmin
       .from('attendances')
-      .select('*')
+      .select('profile_id, user_id')
+      .eq('event_id', eventId)
 
     if (attsErr) {
-      return NextResponse.json({ error: `Jelentkezők lekérdezési hiba: ${attsErr.message}` }, { status: 500 })
+      return NextResponse.json({ error: `Attendance query error: ${attsErr.message}` }, { status: 500 })
     }
 
-    const eventAtts = (atts || []).filter((a: any) => {
-      const eId = a.event_id || a.event
-      return String(eId) === String(eventId)
-    })
-
+    const rawAtts = (eventAtts || []) as AttendanceRecord[]
     const profileIds = Array.from(
-      new Set(eventAtts.map((a: any) => a.profile_id || a.user_id).filter(Boolean))
+      new Set(rawAtts.map((a) => a.profile_id || a.user_id).filter(Boolean) as string[])
     )
 
-    const sentList: any[] = []
-    const skippedNoEmail: any[] = []
-    const failedEmails: any[] = []
+    const sentList: Array<{ name: string; email: string }> = []
+    const skippedNoEmail: Array<{ name: string }> = []
+    const failedEmails: Array<{ name: string; email: string; error: string }> = []
 
     if (profileIds.length > 0) {
-      const { data: profiles } = await supabaseAdmin
+      const { data: profiles, error: profErr } = await supabaseAdmin
         .from('profiles')
         .select('id, full_name, email')
         .in('id', profileIds)
+
+      if (profErr) {
+        return NextResponse.json({ error: `Profiles query error: ${profErr.message}` }, { status: 500 })
+      }
 
       const smtpHost = process.env.SMTP_HOST
       const smtpPort = Number(process.env.SMTP_PORT) || 587
       const smtpUser = process.env.SMTP_USER
       const smtpPass = process.env.SMTP_PASS
       const smtpSecure = process.env.SMTP_SECURE === 'true'
-      const fromEmail = process.env.SMTP_FROM || smtpUser || 'no-reply@imisdance.local'
 
       if (!smtpHost || !smtpUser || !smtpPass) {
         return NextResponse.json({
-          error: 'Hiányzó SMTP konfiguráció a .env.local fájlban (SMTP_HOST, SMTP_USER, SMTP_PASS).'
+          error: 'Missing SMTP configuration (SMTP_HOST, SMTP_USER, SMTP_PASS).'
         }, { status: 500 })
       }
+
+      const fromEmail = process.env.SMTP_FROM || smtpUser
 
       const transporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
+        auth: { user: smtpUser, pass: smtpPass },
+        tls: { rejectUnauthorized: false }
       })
 
-      for (const prof of profiles || []) {
-        const name = prof.full_name || 'Táncos'
+      const profileList = (profiles || []) as ProfileRecord[]
+
+      for (const prof of profileList) {
+        const name = prof.full_name || 'Dancer'
         const email = (prof.email || '').trim()
 
-        if (!email || email.endsWith('@imisdance.local')) {
+        if (!isValidEmail(email)) {
           skippedNoEmail.push({ name })
           continue
         }
@@ -94,13 +114,13 @@ export async function POST(req: Request) {
           await transporter.sendMail({
             from: `"ImiDance" <${fromEmail}>`,
             to: email,
-            subject: subject || 'Esemény törölve',
+            subject: subject || 'Event Cancelled',
             text: customizedBody,
           })
           sentList.push({ email, name })
-        } catch (sendErr: any) {
-          console.error(`SMTP küldési hiba (${email}):`, sendErr)
-          failedEmails.push({ email, name, error: sendErr?.message || 'Ismeretlen SMTP hiba' })
+        } catch (sendErr: unknown) {
+          const errorMessage = sendErr instanceof Error ? sendErr.message : 'Unknown SMTP error'
+          failedEmails.push({ email, name, error: errorMessage })
         }
       }
     }
@@ -111,7 +131,8 @@ export async function POST(req: Request) {
       skipped_no_email: skippedNoEmail,
       failed: failedEmails
     })
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Szerver hiba történt.' }, { status: 500 })
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Server error occurred.'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
