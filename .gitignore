@@ -1,0 +1,34 @@
+.vercel
+.history/
+.env*
+
+# --- Titkok ---
+.env.local
+.env.production.local
+prod_env_variables.json
+
+# --- Személyes adatok (tagok) ---
+names_email.csv
+names_email.tsv
+names_email.tsv.xlsx
+tablázat.png
+Első körös regisztráció.docx
+email_sending_log.txt
+
+# --- Segéd/dump fájlok ---
+dir_structure.txt
+structure.json
+tables.json
+dump_tree_v001.mjs
+get_dir_structure.ps1
+
+# --- PowerShell munkaszkriptek ---
+*.ps1
+
+# --- Szerkesztő / build / lokális ---
+.history/
+.vercel/
+ImiDance.code-workspace
+# --- Node / Next build ---
+node_modules/
+.next/

@@ -1,0 +1,822 @@
+[
+    {
+        "full_name": "Bajnai Krisztina",
+        "last_name": "Bajnai",
+        "first_name": "Krisztina",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Bajnai Krisztina",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Erdős Adél",
+        "last_name": "Erdős",
+        "first_name": "Adél",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Erdős Adél",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Geiger Ágnes",
+        "last_name": "Geiger",
+        "first_name": "Ágnes",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Geiger Ágnes",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Golács Erzsébet",
+        "last_name": "Golács",
+        "first_name": "Erzsébet",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Golács Erzsébet",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Havasi Tímea",
+        "last_name": "Havasi",
+        "first_name": "Tímea",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Havasi Tímea",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "nan",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Horváth Orsolya",
+        "last_name": "Horváth",
+        "first_name": "Orsolya",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Horváth Orsolya",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "X",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Jánoska Nikol Ágnes",
+        "last_name": "Jánoska Nikol",
+        "first_name": "Ágnes",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Jánoska Nikol Ágnes",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kádas Eszter",
+        "last_name": "Kádas",
+        "first_name": "Eszter",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Kádas Eszter",
+            "Email cím": "kadase@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "nan",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Kanizsai Zoltán",
+        "last_name": "Kanizsai",
+        "first_name": "Zoltán",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kanizsai Zoltán",
+            "Email cím": "kanizsai.z@gmail.com",
+            "Fiú / Lány": "fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kelen Botond",
+        "last_name": "Kelen",
+        "first_name": "Botond",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Kelen Botond",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Király Anna",
+        "last_name": "Király",
+        "first_name": "Anna",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Király Anna",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kirner Dezső",
+        "last_name": "Kirner",
+        "first_name": "Dezső",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kirner Dezső",
+            "Email cím": "kirnerd@gmail.com",
+            "Fiú / Lány": "fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Kisfaludi Gábor",
+        "last_name": "Kisfaludi",
+        "first_name": "Gábor",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kisfaludi Gábor",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kiss Berta",
+        "last_name": "Kiss",
+        "first_name": "Berta",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kiss Berta",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kiss Gábor",
+        "last_name": "Kiss",
+        "first_name": "Gábor",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kiss Gábor",
+            "Email cím": "kissgaborz@gmail.com",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Kollár György",
+        "last_name": "Kollár",
+        "first_name": "György",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kollár György",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kuralit Piroska",
+        "last_name": "Kuralit",
+        "first_name": "Piroska",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Kuralit Piroska",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Kuripla István",
+        "last_name": "Kuripla",
+        "first_name": "István",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Kuripla István",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "X",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Lakatos Anna",
+        "last_name": "Lakatos",
+        "first_name": "Anna",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Lakatos Anna",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Lau Winnie",
+        "last_name": "Lau",
+        "first_name": "Winnie",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Lau, Winnie",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Lejtényi Ágnes",
+        "last_name": "Lejtényi",
+        "first_name": "Ágnes",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Lejtényi Ágnes",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "X",
+            "2026-09-19": "nan",
+            "2026-09-26": "X",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Lovas Anikó",
+        "last_name": "Lovas",
+        "first_name": "Anikó",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Lovas Anikó",
+            "Email cím": "majorne.lovas.aniko@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Miklós Márta",
+        "last_name": "Miklós",
+        "first_name": "Márta",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Miklós Márta",
+            "Email cím": "mikimartus@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Molnár Katalin",
+        "last_name": "Molnár",
+        "first_name": "Katalin",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Molnár Katalin",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Murányi Réka",
+        "last_name": "Murányi",
+        "first_name": "Réka",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Murányi Réka",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Nagyné Horváth Anikó",
+        "last_name": "Nagyné Horváth",
+        "first_name": "Anikó",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Nagyné Horváth Anikó",
+            "Email cím": "haniko83@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Petrusic Dorotea",
+        "last_name": "Petrusic",
+        "first_name": "Dorotea",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Petrusic Dorotea",
+            "Email cím": "p.dorotty@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Polyák-Bartos Viktória",
+        "last_name": "Polyák-Bartos",
+        "first_name": "Viktória",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Polyák-Bartos Viktória",
+            "Email cím": "polyak.bartos.viktoria@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "-",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Szabó Győző",
+        "last_name": "Szabó",
+        "first_name": "Győző",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Szabó Győző",
+            "Email cím": "gyozo.szabo.97@gmail.com",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Szabó Tamás",
+        "last_name": "Szabó",
+        "first_name": "Tamás",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Szabó Tamás",
+            "Email cím": "tszabo167@gmail.com",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "nan",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Szabó Tünde",
+        "last_name": "Szabó",
+        "first_name": "Tünde",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Szabó Tünde",
+            "Email cím": "szabo.g.tunde@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Szajkó Szabolcs",
+        "last_name": "Szajkó",
+        "first_name": "Szabolcs",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Szajkó Szabolcs",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Szecsődi Zsigmond",
+        "last_name": "Szecsődi",
+        "first_name": "Zsigmond",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Szecsődi Zsigmond",
+            "Email cím": "szecsodizsigmond@gmail.com",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Szekeres Katalin",
+        "last_name": "Szekeres",
+        "first_name": "Katalin",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Szekeres Katalin",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Tábori Ármin",
+        "last_name": "Tábori",
+        "first_name": "Ármin",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Tábori Ármin",
+            "Email cím": "armin.tabori@gmail.com",
+            "Fiú / Lány": "Fiú",
+            "Partner": "X",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "X",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Tóth Ágnes",
+        "last_name": "Tóth",
+        "first_name": "Ágnes",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Tóth Ágnes",
+            "Email cím": "maganlevelezesek@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "X",
+            "2026-09-12": "nan",
+            "2026-09-19": "X",
+            "2026-09-26": "X",
+            "2026-10-03": "X"
+        }
+    },
+    {
+        "full_name": "Vágó Gergely",
+        "last_name": "Vágó",
+        "first_name": "Gergely",
+        "gender": "Fiú",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Vágó Gergely",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "nan",
+            "2026-08-29": "nan",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Zilahy Zsuzsa",
+        "last_name": "Zilahy",
+        "first_name": "Zsuzsa",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Zilahy Zsuzsa",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "X",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Zólyomi Johanna",
+        "last_name": "Zólyomi",
+        "first_name": "Johanna",
+        "gender": "Lány",
+        "dance_level": "Haladó",
+        "applications": {
+            "Név": "Zólyomi Johanna",
+            "Email cím": "johanna.zolyomi@gmail.com",
+            "Fiú / Lány": "Lány",
+            "Partner": "X",
+            "Tudásszint": "nan",
+            "2026-08-29": "X",
+            "2026-09-05": "X",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Vincze Csilla",
+        "last_name": "Vincze",
+        "first_name": "Csilla",
+        "gender": "Lány",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Vincze Csilla",
+            "Email cím": "nan",
+            "Fiú / Lány": "Lány",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    },
+    {
+        "full_name": "Szolnoki Gábor",
+        "last_name": "Szolnoki",
+        "first_name": "Gábor",
+        "gender": "Fiú",
+        "dance_level": "Hobbi",
+        "applications": {
+            "Név": "Szolnoki Gábor",
+            "Email cím": "nan",
+            "Fiú / Lány": "Fiú",
+            "Partner": "nan",
+            "Tudásszint": "Hobbi",
+            "2026-08-29": "X",
+            "2026-09-05": "nan",
+            "2026-09-12": "nan",
+            "2026-09-19": "nan",
+            "2026-09-26": "nan",
+            "2026-10-03": "nan"
+        }
+    }
+]
