@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 interface EventItem {
   id: string;
   title: string;
-  event_date: string; // Javítva date -> event_date[cite: 2]
+  event_date: string;
   description?: string;
   location_id?: string;
 }
@@ -20,8 +20,8 @@ export function EventAdmin() {
     setLoading(true);
     const { data, error } = await supabase
       .from("events")
-      .select("id, title, event_date, description, location_id") // Javítva a lekérdezett oszlopok[cite: 2]
-      .order("event_date", { ascending: true }); // Javítva date -> event_date[cite: 2]
+      .select("id, title, event_date, description, location_id")
+      .order("event_date", { ascending: true });
 
     if (error) {
       setError(error.message);
@@ -38,10 +38,40 @@ export function EventAdmin() {
   const handleDeleteEvent = async (id: string) => {
     if (!confirm("Biztosan törölni szeretnéd ezt az eseményt?")) return;
 
-    const { error } = await supabase.from("events").delete().eq("id", id);
-    if (error) {
-      alert(`Hiba törléskor: ${error.message}`);
+    // 1. Lépés: Kapcsolódó attendances rekordok törlése
+    const { error: attendancesError } = await supabase
+      .from("attendances")
+      .delete()
+      .eq("event_id", id);
+
+    if (attendancesError) {
+      alert(`Hiba az attendances törlésekor: ${attendancesError.message}`);
+      return;
+    }
+    alert("1. Lépés: Kapcsolódó jelenlétek (attendances) sikeresen törölve.");
+
+    // 2. Lépés: Kapcsolódó activity_logs rekordok törlése
+    const { error: logsError } = await supabase
+      .from("activity_logs")
+      .delete()
+      .eq("event_id", id);
+
+    if (logsError) {
+      alert(`Hiba az activity_logs törlésekor: ${logsError.message}`);
+      return;
+    }
+    alert("2. Lépés: Kapcsolódó tevékenységnaplók (activity_logs) sikeresen törölve.");
+
+    // 3. Lépés: Maga az esemény törlése az events táblából
+    const { error: eventError } = await supabase
+      .from("events")
+      .delete()
+      .eq("id", id);
+
+    if (eventError) {
+      alert(`Hiba az esemény törlésekor: ${eventError.message}`);
     } else {
+      alert("3. Lépés: Az esemény sikeresen törölve az adatbázisból.");
       setEvents(events.filter((e) => e.id !== id));
     }
   };
