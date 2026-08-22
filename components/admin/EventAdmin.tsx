@@ -6,9 +6,9 @@ import { supabase } from "@/lib/supabase";
 interface EventItem {
   id: string;
   title: string;
-  date: string;
-  location: string;
-  capacity: number;
+  event_date: string; // Javítva date -> event_date[cite: 2]
+  description?: string;
+  location_id?: string;
 }
 
 export function EventAdmin() {
@@ -20,8 +20,8 @@ export function EventAdmin() {
     setLoading(true);
     const { data, error } = await supabase
       .from("events")
-      .select("id, title, date, location, capacity")
-      .order("date", { ascending: true });
+      .select("id, title, event_date, description, location_id") // Javítva a lekérdezett oszlopok[cite: 2]
+      .order("event_date", { ascending: true }); // Javítva date -> event_date[cite: 2]
 
     if (error) {
       setError(error.message);
@@ -72,7 +72,7 @@ export function EventAdmin() {
               <div>
                 <h4 className="font-medium text-zinc-800">{event.title}</h4>
                 <p className="text-xs text-zinc-500">
-                  {new Date(event.date).toLocaleString()} &bull; {event.location || "Helyszín nélkül"} (Férőhely: {event.capacity})
+                  {new Date(event.event_date).toLocaleString()} &bull; {event.description || "Nincs leírás"}
                 </p>
               </div>
               <button
