@@ -8,13 +8,14 @@ import { ProfileEdit } from '@/components/profile/ProfileEdit'
 import { StatisticsDashboard } from '@/components/profile/statistics/StatisticsDashboard'
 import { EventCreator } from '@/components/teacher/EventCreator'
 import { EventManageList } from '@/components/teacher/EventManageList'
+import { LocationManagement } from '@/components/teacher/LocationManagement'
 import { AdminPanel } from '@/components/admin/AdminPanel'
 import { MemberStatus } from '@/components/admin/MemberStatus'
 import { PolicyGate } from '@/components/policy/PolicyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
 
 type TopTab = 'events' | 'statistics' | 'profile' | 'teacher' | 'admin'
-type TeacherSubTab = 'manage' | 'create' | 'members' | 'policy'
+type TeacherSubTab = 'manage' | 'create' | 'locations' | 'members' | 'policy'
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState<TopTab>('events')
@@ -63,10 +64,11 @@ export function Dashboard() {
 
   // Az Oktatói felület alfülei — mind a saját kulcsára
   const teacherSubs: { key: TeacherSubTab; label: string; show: boolean }[] = [
-    { key: 'manage',  label: 'Alkalmak kezelése', show: canManageEvents },
-    { key: 'create',  label: 'Új alkalom',        show: canManageEvents },
-    { key: 'members', label: 'Tagok aktivitása',  show: canSeeMembers },
-    { key: 'policy',  label: 'Házirend',          show: canAdminPolicy },
+    { key: 'manage',    label: 'Alkalmak kezelése', show: canManageEvents },
+    { key: 'create',    label: 'Új alkalom',        show: canManageEvents },
+    { key: 'locations', label: 'Helyszínek',        show: canManageEvents },
+    { key: 'members',   label: 'Tagok aktivitása',  show: canSeeMembers },
+    { key: 'policy',    label: 'Házirend',          show: canAdminPolicy },
   ]
   const visibleTeacherSubs = teacherSubs.filter(s => s.show)
 
@@ -208,10 +210,11 @@ export function Dashboard() {
             </div>
 
             <div>
-              {teacherSub === 'manage'  && canManageEvents && <EventManageList />}
-              {teacherSub === 'create'  && canManageEvents && <EventCreator />}
-              {teacherSub === 'members' && canSeeMembers   && <MemberStatus />}
-              {teacherSub === 'policy'  && canAdminPolicy  && <PolicyEditor />}
+              {teacherSub === 'manage'    && canManageEvents && <EventManageList />}
+              {teacherSub === 'create'    && canManageEvents && <EventCreator />}
+              {teacherSub === 'locations' && canManageEvents && <LocationManagement />}
+              {teacherSub === 'members'   && canSeeMembers   && <MemberStatus />}
+              {teacherSub === 'policy'    && canAdminPolicy  && <PolicyEditor />}
             </div>
           </div>
         )}

@@ -4,7 +4,6 @@ import nodemailer from 'nodemailer'
 
 interface AttendanceRecord {
   profile_id?: string | null
-  user_id?: string | null
 }
 
 interface ProfileRecord {
@@ -17,6 +16,60 @@ const isValidEmail = (email?: string | null): boolean => {
   if (!email) return false
   const e = email.trim().toLowerCase()
   return e.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)
+}
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const eventId = searchParams.get('eventId')
+
+    if (!eventId) {
+      return NextResponse.json({ error: 'Missing required parameter: eventId.' }, { status: 400 })
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !serviceKey) {
+      return NextResponse.json({ error: 'Server configuration missing: Supabase admin key.' }, { status: 500 })
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey)
+
+    // Query attendances table using profile_id only
+    const { data: eventAtts, error: attsErr } = await supabaseAdmin
+      .from('attendances')
+      .select('profile_id')
+      .eq('event_id', eventId)
+
+    if (attsErr) {
+      return NextResponse.json({ error: `Attendance query error: ${attsErr.message}` }, { status: 500 })
+    }
+
+    const rawAtts = (eventAtts || []) as AttendanceRecord[]
+    const profileIds = Array.from(
+      new Set(rawAtts.map((a) => a.profile_id).filter(Boolean) as string[])
+    )
+
+    if (profileIds.length === 0) {
+      return NextResponse.json({ recipients: [] })
+    }
+
+    // Query profiles matching the profile_id array
+    const { data: profiles, error: profErr } = await supabaseAdmin
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', profileIds)
+
+    if (profErr) {
+      return NextResponse.json({ error: `Profiles query error: ${profErr.message}` }, { status: 500 })
+    }
+
+    return NextResponse.json({ recipients: profiles || [] })
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Server error occurred.'
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
+  }
 }
 
 export async function POST(req: Request) {
@@ -36,7 +89,7 @@ export async function POST(req: Request) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceKey)
 
-    // 1. Deactivate the event in the database
+    // 1. Deactivate event
     const { error: dbError } = await supabaseAdmin
       .from('events')
       .update({ is_active: false })
@@ -46,10 +99,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Database update error: ${dbError.message}` }, { status: 500 })
     }
 
-    // 2. Query attendance records filtered directly by eventId
+    // 2. Fetch attendee profile IDs
     const { data: eventAtts, error: attsErr } = await supabaseAdmin
       .from('attendances')
-      .select('profile_id, user_id')
+      .select('profile_id')
       .eq('event_id', eventId)
 
     if (attsErr) {
@@ -58,7 +111,7 @@ export async function POST(req: Request) {
 
     const rawAtts = (eventAtts || []) as AttendanceRecord[]
     const profileIds = Array.from(
-      new Set(rawAtts.map((a) => a.profile_id || a.user_id).filter(Boolean) as string[])
+      new Set(rawAtts.map((a) => a.profile_id).filter(Boolean) as string[])
     )
 
     const sentList: Array<{ name: string; email: string }> = []
@@ -100,7 +153,7 @@ export async function POST(req: Request) {
       const profileList = (profiles || []) as ProfileRecord[]
 
       for (const prof of profileList) {
-        const name = prof.full_name || 'Dancer'
+        const name = prof.full_name || 'Táncos'
         const email = (prof.email || '').trim()
 
         if (!isValidEmail(email)) {
@@ -114,7 +167,7 @@ export async function POST(req: Request) {
           await transporter.sendMail({
             from: `"ImiDance" <${fromEmail}>`,
             to: email,
-            subject: subject || 'Event Cancelled',
+            subject: subject || 'Esemény törölve',
             text: customizedBody,
           })
           sentList.push({ email, name })
