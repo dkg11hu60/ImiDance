@@ -42,7 +42,21 @@ export function EventManageList() {
     if (error) {
       setError(error.message);
     } else {
-      setEvents(data || []);
+      const now = new Date();
+
+      // Csak azokat az eseményeket tartjuk meg, amelyeknek a vége KÉSŐBB van, mint a now()
+      const validEvents = (data || []).filter((event) => {
+        const datePart = event.event_date ? event.event_date.split("T")[0] : "";
+        const timePart = event.end_time || event.start_time || "23:59:59";
+        const eventEnd = new Date(`${datePart}T${timePart}`);
+
+        if (isNaN(eventEnd.getTime())) return true;
+
+        // Látható marad, ameddig a now() pillanat nem jött el az esemény vége után
+        return eventEnd > now;
+      });
+
+      setEvents(validEvents);
     }
     setLoading(false);
   };
@@ -120,6 +134,7 @@ export function EventManageList() {
         throw new Error(result.error || "Hiba történt az inaktiválás során.");
       }
 
+      // Helyben frissítjük inaktívvá, így azonnal átvált a TÖRÖLVE nézetre, de látható marad az idő lejártáig
       setEvents((prev) =>
         prev.map((e) => (e.id === cancelTarget.id ? { ...e, is_active: false } : e))
       );

@@ -9,6 +9,7 @@ interface EventItem {
   event_date: string;
   description?: string;
   location_id?: string;
+  is_active?: boolean;
 }
 
 export function EventAdmin() {
@@ -20,13 +21,15 @@ export function EventAdmin() {
     setLoading(true);
     const { data, error } = await supabase
       .from("events")
-      .select("id, title, event_date, description, location_id")
+      .select("id, title, event_date, description, location_id, is_active")
       .order("event_date", { ascending: true });
 
     if (error) {
       setError(error.message);
     } else {
-      setEvents(data || []);
+      // Csak az INAKTÍV eseményeket szűrjük ki (ahol az is_active hamis vagy nem aktív)
+      const inactiveEvents = (data || []).filter((e) => e.is_active === false);
+      setEvents(inactiveEvents);
     }
     setLoading(false);
   };
@@ -35,44 +38,29 @@ export function EventAdmin() {
     fetchEvents();
   }, []);
 
-  const handleDeleteEvent = async (id: string) => {
-    if (!confirm("Biztosan törölni szeretnéd ezt az eseményt?")) return;
-
-    // 1. Lépés: Kapcsolódó attendances rekordok törlése
-    const { error: attendancesError } = await supabase
-      .from("attendances")
-      .delete()
-      .eq("event_id", id);
-
-    if (attendancesError) {
-      alert(`Hiba az attendances törlésekor: ${attendancesError.message}`);
+const handleDeleteEvent = async (id: string) => {
+    if (!confirm("Biztosan véglegesen ki akarod takarítani ezt az inaktív eseményt az adatbázisból?")) {
       return;
     }
-    alert("1. Lépés: Kapcsolódó jelenlétek (attendances) sikeresen törölve.");
 
-    // 2. Lépés: Kapcsolódó activity_logs rekordok törlése
-    const { error: logsError } = await supabase
-      .from("activity_logs")
-      .delete()
-      .eq("event_id", id);
+    try {
+      const response = await fetch("/api/delete-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId: id }),
+      });
 
-    if (logsError) {
-      alert(`Hiba az activity_logs törlésekor: ${logsError.message}`);
-      return;
-    }
-    alert("2. Lépés: Kapcsolódó tevékenységnaplók (activity_logs) sikeresen törölve.");
+      const result = await response.json();
 
-    // 3. Lépés: Maga az esemény törlése az events táblából
-    const { error: eventError } = await supabase
-      .from("events")
-      .delete()
-      .eq("id", id);
+      if (!response.ok) {
+        throw new Error(result.error || "Hiba történt a törlés során.");
+      }
 
-    if (eventError) {
-      alert(`Hiba az esemény törlésekor: ${eventError.message}`);
-    } else {
-      alert("3. Lépés: Az esemény sikeresen törölve az adatbázisból.");
-      setEvents(events.filter((e) => e.id !== id));
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+      alert("Az esemény sikeresen kitakarítva az adatbázisból!");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Ismeretlen hiba";
+      alert(`Törlési hiba: ${msg}`);
     }
   };
 
@@ -88,14 +76,14 @@ export function EventAdmin() {
     <div className="p-6 bg-white border border-zinc-200 rounded-xl shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-zinc-900 text-lg">Események kezelése</h3>
-          <p className="text-sm text-zinc-500">A rendszerben található események listája.</p>
+          <h3 className="font-semibold text-zinc-900 text-lg">Inaktív események takarítása</h3>
+          <p className="text-sm text-zinc-500">Csak a már inaktivált események láthatók itt (az aktívak védve vannak).</p>
         </div>
       </div>
 
       <div className="border border-zinc-100 rounded-lg overflow-hidden divide-y divide-zinc-100">
         {events.length === 0 ? (
-          <div className="p-4 text-sm text-zinc-500 italic">Nincs rögzített esemény.</div>
+          <div className="p-4 text-sm text-zinc-500 italic">Nincs inaktív, törölhető esemény.</div>
         ) : (
           events.map((event) => (
             <div key={event.id} className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors">
@@ -109,7 +97,7 @@ export function EventAdmin() {
                 onClick={() => handleDeleteEvent(event.id)}
                 className="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-200 transition-colors"
               >
-                Törlés
+                Végleges törlés
               </button>
             </div>
           ))
