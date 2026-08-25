@@ -13,9 +13,10 @@ import { AdminPanel } from '@/components/admin/AdminPanel'
 import { MemberStatus } from '@/components/admin/MemberStatus'
 import { PolicyGate } from '@/components/policy/PolicyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
+import { EventAttendanceManager } from '@/components/teacher/EventAttendanceManager'
 
 type TopTab = 'events' | 'statistics' | 'profile' | 'teacher' | 'admin'
-type TeacherSubTab = 'manage' | 'create' | 'locations' | 'members' | 'policy'
+type TeacherSubTab = 'attendance' | 'manage' | 'create' | 'locations' | 'members' | 'policy'
 
 export function Dashboard() {
   const [activeTab, setActiveTab] = useState<TopTab>('events')
@@ -58,12 +59,14 @@ export function Dashboard() {
   const canSeeMembers   = visible.has('members.status')  // Tagok aktivitása
   const canAdminPolicy  = visible.has('policy.admin')    // Házirend adminisztrálása
   const canManageUsers  = visible.has('admin.users')     // Adminisztráció (külön top-level)
+  const canSeeAllStats  = visible.has('stats.all')       // Összesített statisztikák láthatósága
 
   // Az Oktatói felület gyűjtő akkor látszik, ha bármelyik alfül elérhető
   const canSeeTeacher = canManageEvents || canSeeMembers || canAdminPolicy
 
   // Az Oktatói felület alfülei — mind a saját kulcsára
   const teacherSubs: { key: TeacherSubTab; label: string; show: boolean }[] = [
+    { key: 'attendance', label: 'Jelenlét & Fizetés', show: canManageEvents },
     { key: 'manage',    label: 'Alkalmak kezelése', show: canManageEvents },
     { key: 'create',    label: 'Új alkalom',        show: canManageEvents },
     { key: 'locations', label: 'Helyszínek',        show: canManageEvents },
@@ -122,7 +125,7 @@ export function Dashboard() {
           {(() => {
             const tabs: { key: TopTab; label: string; show: boolean }[] = [
               { key: 'events', label: 'Táncórák / Események', show: true },
-              { key: 'statistics', label: 'Statisztikák', show: true },
+              { key: 'statistics', label: canSeeAllStats ? 'Statisztikák' : 'Saját részvételeim', show: true },
               { key: 'profile', label: 'Profil', show: true },
               { key: 'teacher', label: 'Oktatói felület', show: canSeeTeacher },
               { key: 'admin', label: 'Adminisztráció', show: canManageUsers },
@@ -215,6 +218,7 @@ export function Dashboard() {
               {teacherSub === 'locations' && canManageEvents && <LocationManagement />}
               {teacherSub === 'members'   && canSeeMembers   && <MemberStatus />}
               {teacherSub === 'policy'    && canAdminPolicy  && <PolicyEditor />}
+              {teacherSub === 'attendance' && canManageEvents && <EventAttendanceManager />}
             </div>
           </div>
         )}
