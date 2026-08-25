@@ -8,9 +8,7 @@ interface EventItem {
   title?: string
   event_date: string
   start_time?: string
-  location_name?: string
-  location_id?: string
-  location?: string
+  is_active?: boolean
 }
 
 interface DancerRow {
@@ -23,17 +21,20 @@ interface DancerRow {
   paid: boolean
 }
 
+type SortOrder = 'asc' | 'desc'
+
 export function EventAttendanceManager() {
   const [events, setEvents] = useState<EventItem[]>([])
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [allProfiles, setAllProfiles] = useState<any[]>([])
   const [attendances, setAttendances] = useState<any[]>([])
   const [onlyRegistered, setOnlyRegistered] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [loadingEvents, setLoadingEvents] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
 
-  // 1. Események és profilok betöltése, MOST-hoz legközelebbi kiválasztása
   useEffect(() => {
     async function initData() {
       try {
@@ -46,30 +47,37 @@ export function EventAttendanceManager() {
         if (eventsRes.error) throw eventsRes.error
         if (profilesRes.error) throw profilesRes.error
 
-        if (profilesRes.data) {
-          setAllProfiles(profilesRes.data)
-        }
+        if (profilesRes.data) setAllProfiles(profilesRes.data)
 
         if (eventsRes.data && eventsRes.data.length > 0) {
-          setEvents(eventsRes.data)
+          const todayStr = new Date().toISOString().split('T')[0]
 
-          const now = Date.now()
-          let closestId = eventsRes.data[0].id
-          let minDiff = Infinity
-
-          eventsRes.data.forEach((ev: any) => {
+          const activeUpcomingEvents = eventsRes.data.filter((ev: any) => {
+            if (ev.is_active === false) return false
             const dateStr = (ev.event_date || ev.day || ev.created_at || '').split('T')[0]
-            const timeStr = (ev.start_time || '00:00').slice(0, 5)
-            const evTimestamp = new Date(`${dateStr}T${timeStr}:00`).getTime()
-
-            const diff = Math.abs(evTimestamp - now)
-            if (diff < minDiff) {
-              minDiff = diff
-              closestId = ev.id
-            }
+            return dateStr >= todayStr
           })
 
-          setSelectedEventId(closestId)
+          setEvents(activeUpcomingEvents)
+
+          if (activeUpcomingEvents.length > 0) {
+            const now = Date.now()
+            let closestId = activeUpcomingEvents[0].id
+            let minDiff = Infinity
+
+            activeUpcomingEvents.forEach((ev: any) => {
+              const dateStr = (ev.event_date || ev.day || ev.created_at || '').split('T')[0]
+              const timeStr = (ev.start_time || '00:00').slice(0, 5)
+              const evTimestamp = new Date(`${dateStr}T${timeStr}:00`).getTime()
+
+              const diff = Math.abs(evTimestamp - now)
+              if (diff < minDiff) {
+                minDiff = diff
+                closestId = ev.id
+              }
+            })
+            setSelectedEventId(closestId)
+          }
         }
       } catch (err: any) {
         // eslint-disable-next-line no-console
@@ -82,7 +90,6 @@ export function EventAttendanceManager() {
     initData()
   }, [])
 
-  // 2. Jelenlétek betöltése a kiválasztott eseményhez
   useEffect(() => {
     if (!selectedEventId) return
 
@@ -107,8 +114,14 @@ export function EventAttendanceManager() {
     loadAttendances()
   }, [selectedEventId])
 
-  // Lista összeállítása profilokból és jelenlétekből
   const attMap = new Map(attendances.map(a => [a.profile_id || a.user_id, a]))
+
+  const isDancerRegistered = (att: any) => {
+    if (!att) return false
+    return att.registered !== false && att.is_registered !== false
+  }
+
+  const registeredCount = allProfiles.filter(p => isDancerRegistered(attMap.get(p.id))).length
 
   const dancerRows: DancerRow[] = allProfiles
     .map(p => {
@@ -121,22 +134,24 @@ export function EventAttendanceManager() {
         profileId: p.id,
         name,
         danceLevel,
-        isRegistered: Boolean(att),
+        isRegistered: isDancerRegistered(att),
         attended: Boolean(att?.attended),
         paid: Boolean(att?.paid)
       }
     })
     .filter(row => (onlyRegistered ? row.isRegistered : true))
-    .sort((a, b) => a.name.localeCompare(b.name, 'hu'))
+    .filter(row => row.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      const cmp = a.name.localeCompare(b.name, 'hu')
+      return sortOrder === 'asc' ? cmp : -cmp
+    })
 
-  // Toggle Kezelés (Attended / Paid)
   const handleToggle = async (row: DancerRow, field: 'attended' | 'paid') => {
     const newValue = !row[field]
     setUpdatingId(`${row.profileId}-${field}`)
 
     try {
       if (row.attendanceId) {
-        // Meglévő rekord frissítése
         const { error } = await supabase
           .from('attendances')
           .update({ [field]: newValue })
@@ -148,10 +163,10 @@ export function EventAttendanceManager() {
           prev.map(a => (a.id === row.attendanceId ? { ...a, [field]: newValue } : a))
         )
       } else {
-        // Új rekord beszúrása (ha nem volt regisztrálva)
-        const newRecord = {
+        const newRecord: any = {
           profile_id: row.profileId,
           event_id: selectedEventId,
+          registered: false,
           attended: field === 'attended' ? newValue : false,
           paid: field === 'paid' ? newValue : false
         }
@@ -175,7 +190,6 @@ export function EventAttendanceManager() {
     }
   }
 
-  // Tömeges gyorsműveletek
   const handleBulkSet = async (field: 'attended' | 'paid', targetValue: boolean) => {
     try {
       const { error } = await supabase
@@ -184,7 +198,6 @@ export function EventAttendanceManager() {
         .eq('event_id', selectedEventId)
 
       if (error) throw error
-
       setAttendances(prev => prev.map(a => ({ ...a, [field]: targetValue })))
     } catch (err: any) {
       // eslint-disable-next-line no-console
@@ -192,7 +205,9 @@ export function EventAttendanceManager() {
     }
   }
 
-  const selectedEvent = events.find(e => e.id === selectedEventId)
+  const toggleSortOrder = () => {
+    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))
+  }
 
   const formatEventDate = (dateStr?: string) => {
     if (!dateStr) return ''
@@ -206,9 +221,17 @@ export function EventAttendanceManager() {
     return <div className="p-6 text-zinc-500">Események betöltése...</div>
   }
 
+  if (events.length === 0) {
+    return (
+      <div className="bg-white p-8 rounded-2xl border border-zinc-200 shadow-sm text-center max-w-4xl mx-auto space-y-2">
+        <h3 className="text-lg font-bold text-zinc-800">Nincs aktív vagy közeledő alkalom</h3>
+        <p className="text-sm text-zinc-500">A múltbéli és inaktív események nem jelennek meg a beléptető felületen.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm space-y-6 max-w-4xl mx-auto">
-      {/* Fejléc és Eseményválasztó */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-4">
         <div>
           <h3 className="text-lg font-bold text-zinc-900">Jelenlét & Fizetés Rögzítése</h3>
@@ -228,10 +251,8 @@ export function EventAttendanceManager() {
         </select>
       </div>
 
-      {/* Lista Szűrő Kapcsoló & Gyorsműveletek */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-zinc-600">Megjelenítés:</span>
+        <div className="flex flex-wrap items-center gap-3">
           <div className="inline-flex p-1 bg-zinc-200/70 rounded-xl">
             <button
               onClick={() => setOnlyRegistered(true)}
@@ -239,7 +260,7 @@ export function EventAttendanceManager() {
                 onlyRegistered ? 'bg-white text-indigo-700 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
               }`}
             >
-              Csak regisztráltak ({attendances.length})
+              Csak regisztráltak ({registeredCount})
             </button>
             <button
               onClick={() => setOnlyRegistered(false)}
@@ -250,27 +271,32 @@ export function EventAttendanceManager() {
               Minden táncos ({allProfiles.length})
             </button>
           </div>
+
+          <input
+            type="text"
+            placeholder="Keresés névre..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-3 py-1 text-xs border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
         </div>
 
-        {selectedEvent && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleBulkSet('attended', true)}
-              className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-            >
-              Mind megjelent
-            </button>
-            <button
-              onClick={() => handleBulkSet('paid', true)}
-              className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              Mind fizetett
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleBulkSet('attended', true)}
+            className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Mind megjelent
+          </button>
+          <button
+            onClick={() => handleBulkSet('paid', true)}
+            className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Mind fizetett
+          </button>
+        </div>
       </div>
 
-      {/* Résztvevők listája */}
       {loadingData ? (
         <div className="py-8 text-center text-zinc-500 italic">Adatok betöltése...</div>
       ) : dancerRows.length === 0 ? (
@@ -279,8 +305,13 @@ export function EventAttendanceManager() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase">
-                <th className="py-3 px-3">Név</th>
+              <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase select-none">
+                <th
+                  onClick={toggleSortOrder}
+                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors"
+                >
+                  Név {sortOrder === 'asc' ? '▲ (A–Z)' : '▼ (Z–A)'}
+                </th>
                 <th className="py-3 px-3">Szint</th>
                 <th className="py-3 px-3 text-center">Előzetesen regisztrált</th>
                 <th className="py-3 px-3 text-center">Részt vett</th>
@@ -294,13 +325,12 @@ export function EventAttendanceManager() {
                   <td className="py-3 px-3 text-xs text-zinc-500">{row.danceLevel}</td>
                   <td className="py-3 px-3 text-center text-xs">
                     {row.isRegistered ? (
-                      <span className="inline-flex px-2 py-0.5 rounded font-medium bg-zinc-100 text-zinc-700">Igen</span>
+                      <span className="inline-flex px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
                     ) : (
                       <span className="text-zinc-400">Nem</span>
                     )}
                   </td>
 
-                  {/* Megjelent toggle */}
                   <td className="py-3 px-3 text-center">
                     <button
                       onClick={() => handleToggle(row, 'attended')}
@@ -315,7 +345,6 @@ export function EventAttendanceManager() {
                     </button>
                   </td>
 
-                  {/* Fizetés gomb - Kizárólag akkor, ha részt vett! */}
                   <td className="py-3 px-3 text-center">
                     {row.attended ? (
                       <button

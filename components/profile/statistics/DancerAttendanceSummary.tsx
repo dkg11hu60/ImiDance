@@ -8,6 +8,9 @@ interface DancerAttendanceSummaryProps {
   eventsData?: any[]
 }
 
+type SortField = 'name' | 'danceLevel' | 'registeredCount' | 'attendedCount' | 'paidCount' | 'status'
+type SortDirection = 'asc' | 'desc'
+
 export function DancerAttendanceSummary({
   attendancesData,
   profilesData,
@@ -16,6 +19,10 @@ export function DancerAttendanceSummary({
   const [search, setSearch] = useState('')
   const [onlyMismatches, setOnlyMismatches] = useState(false)
   const [selectedDancerId, setSelectedDancerId] = useState<string | null>(null)
+
+  // Sorba rendezési állapotok
+  const [sortField, setSortField] = useState<SortField>('registeredCount')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   const eventMap = new Map(eventsData.map(e => [e.id, e]))
 
@@ -54,11 +61,47 @@ export function DancerAttendanceSummary({
     }
   })
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDirection(field === 'name' || field === 'danceLevel' ? 'asc' : 'desc')
+    }
+  }
+
   const sortedDancers = Array.from(counts.values())
     .filter(d => d.registeredCount > 0)
     .filter(d => d.name.toLowerCase().includes(search.toLowerCase()))
     .filter(d => (onlyMismatches ? d.attendedCount !== d.paidCount : true))
-    .sort((a, b) => b.registeredCount - a.registeredCount)
+    .sort((a, b) => {
+      let valA: number | string
+      let valB: number | string
+
+      if (sortField === 'status') {
+        valA = a.attendedCount - a.paidCount
+        valB = b.attendedCount - b.paidCount
+      } else {
+        valA = a[sortField]
+        valB = b[sortField]
+      }
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        const cmp = valA.localeCompare(valB, 'hu')
+        return sortDirection === 'asc' ? cmp : -cmp
+      }
+
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return sortDirection === 'asc' ? valA - valB : valB - valA
+      }
+
+      return 0
+    })
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field) return <span className="text-zinc-300 ml-1">↕</span>
+    return sortDirection === 'asc' ? <span className="text-indigo-600 ml-1">▲</span> : <span className="text-indigo-600 ml-1">▼</span>
+  }
 
   const selectedDancer = selectedDancerId ? counts.get(selectedDancerId) : null
   const selectedDancerHistory = selectedDancerId
@@ -93,7 +136,7 @@ export function DancerAttendanceSummary({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-lg font-bold text-zinc-900">Összesített kimutatás táncosonként</h3>
-          <p className="text-xs text-zinc-500">Kattints a táncos nevére a részletes alkalom-lista megtekintéséhez</p>
+          <p className="text-xs text-zinc-500">Kattints a fejlécekre a sorba rendezéshez, vagy a táncos nevére a részletes előzményekért</p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <label className="flex items-center gap-2 text-xs font-semibold text-zinc-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg cursor-pointer hover:bg-amber-100 transition-colors">
@@ -118,13 +161,25 @@ export function DancerAttendanceSummary({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase">
-              <th className="py-2.5 px-3">Név</th>
-              <th className="py-2.5 px-3">Szint</th>
-              <th className="py-2.5 px-3 text-center">Jelentkezett</th>
-              <th className="py-2.5 px-3 text-center">Részt vett</th>
-              <th className="py-2.5 px-3 text-center">Fizetett</th>
-              <th className="py-2.5 px-3 text-center">Státusz</th>
+            <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase select-none">
+              <th onClick={() => handleSort('name')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors">
+                Név {renderSortIcon('name')}
+              </th>
+              <th onClick={() => handleSort('danceLevel')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors">
+                Szint {renderSortIcon('danceLevel')}
+              </th>
+              <th onClick={() => handleSort('registeredCount')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center">
+                Jelentkezett {renderSortIcon('registeredCount')}
+              </th>
+              <th onClick={() => handleSort('attendedCount')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center">
+                Részt vett {renderSortIcon('attendedCount')}
+              </th>
+              <th onClick={() => handleSort('paidCount')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center">
+                Fizetett {renderSortIcon('paidCount')}
+              </th>
+              <th onClick={() => handleSort('status')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center">
+                Státusz {renderSortIcon('status')}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
