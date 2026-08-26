@@ -23,45 +23,60 @@ export function Dashboard() {
   const [teacherSub, setTeacherSub] = useState<TeacherSubTab>('manage')
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
-  const [roleLabel, setRoleLabel] = useState<string>('')
+  const [roleLabels, setRoleLabels] = useState<string[]>([])
   const [visible, setVisible] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const [policyOk, setPolicyOk] = useState(false)
 
   useEffect(() => {
-    async function loadUserData() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      async function loadUserData() {
+        const { data: { user } } = await supabase.auth.getUser()
+        setUser(user)
+        console.log("1. Betöltött user:", user?.id)
 
-      if (user) {
-        // 1. Profil lekérdezése
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-
-        setProfile(profileData)
-        
-        if (profileData?.role) {
-          // 2. Szerep címkéjének lekérése a roles táblából (ahol a név/címke van tárolva)
-          const { data: roleData } = await supabase
-            .from('roles')
-            .select('name, label')
-            .eq('key', profileData.role)
+        if (user) {
+          // 1. Profil lekérdezése
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
             .single()
 
-          setRoleLabel(roleData?.label || roleData?.name || profileData.role)
+          setProfile(profileData)
+          console.log("2. Profil adatok:", profileData)
+
+          // 2. Felhasználó ÖSSZES szerepének lekérése a user_roles kapcsolótáblából
+          const { data: userRolesData, error: urError } = await supabase
+            .from('user_roles')
+            .select('role_key')
+            .eq('user_id', user.id)
+
+          console.log("3. User roles adatbázis válasz:", userRolesData, "Hiba:", urError)
+
+          const roleKeys = userRolesData?.map(r => r.role_key) || []
+
+          if (roleKeys.length > 0) {
+            const { data: rolesMeta } = await supabase
+              .from('roles')
+              .select('key, label, name')
+              .in('key', roleKeys)
+
+            if (rolesMeta) {
+              setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
+            }
+          }
+
+          // 3. Jogosultságok betöltése a permissions.ts-ből a user id alapján
+          const visibleSet = await loadVisibleObjects(user.id)
+          console.log("4. Betöltött visibleSet elemek:", Array.from(visibleSet))
+          setVisible(visibleSet)
         }
-
-        setVisible(await loadVisibleObjects(profileData?.role))
+        setLoading(false)
       }
-      setLoading(false)
-    }
 
-    loadUserData()
-  }, [])
+      loadUserData()
+    }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -133,11 +148,15 @@ export function Dashboard() {
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold tracking-tight text-white">ImreDance</h1>
             {profile && (
-              <span className="text-xs px-3 py-1 bg-emerald-600 text-white font-bold rounded-full shadow-sm flex items-center gap-1.5">
+              <span className="text-xs px-3 py-1 bg-emerald-600 text-white font-bold rounded-full shadow-sm flex items-center gap-1.5 flex-wrap">
                 <span>{profile.full_name || profile.name || user?.email}</span>
-                {roleLabel && (
-                  <span className="bg-emerald-800 text-emerald-100 px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide">
-                    {roleLabel}
+                {roleLabels.length > 0 && (
+                  <span className="flex gap-1">
+                    {roleLabels.map((lbl, idx) => (
+                      <span key={idx} className="bg-emerald-800 text-emerald-100 px-1.5 py-0.5 rounded text-[10px] font-semibold tracking-wide">
+                        {lbl}
+                      </span>
+                    ))}
                   </span>
                 )}
               </span>

@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase'
 export function UserAdmin() {
   const [profiles, setProfiles] = useState<any[]>([])
   const [roles, setRoles] = useState<any[]>([])
+  const [userRolesMap, setUserRolesMap] = useState<{ [userId: string]: string[] }>({})
   const [myId, setMyId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [resetting, setResetting] = useState(false)
@@ -20,16 +21,29 @@ export function UserAdmin() {
     const { data: { user } } = await supabase.auth.getUser()
     setMyId(user?.id ?? null)
 
-    const [profilesRes, rolesRes] = await Promise.all([
+    const [profilesRes, rolesRes, userRolesRes] = await Promise.all([
       supabase.from('profiles').select('*').order('name'),
-      supabase.from('roles').select('*').order('sort', { ascending: true })
+      supabase.from('roles').select('*').order('sort', { ascending: true }),
+      supabase.from('user_roles').select('*')
     ])
+
     if (profilesRes.data) setProfiles(profilesRes.data)
     if (rolesRes.data) setRoles(rolesRes.data)
+
+    // Összegyűjtjük map-be, hogy melyik user-nek mik a szerepei: { [userId]: ['admin', 'teacher'] }
+    if (userRolesRes.data) {
+      const map: { [userId: string]: string[] } = {}
+      userRolesRes.data.forEach((ur: any) => {
+        if (!map[ur.user_id]) map[ur.user_id] = []
+        map[ur.user_id].push(ur.role_key)
+      })
+      setUserRolesMap(map)
+    }
+
     setLoading(false)
   }
 
-  async function updateProfile(id: string, field: string, value: any) {
+  async function updateProfileField(id: string, field: string, value: any) {
     const { error } = await supabase
       .from('profiles')
       .update({ [field]: value })
@@ -37,6 +51,47 @@ export function UserAdmin() {
 
     if (error) alert('Hiba: ' + error.message)
     else loadData()
+  }
+
+  // Szerepkör hozzáadása vagy elvétele egy adott felhasználótól
+  async function handleRoleToggle(userId: string, roleKey: string, currentRoles: string[]) {
+    const isAlreadyAssigned = currentRoles.includes(roleKey)
+    let newRoles: string[]
+
+    if (isAlreadyAssigned) {
+      // Ha már benne van, vesszük ki (de ne engedjük, hogy teljesen üres maradjon, ha szeretnéd, ezt a ellenőrzést kiszedheted)
+      newRoles = currentRoles.filter(r => r !== roleKey)
+    } else {
+      // Ha nincs benne, adjuk hozzá
+      newRoles = [...currentRoles, roleKey]
+    }
+
+    // 1. Töröljük a user összes eddigi szerepét a user_roles táblából
+    const { error: deleteError } = await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId)
+
+    if (deleteError) {
+      alert('Hiba a szerepkörök frissítésekor: ' + deleteError.message)
+      return
+    }
+
+    // 2. Beillesztjük az újakat, ha maradt szerep
+    if (newRoles.length > 0) {
+      const insertData = newRoles.map(rk => ({ user_id: userId, role_key: rk }))
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert(insertData)
+
+      if (insertError) {
+        alert('Hiba az új szerepkörök mentésekor: ' + insertError.message)
+        return
+      }
+    }
+
+    // Helyi state frissítése azonnali visszajelzéshez
+    setUserRolesMap(prev => ({ ...prev, [userId]: newRoles }))
   }
 
   async function toggleUserActive(id: string, currentActive: boolean, userName: string) {
@@ -140,7 +195,7 @@ export function UserAdmin() {
             <th className="pb-3">Név</th>
             <th className="pb-3">E-mail</th>
             <th className="pb-3">Szint</th>
-            <th className="pb-3">Szerep</th>
+            <th className="pb-3">Szerepkörök (Többszörös)</th>
             <th className="pb-3 text-right">Akciók</th>
           </tr>
         </thead>
@@ -149,6 +204,7 @@ export function UserAdmin() {
             const isSelf = p.id === myId
             const isActive = p.is_active ?? true
             const displayName = p.full_name || p.name || 'Névtelen'
+            const userRoles = userRolesMap[p.id] || []
 
             return (
               <tr key={p.id} className={!isActive ? 'bg-zinc-50 opacity-75' : ''}>
@@ -164,7 +220,7 @@ export function UserAdmin() {
                 <td className="py-3 whitespace-nowrap">
                   <select
                     value={p.dance_level || 'Haladó'}
-                    onChange={(e) => updateProfile(p.id, 'dance_level', e.target.value)}
+                    onChange={(e) => updateProfileField(p.id, 'dance_level', e.target.value)}
                     className="border rounded px-2 py-1"
                   >
                     {['Haladó', 'SzuperH', 'ExtraH', 'Hobbi'].map(lvl => (
@@ -172,22 +228,32 @@ export function UserAdmin() {
                     ))}
                   </select>
                 </td>
-                <td className="py-3 whitespace-nowrap">
-                  {isSelf ? (
-                    <span className="px-2 py-1 text-zinc-500 italic">
-                      {roles.find(r => r.key === p.role)?.label || p.role || 'admin'} (te)
-                    </span>
-                  ) : (
-                    <select
-                      value={p.role || 'user'}
-                      onChange={(e) => updateProfile(p.id, 'role', e.target.value)}
-                      className="border rounded px-2 py-1"
-                    >
-                      {roles.map(r => (
-                        <option key={r.key} value={r.key}>{r.label}</option>
-                      ))}
-                    </select>
-                  )}
+                <td className="py-3">
+                  {/* Jelölőnégyzetek (Checkboxok) az összes elérhető szerepkörhöz */}
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {roles.map(r => {
+                      const isChecked = userRoles.includes(r.key)
+                      return (
+                        <label 
+                          key={r.key} 
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs cursor-pointer transition-colors ${
+                            isChecked 
+                              ? 'bg-indigo-50 border-indigo-300 text-indigo-900 font-semibold' 
+                              : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={isSelf && r.key === 'admin'} // Magadnak az admin jogot ne tudd véletlenül elvenni
+                            onChange={() => handleRoleToggle(p.id, r.key, userRoles)}
+                            className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          <span>{r.label}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
                 </td>
                 <td className="py-3 text-right whitespace-nowrap">
                   <div className="flex items-center justify-end gap-3 whitespace-nowrap">
