@@ -1,101 +1,68 @@
-'use client'
+'use client';
 
-export function StatisticsOverview({
-  stats,
-  summary,
-  data = [],
-  visibleObjects,
-  onRowSelect,
-}: {
-  stats: any[]
-  summary?: any
-  data?: any[]
-  visibleObjects: Set<string>
-  onRowSelect?: (row: any) => void
-}) {
-  const canOpenDetailed = visibleObjects.has('stats.detailed')
+import React, { useState } from 'react';
+import { StatsDetailedModal } from './StatsDetailedModal';
 
-  const totalEvents = summary?.totalEvents ?? stats.length
-  const totalAtt = summary?.totalAttendances ?? 0
-  const f = summary?.f ?? 0
-  const l = summary?.l ?? 0
+interface StatisticsOverviewProps {
+  userPermissions: string[];
+  summaryData: {
+    totalMembers: number;
+    activeMembers: number;
+    totalRevenue: number;
+    totalEvents: number;
+  };
+}
 
-  const pct = (part: number, whole: number) =>
-    whole > 0 ? Math.round((part / whole) * 100) : 0
+export function StatisticsOverview({ userPermissions, summaryData }: StatisticsOverviewProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Helykímélő létszám: F/L/P/Összes egy cellában. Összes = egyedi résztvevők (attendees.length).
-  const formatCounts = (row: any): string => {
-    const total = Array.isArray(row.attendees) ? row.attendees.length : 0
-    if (total === 0) return '—/—/—/—'
-    return `${row.fCount ?? 0}/${row.lCount ?? 0}/${row.pairs ?? 0}/${total}`
-  }
+  const canViewOverview = userPermissions.includes('stats.all');
+  const canViewDetailed = userPermissions.includes('stats.detailed');
 
-  function handleRowClick(row: any) {
-    if (!canOpenDetailed) return
-    onRowSelect?.(row)
+  if (!canViewOverview) {
+    return null;
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="font-bold text-lg">Összesített statisztika</h3>
+    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-md">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-slate-100">Összesített statisztika</h2>
+        
+        {canViewDetailed && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 text-sm font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/60 rounded-lg hover:bg-emerald-900/50 transition-colors"
+          >
+            Név szerinti részletezés
+          </button>
+        )}
+      </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 bg-zinc-100 rounded-lg">
-          <p className="text-sm text-zinc-600">Nyitott események száma:</p>
-          <p className="text-2xl font-bold">{totalEvents}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/40">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Összes Tag</p>
+          <p className="text-2xl font-bold text-slate-100 mt-1">{summaryData.totalMembers}</p>
         </div>
 
-        <div className="p-4 bg-zinc-100 rounded-lg">
-          <p className="text-sm text-zinc-600">Összes jelentkezés</p>
-          <p className="text-2xl font-bold">{totalAtt}</p>
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/40">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Aktív Tagok</p>
+          <p className="text-2xl font-bold text-emerald-400 mt-1">{summaryData.activeMembers}</p>
         </div>
 
-        <div className="p-4 bg-zinc-100 rounded-lg">
-          <p className="text-sm text-zinc-600">Fiú / Lány</p>
-          <p className="text-2xl font-bold">{f} / {l}</p>
-          <p className="text-[11px] text-zinc-500">{pct(f, f + l)}% / {pct(l, f + l)}%</p>
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/40">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Megtartott Órák</p>
+          <p className="text-2xl font-bold text-slate-100 mt-1">{summaryData.totalEvents}</p>
         </div>
 
-        <div className="p-4 bg-zinc-100 rounded-lg">
-          <p className="text-sm text-zinc-600">Átlag / alkalom</p>
-          <p className="text-2xl font-bold">
-            {totalEvents > 0 ? Math.round(totalAtt / totalEvents) : 0}
-          </p>
+        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/40">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Összes Bevétel</p>
+          <p className="text-2xl font-bold text-amber-400 mt-1">{summaryData.totalRevenue.toLocaleString('hu-HU')} Ft</p>
         </div>
       </div>
 
-      {/* Mindenki által látható alkalom-táblázat (névsor nélkül) */}
-      <div className="space-y-2">
-        <h4 className="font-bold text-base">Alkalmak</h4>
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left">Dátum</th>
-              <th className="text-left">F/L/P/Összes</th>
-              <th className="text-left">Helyszín</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, i) => (
-              <tr
-                key={i}
-                className={`border-b transition-colors ${
-                  canOpenDetailed ? 'hover:bg-indigo-50 cursor-pointer' : ''
-                }`}
-                onClick={() => handleRowClick(row)}
-              >
-                <td className={`py-2 ${canOpenDetailed ? 'underline text-indigo-700' : 'text-zinc-700'}`}>
-                  {row.date}
-                </td>
-                <td className="py-2 tabular-nums whitespace-nowrap text-zinc-700">
-                  {formatCounts(row)}
-                </td>
-                <td className="py-2">{row.location}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {canViewDetailed && isModalOpen && (
+        <StatsDetailedModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
-  )
+  );
 }

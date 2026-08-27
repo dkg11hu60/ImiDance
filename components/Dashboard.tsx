@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { loadVisibleObjects } from '@/lib/permissions'
 import { EventList } from '@/components/events/EventList'
 import { ProfileEdit } from '@/components/profile/ProfileEdit'
-import { StatisticsDashboard } from '@/components/profile/statistics/StatisticsDashboard'
+import StatisticDashboard from '@/components/profile/statistics/StatisticsDashboard'
 import { EventCreator } from '@/components/teacher/EventCreator'
 import { EventManageList } from '@/components/teacher/EventManageList'
 import { LocationManagement } from '@/components/teacher/LocationManagement'
@@ -30,53 +30,45 @@ export function Dashboard() {
   const [policyOk, setPolicyOk] = useState(false)
 
   useEffect(() => {
-      async function loadUserData() {
-        const { data: { user } } = await supabase.auth.getUser()
-        setUser(user)
-        console.log("1. Betöltött user:", user?.id)
+    async function loadUserData() {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
 
-        if (user) {
-          // 1. Profil lekérdezése
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
+      if (user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
 
-          setProfile(profileData)
-          console.log("2. Profil adatok:", profileData)
+        setProfile(profileData)
 
-          // 2. Felhasználó ÖSSZES szerepének lekérése a user_roles kapcsolótáblából
-          const { data: userRolesData, error: urError } = await supabase
-            .from('user_roles')
-            .select('role_key')
-            .eq('user_id', user.id)
+        const { data: userRolesData } = await supabase
+          .from('user_roles')
+          .select('role_key')
+          .eq('user_id', user.id)
 
-          console.log("3. User roles adatbázis válasz:", userRolesData, "Hiba:", urError)
+        const roleKeys = userRolesData?.map(r => r.role_key) || []
 
-          const roleKeys = userRolesData?.map(r => r.role_key) || []
+        if (roleKeys.length > 0) {
+          const { data: rolesMeta } = await supabase
+            .from('roles')
+            .select('key, label, name')
+            .in('key', roleKeys)
 
-          if (roleKeys.length > 0) {
-            const { data: rolesMeta } = await supabase
-              .from('roles')
-              .select('key, label, name')
-              .in('key', roleKeys)
-
-            if (rolesMeta) {
-              setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
-            }
+          if (rolesMeta) {
+            setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
           }
-
-          // 3. Jogosultságok betöltése a permissions.ts-ből a user id alapján
-          const visibleSet = await loadVisibleObjects(user.id)
-          console.log("4. Betöltött visibleSet elemek:", Array.from(visibleSet))
-          setVisible(visibleSet)
         }
-        setLoading(false)
-      }
 
-      loadUserData()
-    }, [])
+        const visibleSet = await loadVisibleObjects(user.id)
+        setVisible(visibleSet)
+      }
+      setLoading(false)
+    }
+
+    loadUserData()
+  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -250,7 +242,8 @@ export function Dashboard() {
           <EventAttendanceManager />
         )}
 
-        {activeTab === 'statistics' && <StatisticsDashboard />}
+        {activeTab === 'statistics' && <StatisticDashboard />}
+
         {activeTab === 'profile' && <ProfileEdit userId={user?.id} />}
 
         {activeTab === 'teacher' && canSeeTeacher && (
