@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { PolicyModal } from './PolicyModal'
 
@@ -14,6 +15,7 @@ interface PolicyData {
 }
 
 export function PolicyGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const [modalOpen, setModalOpen] = useState(false)
   const [policy, setPolicy] = useState<PolicyData | null>(null)
   const [accepting, setAccepting] = useState(false)
@@ -66,6 +68,11 @@ export function PolicyGuard({ children }: { children: React.ReactNode }) {
     setModalOpen(false)
   }
 
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
   return (
     <>
       {children}
@@ -77,6 +84,7 @@ export function PolicyGuard({ children }: { children: React.ReactNode }) {
           sections={policy.sections}
           onAccept={handleAccept}
           accepting={accepting}
+          onLogout={handleLogout}
         />
       )}
     </>

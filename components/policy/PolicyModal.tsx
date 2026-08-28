@@ -1,4 +1,4 @@
-'use client'
+'type client'
 
 type Section = { key: string; heading: string; body: string }
 
@@ -9,6 +9,7 @@ interface PolicyModalProps {
   sections: Section[]
   onAccept: () => void
   accepting?: boolean
+  onLogout?: () => void // Új prop a kilépéshez
 }
 
 export function PolicyModal({
@@ -18,6 +19,7 @@ export function PolicyModal({
   sections,
   onAccept,
   accepting = false,
+  onLogout,
 }: PolicyModalProps) {
   if (!isOpen) return null
 
@@ -49,7 +51,17 @@ export function PolicyModal({
           ))}
         </div>
 
-        <div className="p-4 border-t border-zinc-200 bg-zinc-50 flex justify-end">
+        <div className="p-4 border-t border-zinc-200 bg-zinc-50 flex flex-col sm:flex-row justify-between items-center gap-3">
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="text-sm text-zinc-500 hover:text-zinc-800 underline transition-colors"
+            >
+              Kilépés a fiókból
+            </button>
+          ) : <div />}
+
           <button
             onClick={onAccept}
             disabled={accepting}

@@ -48,7 +48,11 @@ export function Dashboard() {
           .select('role_key')
           .eq('user_id', user.id)
 
-        const roleKeys = userRolesData?.map(r => r.role_key) || []
+        let roleKeys = userRolesData?.map(r => r.role_key) || []
+
+        if (roleKeys.length === 0 && profileData?.role) {
+          roleKeys = [profileData.role]
+        }
 
         if (roleKeys.length > 0) {
           const { data: rolesMeta } = await supabase
@@ -56,8 +60,10 @@ export function Dashboard() {
             .select('key, label, name')
             .in('key', roleKeys)
 
-          if (rolesMeta) {
+          if (rolesMeta && rolesMeta.length > 0) {
             setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
+          } else {
+            setRoleLabels(roleKeys)
           }
         }
 
@@ -137,21 +143,28 @@ export function Dashboard() {
       {/* Header */}
       <header className="bg-indigo-600/90 border-b border-indigo-700 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-bold tracking-tight text-white">ImreDance</h1>
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold tracking-tight text-white hidden sm:block">ImreDance</h1>
             {profile && (
-              <span className="text-xs px-3 py-1 bg-emerald-600 text-white font-bold rounded-full shadow-sm flex items-center gap-1.5 flex-wrap">
-                <span>{profile.full_name || profile.name || user?.email}</span>
+              <div className="flex items-center bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl shadow-sm gap-3">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold leading-tight">
+                    {profile.full_name || profile.name || user?.email}
+                  </span>
+                  <span className="text-[10px] text-emerald-100 opacity-90">
+                    {user?.email}
+                  </span>
+                </div>
                 {roleLabels.length > 0 && (
-                  <span className="flex gap-1">
+                  <div className="flex gap-1 border-l border-emerald-600 pl-3">
                     {roleLabels.map((lbl, idx) => (
-                      <span key={idx} className="bg-emerald-800 text-emerald-100 px-1.5 py-0.5 rounded text-[10px] font-semibold tracking-wide">
+                      <span key={idx} className="bg-emerald-900 text-emerald-100 px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase">
                         {lbl}
                       </span>
                     ))}
-                  </span>
+                  </div>
                 )}
-              </span>
+              </div>
             )}
           </div>
           <div className="flex items-center space-x-3">
@@ -249,7 +262,7 @@ export function Dashboard() {
         {activeTab === 'teacher' && canSeeTeacher && (
           <div className="space-y-6">
             <div className="flex flex-wrap gap-2">
-              {visibleTeacherSubs.map(s => (
+              {visibleTeacherSubs.map((s) => (
                 <button
                   key={s.key}
                   onClick={() => setTeacherSub(s.key)}
