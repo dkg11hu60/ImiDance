@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { loadVisibleObjects } from '../../lib/permissions'
+import { supabase } from '@/lib/supabase'
+import { loadVisibleObjects } from '@/lib/permissions'
 
 export function EventList({ userId }: { userId: string }) {
   const [events, setEvents] = useState<any[]>([])
