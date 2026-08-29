@@ -1,0 +1,40 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "actionButtons": {
+      "reloadButton": null,
+      "loadNpmCommands": false,
+      "commands": [
+        {
+          "name": "| $(play) DEV SRV |",
+          "color": "white",
+          "singleInstance": true,
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_deV.ps1"
+        },
+        {
+          "name": "| $(rocket) DPL |",
+          "color": "white",
+          "singleInstance": true,
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_dePloy.ps1"
+        },
+        {
+          "name": "| $(rocket) PIPELINE (Dev+Git+Vercel) |",
+          "color": "white",
+          "singleInstance": true,
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_MasterPipeline.ps1"
+        },
+        {
+          "name": "| $(sync) SYNC & PUSH |",
+          "color": "white",
+          "singleInstance": true,
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_syncPush.ps1"
+        }
+      ]
+    },
+    "js/ts.experimental.useTsgo": false
+  }
+}
