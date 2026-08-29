@@ -330,7 +330,7 @@ A hook három nézetet számol az `get_global_statistics_data` nyers adataiból.
 
 **Táncesemények Összesítő (nemenkénti + szint-bontás).** Identitás:
 
-```
+```text
 F* + L* + 2·P = Össz
 ```
 
@@ -338,7 +338,7 @@ ahol `P` = a **kölcsönös, jelenlévő** párok száma (nem `min(F, L)`), `F* 
 
 **Szint-leképezés (explicit, a valós `dance_level` értékekre):**
 
-```
+```text
 Hobbi  -> Hobbi
 Haladó -> H
 SzuperH-> Sz
