@@ -1,5 +1,7 @@
 # ImiDance Alkalmazás – Projekt Dokumentáció
 
+> **Verzió: v003 (2026-08-29).** Új fejezetek: §14 jelentkezés-gomb jogosultsági regresszió (javítva, éles), §15 `handle_new_user` trigger hiba (NYITOTT, élesben aktív adatvesztés). Részletek: §13 (changelog), §14, §15.
+>
 > **Verzió: v002 (2026-08-28).** A §3 séma az élő adatbázishoz igazítva; új fejezetek: §9 pár- és jelentkezés-automatizmus, §10 statisztika-szemantika, §11 egyszeri migrációk, §12 nyitott pontok, §13 változásnapló. Részletek: §13.
 
 ## 1. A projekt áttekintése
@@ -374,8 +376,22 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
 - **Navbar felirat:** „Saját részvételeim” → „Részvétel” átnevezés a `components/layout/Navbar.tsx`-ben **még nincs elvégezve** (az eredeti kérés innen indult; a fájl nem volt feltöltve).
 - **`CHECK (partner_id <> id)`** megszorítás még nincs.
 - **Fizetési audit trail:** jövőbeli követelmény (számlázás). A jelentkezés nem igényel naplót, a fizetés viszont igen — külön megtervezendő; jelenleg a séma nem tartja a fizetés-történetet.
+- **`handle_new_user` trigger adatvesztés — ÉLESBEN AKTÍV, NEM JAVÍTOTT.** Részletek: §15. Minden önálló `/register` regisztráció névtelen/email nélküli `profiles` sort kap; a valós adat a `raw_user_meta_data`-ban vész el.
+- **Ismeretlen eredetű, soha be nem lépett teszt/admin-létrehozású fiók:** `winnielau8899@yahoo.com` ("Lau Winnie") — a projektgazda nem ismeri fel, `must_change_password` metaadattal, feltehetően a korábbi Excel-import/meghívás maradványa. Nem törölve, tisztázandó és/vagy eltávolítandó.
+- **Vercel↔GitHub auto-deploy megbízhatatlan:** a `master`-re történő push nem mindig triggerel automatikus production deploy-t (2026-08-29-én három egymást követő push sem indított automatikus deployt, 16 órán át a régi build maradt élesben). Átmenetileg kézi `vercel --prod` futtatással kerülendő meg. A Vercel projekt Settings → Git beállításait érdemes átnézni.
 
 ## 13. Változásnapló
+
+**Doc v003 (2026-08-29):**
+
+- Új fejezetek: §14 (jelentkezés-gomb jogosultsági regresszió, javítva, éles), §15 (`handle_new_user` trigger adatvesztés, NYITOTT).
+- §12 kiegészítve: `handle_new_user` hiba, ismeretlen eredetű `winnielau8899@yahoo.com` fiók, megbízhatatlan Vercel auto-deploy.
+
+**Kód / DB verziók (v003):**
+
+- `EventList.tsx` jelentkezés-gomb jogosultság — **javítva, ÉLES** (§14). PR: `dkg11hu60/ImiDance#2`.
+- `set-attendance` API — új jelentkezés `status` mostantól `'registered'` (korábban tévesen legacy `'X'`), **javítva, ÉLES**.
+- `handle_new_user` trigger — **NEM javítva, FÜGGŐBEN**, a hiba élesben aktív (§15).
 
 **Doc v002 (2026-08-28):**
 
@@ -389,3 +405,69 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
 - `sync_partner_relationship` — **v002** (rekurzió-lánctörő, ütközés-feloldás), FÜGGŐBEN.
 - `attendance_pair_sync` — **v001** (jelentkezés-propagálás kölcsönös párra), FÜGGŐBEN.
 - Adat: `status` `'X'` → `registered`/`cancelled`; jövőbeli pár-szinkron (+12 sor).
+
+## 14. Jelentkezés-gomb jogosultsági regresszió és javítása (2026-08-29)
+
+**Tünet:** senki — még admin fiókkal sem — tudott táncórára jelentkezni. Minden eseménynél statikus "Állandó résztvevő" felirat jelent meg a jelentkező gomb helyett, élesben is, lokálisan is.
+
+**Gyökér-ok:** `components/events/EventList.tsx` a jogosultság-ellenőrző `loadVisibleObjects()`-nek (lásd `lib/permissions.ts`) `myProfile?.role`-t adott át `userId` helyett. A `profiles` táblában **nincs is `role` oszlop** (lásd §3.1) — ez mindig `undefined` volt, a jogosultság-lekérdezés mindig üres halmazt adott vissza, a `canAttend` mindig `false` maradt. A helyes minta már megvolt máshol (`components/Dashboard.tsx`: `loadVisibleObjects(user.id)`), csak az `EventList.tsx` tért el tőle.
+
+**Javítás:** `loadVisibleObjects(userId)`. PR: `dkg11hu60/ImiDance#2`, commit `6a3185d`.
+
+**Melléklet ugyanabban a javításban:** az `app/api/set-attendance/route.ts` új jelentkezéskor a kivezetett legacy `status: 'X'` értéket írta a `'registered'` helyett (§11) — ez a statisztikából kizárta volna az új jelentkezéseket. Javítva ugyanabban a commitban.
+
+**Melléklet #2 — build-hiba:** Next.js 16 (Turbopack) production build alatt a repo gyökerében talált egy **használaton kívüli, üres placeholder** `events/EventList.tsx` fájlt (a legelső commit óta ott volt, semmi nem importálta). A benne lévő `../../lib/...` relatív import a repo *fölé* mutatott (TS2307 hiba). A fájlt törölve, illetve elővigyázatosságból a valódi `components/events/EventList.tsx`-ben is a bevett `@/lib/...` alias importra cserélve (a `components/teacher/AttendanceTracker.tsx` mintájára). Commitok: `b2f9ba1`, `1b7b525`.
+
+**Jogosultsági adat-ellenőrzés:** az `event.attend` objektum-kulcs helyesen be van kötve a "Felhasználó" és "Adminisztrátor" szerepkörhöz az `object_roles` táblában (Adminisztráció → Szerepek fül) — ez a mátrix rendben volt. Egyedi fiókoknál (pl. teszt user, `dkg11hu@outlook.com`) viszont hiányzott a "Felhasználó" szerepkör tényleges hozzárendelése a `user_roles` táblában (Adminisztráció → Felhasználók fül) — ez fiókonként ellenőrizendő/pótolandó, nem kódhiba.
+
+**Deploy:** PR #2 mergelve `master`-be. A Vercel↔GitHub auto-deploy nem triggerelt a mai push-okra (lásd §12) — kézi `vercel --prod` futtatással deployolva élesre. **Állapot: ÉLES, ellenőrizve mindkét (dev + prod) környezetben.**
+
+## 15. NYITOTT: `handle_new_user` trigger nem másolja át a regisztrációs adatokat (2026-08-29)
+
+> **Élesben aktív adatvesztési hiba, még NINCS javítva.** A felhasználó a felfedezés napján elhalasztotta a tesztelést/élesítést — ez a fejezet a folytatáshoz szükséges teljes kontextust adja.
+
+**Felfedezés módja:** az Adminisztráció → Felhasználók listán 3 "Névtelen" (üres `full_name`/`email`) profil bukkant fel.
+
+**Gyökér-ok — az `auth.users`-en futó trigger teljes forrása (introspekcióval igazolva):**
+
+```sql
+begin
+  insert into public.profiles (id)
+  values (new.id);
+  return new;
+end;
+```
+
+A trigger **kizárólag az `id`-t írja be** — a regisztrációkor a `raw_user_meta_data`-ban ténylegesen elküldött `full_name`, `gender`, `dance_level`, valamint az `auth.users.email` **soha nem kerül át** a `profiles` táblába. Ez **minden** önálló, `/register` oldalon keresztüli regisztrációt érint (nem csak a talált 3 esetet) — a jelenség folyamatosan, csendben termeli az újabb "névtelen" profilokat.
+
+**Konkrét igazolt eset:** Krizsán Tímea (`krizsantimi@gmail.com`) 2026-08-28-án valósan, jóhiszeműen regisztrált (`raw_user_meta_data`: `full_name: "Krizsán Tímea"`, `gender: "Lány"`, `dance_level: "Hobbi"`), de a `profiles` sora üresen jött létre. **Kézzel visszaállítva** (`UPDATE profiles SET full_name=..., email=..., gender=..., dance_level=... WHERE id=...`) — ez csak tüneti kezelés volt az adott sorra, a triggert nem javítja.
+
+**Másik talált, tisztázatlan eset:** "Lau Winnie" (`winnielau8899@yahoo.com`) — 2026-08-16-i, valószínűleg admin által létrehozott/meghívott fiók (`must_change_password: true` a metaadatban, `confirmed_at` ≈ `created_at`, tehát nem önálló email-megerősítés). Soha nem lépett be (`last_sign_in_at: null`). A projektgazda nem ismeri fel — nincs törölve, csak azonosítva és dokumentálva (lásd §12).
+
+**Javasolt javítás (kész, de MÉG NEM alkalmazva élesben):**
+
+```sql
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  insert into public.profiles (id, email, full_name, name, gender, dance_level)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'gender',
+    coalesce(new.raw_user_meta_data->>'dance_level', 'Haladó')
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+```
+
+A `CREATE OR REPLACE` elég — a meglévő `on_auth_user_created` (vagy hasonló nevű) trigger már erre a függvényre mutat, nem kell újra létrehozni.
+
+**Folytatás innen:** a fenti SQL lefuttatása a Supabase SQL Editorban, majd egy teszt-regisztrációval (új, felesleges email címmel) ellenőrizni, hogy a `profiles` sor a névvel/emaillel/nemmel/szinttel együtt jön-e létre.
