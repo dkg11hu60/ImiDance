@@ -51,6 +51,9 @@ export function MyAttendance({ userId }: MyAttendanceProps) {
             const ev = Array.isArray(a.events) ? a.events[0] : a.events
             const rawDate = ev?.event_date || a.created_at || null
 
+            const attended = Boolean(a.attended)
+            const paid = Boolean(a.paid)
+
             let dateStr = 'Ismeretlen dátum'
             let isPast = false
             if (rawDate) {
@@ -59,7 +62,7 @@ export function MyAttendance({ userId }: MyAttendanceProps) {
                 dateStr = d.toLocaleDateString('hu-HU', { year: 'numeric', month: '2-digit', day: '2-digit' })
                 const dd = new Date(d)
                 dd.setHours(0, 0, 0, 0)
-                isPast = dd < today
+                isPast = dd < today || (dd.getTime() === today.getTime() && (attended || paid))
               } else {
                 dateStr = String(rawDate)
               }
@@ -71,8 +74,8 @@ export function MyAttendance({ userId }: MyAttendanceProps) {
               rawDate,
               title: ev?.title || a.event_name || 'Táncóra / Esemény',
               isPast,
-              attended: Boolean(a.attended),
-              paid: Boolean(a.paid),
+              attended,
+              paid,
               cancelled: (a.status ?? '') === 'cancelled',
             }
           })

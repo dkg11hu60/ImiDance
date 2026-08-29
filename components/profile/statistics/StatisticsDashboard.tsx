@@ -4,19 +4,27 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { useStatisticsData } from './useStatisticsData'
 import { Attendee, DanceStat, EventStat, PersonStat } from './types'
+import { MyAttendance } from '../MyAttendance'
 
-export default function StatisticsDashboard() {
+interface StatisticsDashboardProps {
+  mode?: 'jelentesek' | 'reszvétel'
+  userId?: string
+}
+
+export default function StatisticsDashboard({ mode = 'jelentesek', userId }: StatisticsDashboardProps) {
   const { loading, error, isAuthorized, danceStats, eventStats, personStats } = useStatisticsData()
 
   // Engedélyezett objektumok (app_objects kulcsok) tárolása
   const [allowedObjects, setAllowedObjects] = useState<string[]>([])
   const [loadingPermissions, setLoadingPermissions] = useState<boolean>(true)
 
-  const [activeTab, setActiveTab] = useState<'dance_events' | 'events_breakdown' | 'persons_breakdown'>('dance_events')
+  const [activeTab, setActiveTab] = useState<
+    'dance_events' | 'events_breakdown' | 'persons_breakdown' | 'my_attendance'
+  >(mode === 'reszvétel' ? 'my_attendance' : 'dance_events')
   const [searchTerm, setSearchTerm] = useState<string>('')
 
   // Modal állapotok
-  const [selectedRow, setSelectedRow] = useState<DanceStat | null>(null)
+  const [selectedRow, setSelectedRow] = useState<{ datum: string; idopont: string; title?: string } | null>(null)
   const [attendees, setAttendees] = useState<Attendee[]>([])
   const [loadingAttendees, setLoadingAttendees] = useState<boolean>(false)
 
@@ -45,7 +53,9 @@ export default function StatisticsDashboard() {
         setAllowedObjects(keys)
 
         // Első elérhető fül aktiválása
-        if (keys.includes('stats.all')) {
+        if (mode === 'reszvétel') {
+          setActiveTab('my_attendance')
+        } else if (keys.includes('stats.all')) {
           setActiveTab('dance_events')
         } else if (keys.includes('stats.detailed')) {
           setActiveTab('events_breakdown')
@@ -58,29 +68,38 @@ export default function StatisticsDashboard() {
     }
 
     fetchAllowedObjects()
-  }, [])
+  }, [mode])
 
   // Definiáljuk a fülek konfigurációját az app_objects kulcsokkal
-  const ALL_TABS = [
-    {
-      id: 'dance_events',
-      requiredObject: 'stats.all',
-      label: 'Táncesemények Összesítő',
-      subtitle: 'Jövőbeli táncesemények'
-    },
-    {
-      id: 'events_breakdown',
-      requiredObject: 'stats.detailed',
-      label: 'Események szerinti bontás (%)',
-      subtitle: 'Részvétel eseményenként'
-    },
-    {
-      id: 'persons_breakdown',
-      requiredObject: 'stats.detailed',
-      label: 'Személyek szerinti bontás (%)',
-      subtitle: 'Részvétel személyenként'
-    }
-  ]
+  const ALL_TABS = mode === 'reszvétel'
+    ? [
+        {
+          id: 'my_attendance',
+          requiredObject: 'stats.detailed',
+          label: 'Saját részvételem',
+          subtitle: 'Kizárólag a te adataid'
+        },
+        {
+          id: 'events_breakdown',
+          requiredObject: 'stats.detailed',
+          label: 'Események szerinti bontás (%)',
+          subtitle: 'Részvétel eseményenként'
+        },
+        {
+          id: 'persons_breakdown',
+          requiredObject: 'stats.detailed',
+          label: 'Személyek szerinti bontás (%)',
+          subtitle: 'Részvétel személyenként'
+        }
+      ]
+    : [
+        {
+          id: 'dance_events',
+          requiredObject: 'stats.all',
+          label: 'Táncesemények Összesítő',
+          subtitle: 'Jövőbeli táncesemények'
+        }
+      ]
 
   // Csak azok a fülek láthatók, amelyekhez megvan az engedélyezett app_object kulcs
   const visibleTabs = ALL_TABS.filter((tab) => allowedObjects.includes(tab.requiredObject))
@@ -106,11 +125,20 @@ export default function StatisticsDashboard() {
     else { setAttendeeSortField(field); setAttendeeSortDirection('asc') }
   }
 
-  const handleRowClick = async (row: DanceStat) => {
-    // Ha a felhasználónak nincs részletes jogosultsága (stats.all), ne történjen semmi
-    if (!allowedObjects.includes('stats.all')) return
+  const handleRowClick = async (row: any) => {
+    // Ha a felhasználónak nincs megfelelő statisztikai jogosultsága, ne történjen semmi
+    if (!allowedObjects.includes('stats.all') && !allowedObjects.includes('stats.detailed')) return
 
-    setSelectedRow(row)
+    // Ha az összesítés / átlag sorra kattintottak, ne nyíljon meg a modal
+    if (row.event_id === 'TOTAL') return
+
+    const datum = 'datum' in row ? row.datum : row.event_date
+    const idopont = row.idopont
+    const title = 'event_title' in row ? row.event_title : undefined
+
+    if (!datum || !idopont) return
+
+    setSelectedRow({ datum, idopont, title })
     setLoadingAttendees(true)
     setAttendees([])
     setAttendeeSortField('nev')
@@ -118,8 +146,8 @@ export default function StatisticsDashboard() {
 
     try {
       const { data, error: attErr } = await supabase.rpc('get_event_attendees', {
-        p_datum: row.datum,
-        p_idopont: row.idopont,
+        p_datum: datum,
+        p_idopont: idopont,
       })
       if (attErr) throw attErr
       setAttendees(data || [])
@@ -202,37 +230,48 @@ export default function StatisticsDashboard() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Táncesemények és Részvételi Statisztikák
+            {mode === 'reszvétel' ? 'Részvételi Statisztikák' : 'Jelentkezések'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            {isAuthorized
-              ? 'Kattints bármelyik táncesemény sorra a résztvevők megtekintéséhez.'
-              : 'Részletes kimutatások az eseményekről és a résztvevőkről.'}
+            {mode === 'reszvétel'
+              ? 'Saját és iskolai szintű részvételi adatok.'
+              : isAuthorized
+                ? 'Kattints bármelyik táncesemény sorra a jelentkezők megtekintéséhez.'
+                : 'Részletes kimutatások a jelentkezőkről.'}
           </p>
         </div>
-        <input
-          type="text"
-          placeholder="Keresés..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 w-full md:w-64"
-        />
+        {activeTab !== 'my_attendance' && (
+          <input
+            type="text"
+            placeholder="Keresés..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 w-full md:w-64"
+          />
+        )}
       </div>
 
-      {/* Dinamikus Menü / Fülek */}
-      <div className="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
-        {visibleTabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2.5 text-sm font-semibold rounded-t-xl transition-colors whitespace-nowrap ${
-              activeTab === tab.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+      {/* Dinamikus Menü / Fülek (csak ha egynél több fül látható) */}
+      {visibleTabs.length > 1 && (
+        <div className="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
+          {visibleTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 py-2.5 text-sm font-semibold rounded-t-xl transition-colors whitespace-nowrap ${
+                activeTab === tab.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* TAB: SAJÁT RÉSZVÉTEL */}
+      {activeTab === 'my_attendance' && (
+        <MyAttendance userId={userId} />
+      )}
 
       {/* TAB 1: TÁNCESEMÉNYEK */}
       {activeTab === 'dance_events' && allowedObjects.includes('stats.all') && (
@@ -322,10 +361,18 @@ export default function StatisticsDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-700">
-              {sortedEvents.map((row) => (
-                <tr key={row.event_id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium">{row.event_title}</td>
-                  <td className="px-4 py-3">{row.event_date ? new Date(row.event_date).toLocaleDateString('hu-HU') : '-'}</td>
+              {sortedEvents.map((row, index) => (
+                <tr 
+                  key={row.event_id} 
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'} ${
+                    allowedObjects.includes('stats.detailed') 
+                      ? 'cursor-pointer hover:bg-indigo-100/70' 
+                      : 'cursor-default'
+                  } transition-colors`}
+                  onClick={() => handleRowClick(row)}
+                >
+                  <td className="px-4 py-3 font-medium text-slate-900">{row.event_title}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">{row.event_date ? new Date(row.event_date).toLocaleDateString('hu-HU') : '-'}</td>
                   <td className="px-4 py-3 text-center">{row.jelentkezett_count}</td>
                   <td className="px-4 py-3 text-center">{row.megjelent_count}</td>
                   <td className="px-4 py-3 text-center">{row.fizetett_megjelent_count}</td>

@@ -92,6 +92,9 @@ export function useStatisticsData() {
         const rawAttendances = globalData?.attendances || []
         const rawProfiles = globalData?.profiles || []
 
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
 // --- 1. TAB: Táncesemények Összesítő (danceStats) ---
         const danceGroupMap: { [key: string]: DanceStat } = {}
         // v005 — csoportonként a jelen lévő profilok, hogy utólag valódi párt tudjunk számolni
@@ -167,12 +170,14 @@ export function useStatisticsData() {
           totalFizetettMegjelent += fizetettMegjelent
 
           const megArany = jelentkezett > 0 ? Math.round((megjelent / jelentkezett) * 100) : 0
-          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 0
+          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 100
+          const timeStr = ev.start_time ? ev.start_time.substring(0, 5) : '00:00'
 
           return {
             event_id: ev.id,
             event_title: ev.title || 'Névtelen esemény',
             event_date: ev.event_date ? new Date(ev.event_date).toISOString().split('T')[0] : '',
+            idopont: timeStr,
             jelentkezett_count: jelentkezett,
             megjelent_count: megjelent,
             fizetett_megjelent_count: fizetettMegjelent,
@@ -182,12 +187,13 @@ export function useStatisticsData() {
         })
 
         const totalMegArany = totalJelentkezett > 0 ? Math.round((totalMegjelent / totalJelentkezett) * 100) : 0
-        const totalFizArany = totalMegjelent > 0 ? Math.round((totalFizetettMegjelent / totalMegjelent) * 100) : 0
+        const totalFizArany = totalMegjelent > 0 ? Math.round((totalFizetettMegjelent / totalMegjelent) * 100) : 100
 
         computedEventStats.push({
           event_id: 'TOTAL',
           event_title: 'ÖSSZESEN / ÁTLAG',
           event_date: '',
+          idopont: '',
           jelentkezett_count: totalJelentkezett,
           megjelent_count: totalMegjelent,
           fizetett_megjelent_count: totalFizetettMegjelent,
@@ -199,6 +205,7 @@ export function useStatisticsData() {
 
         // --- 3. TAB: Személyek szerinti bontás (personStats) ---
         let personTotalJelentkezes = 0
+        let personTotalEvaluatedJelentkezes = 0
         let personTotalMegjelent = 0
         let personTotalFizetettMegjelent = 0
 
@@ -209,12 +216,33 @@ export function useStatisticsData() {
           const megjelent = userAtts.filter((a: any) => a.attended === true).length
           const fizetettMegjelent = userAtts.filter((a: any) => a.attended === true && a.paid === true).length
 
+          // Csak a múltbeli események (vagy a mai, ha már megjelent/fizetett) számítanak a megjelenési arány alapjába
+          const evaluatedAtts = userAtts.filter((a: any) => {
+            const ev = rawEvents.find((e: any) => e.id === a.event_id)
+            const rawDate = ev?.event_date || a.created_at || null
+            if (!rawDate) return false
+
+            const d = new Date(rawDate)
+            if (isNaN(d.getTime())) return false
+
+            const dd = new Date(d)
+            dd.setHours(0, 0, 0, 0)
+
+            const attended = a.attended === true
+            const paid = a.paid === true
+
+            return dd < today || (dd.getTime() === today.getTime() && (attended || paid))
+          })
+
+          const jelentkezesek_mult = evaluatedAtts.length
+
           personTotalJelentkezes += jelentkezesek
+          personTotalEvaluatedJelentkezes += jelentkezesek_mult
           personTotalMegjelent += megjelent
           personTotalFizetettMegjelent += fizetettMegjelent
 
-          const megArany = jelentkezesek > 0 ? Math.round((megjelent / jelentkezesek) * 100) : 0
-          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 0
+          const megArany = jelentkezesek_mult > 0 ? Math.round((megjelent / jelentkezesek_mult) * 100) : 0
+          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 100
 
           return {
             profile_id: prof.id,
@@ -228,8 +256,8 @@ export function useStatisticsData() {
           }
         })
 
-        const personTotalMegArany = personTotalJelentkezes > 0 ? Math.round((personTotalMegjelent / personTotalJelentkezes) * 100) : 0
-        const personTotalFizArany = personTotalMegjelent > 0 ? Math.round((personTotalFizetettMegjelent / personTotalMegjelent) * 100) : 0
+        const personTotalMegArany = personTotalEvaluatedJelentkezes > 0 ? Math.round((personTotalMegjelent / personTotalEvaluatedJelentkezes) * 100) : 0
+        const personTotalFizArany = personTotalMegjelent > 0 ? Math.round((personTotalFizetettMegjelent / personTotalMegjelent) * 100) : 100
 
         computedPersonStats.push({
           profile_id: 'TOTAL',

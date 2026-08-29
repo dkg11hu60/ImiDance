@@ -114,14 +114,19 @@ export function Dashboard() {
   }
 
   const getTabStyle = (key: TopTab, isActive: boolean) => {
+    if (key === 'attendance') {
+      if (isActive) {
+        return 'bg-red-700 text-white shadow-lg ring-2 ring-red-600 ring-offset-2 font-bold border border-red-800'
+      }
+      return 'bg-red-600 text-white hover:bg-red-700 font-bold border border-red-700 shadow-sm'
+    }
+
     if (isActive) {
-      return 'bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2'
+      return 'bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold'
     }
     switch (key) {
       case 'events':
         return 'bg-blue-100 text-blue-900 hover:bg-blue-200 border border-blue-300 font-bold shadow-sm'
-      case 'attendance':
-        return 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-300 font-bold shadow-sm'
       case 'myattendance':
         return 'bg-teal-100 text-teal-900 hover:bg-teal-200 border border-teal-300 font-bold shadow-sm'
       case 'statistics':
@@ -186,12 +191,12 @@ export function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {(() => {
             const tabs: { key: TopTab; label: string; show: boolean }[] = [
-              { key: 'events', label: 'Táncórák / Események', show: true },
-              { key: 'attendance', label: 'Jelenlét & Fizetés', show: canSeeTeacher },
+              { key: 'events', label: 'Táncórák', show: true },
+              { key: 'statistics', label: 'Jelentkezés', show: canSeeAllStats },
               { key: 'myattendance', label: 'Részvétel', show: true },
-              { key: 'statistics', label: 'Jelentkezések', show: canSeeAllStats },
               { key: 'profile', label: 'Profil', show: true },
-              { key: 'teacher', label: 'Oktatói felület', show: canSeeTeacher },
+              { key: 'attendance', label: 'Beléptetés', show: canSeeTeacher },
+              { key: 'teacher', label: 'Oktató', show: canSeeTeacher },
               { key: 'admin', label: 'Adminisztráció', show: canManageUsers },
             ]
             const visibleTabs = tabs.filter(t => t.show)
@@ -259,9 +264,15 @@ export function Dashboard() {
           <EventAttendanceManager />
         )}
 
-        {activeTab === 'myattendance' && <MyAttendance userId={user?.id} />}
+        {activeTab === 'myattendance' && (
+          canSeeAllStats || visible.has('stats.detailed') ? (
+            <StatisticDashboard mode="reszvétel" userId={user?.id} />
+          ) : (
+            <MyAttendance userId={user?.id} />
+          )
+        )}
 
-        {activeTab === 'statistics' && canSeeAllStats && <StatisticDashboard />}
+        {activeTab === 'statistics' && canSeeAllStats && <StatisticDashboard mode="jelentesek" />}
 
         {activeTab === 'profile' && <ProfileEdit userId={user?.id} />}
 

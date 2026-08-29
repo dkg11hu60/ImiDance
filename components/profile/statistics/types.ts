@@ -22,6 +22,7 @@ export interface EventStat {
   event_id: string
   event_title: string
   event_date: string | null
+  idopont: string
   jelentkezett_count: number
   megjelent_count: number
   fizetett_megjelent_count: number
