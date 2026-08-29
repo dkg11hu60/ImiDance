@@ -71,7 +71,7 @@ export function EventList({ userId }: { userId: string }) {
       setCurrentUserProfile(myProfile)
     }
 
-    setCanAttend((await loadVisibleObjects(myProfile?.role)).has('event.attend'))
+    setCanAttend((await loadVisibleObjects(userId)).has('event.attend'))
 
     if (attsRes.data) {
       const attMap: { [key: string]: boolean } = {}

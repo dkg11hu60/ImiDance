@@ -70,7 +70,7 @@ export async function POST(req: Request) {
         profile_id: pid,
         event_id: eventId,
         event_name: eventName,
-        status: 'X',
+        status: 'registered',
       }))
 
       const { error: upsertError } = await admin
