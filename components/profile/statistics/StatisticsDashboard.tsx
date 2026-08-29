@@ -107,8 +107,8 @@ export default function StatisticsDashboard() {
   }
 
   const handleRowClick = async (row: DanceStat) => {
-    // Ha a felhasználónak nincs részletes jogosultsága (stats.detailed), ne történjen semmi
-    if (!allowedObjects.includes('stats.detailed')) return
+    // Ha a felhasználónak nincs részletes jogosultsága (stats.all), ne történjen semmi
+    if (!allowedObjects.includes('stats.all')) return
 
     setSelectedRow(row)
     setLoadingAttendees(true)
@@ -269,7 +269,7 @@ export default function StatisticsDashboard() {
               <tr
                 key={index}
                 className={`${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'} ${
-                  allowedObjects.includes('stats.detailed') 
+                  allowedObjects.includes('stats.all') 
                     ? 'cursor-pointer hover:bg-indigo-100/70' 
                     : 'cursor-default'
                 } transition-colors`}

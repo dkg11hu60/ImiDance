@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { loadVisibleObjects } from '@/lib/permissions'
 import { EventList } from '@/components/events/EventList'
 import { ProfileEdit } from '@/components/profile/ProfileEdit'
+import { MyAttendance } from '@/components/profile/MyAttendance'
 import StatisticDashboard from '@/components/profile/statistics/StatisticsDashboard'
 import { EventCreator } from '@/components/teacher/EventCreator'
 import { EventManageList } from '@/components/teacher/EventManageList'
@@ -15,7 +16,7 @@ import { PolicyGate } from '@/components/policy/PolicyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
 import { EventAttendanceManager } from '@/components/teacher/EventAttendanceManager'
 
-type TopTab = 'events' | 'attendance' | 'statistics' | 'profile' | 'teacher' | 'admin'
+type TopTab = 'events' | 'attendance' | 'myattendance' | 'statistics' | 'profile' | 'teacher' | 'admin'
 type TeacherSubTab = 'manage' | 'create' | 'locations' | 'members' | 'policy'
 
 export function Dashboard() {
@@ -121,6 +122,8 @@ export function Dashboard() {
         return 'bg-blue-100 text-blue-900 hover:bg-blue-200 border border-blue-300 font-bold shadow-sm'
       case 'attendance':
         return 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-300 font-bold shadow-sm'
+      case 'myattendance':
+        return 'bg-teal-100 text-teal-900 hover:bg-teal-200 border border-teal-300 font-bold shadow-sm'
       case 'statistics':
         return 'bg-cyan-100 text-cyan-900 hover:bg-cyan-200 border border-cyan-300 font-bold shadow-sm'
       case 'profile':
@@ -185,7 +188,8 @@ export function Dashboard() {
             const tabs: { key: TopTab; label: string; show: boolean }[] = [
               { key: 'events', label: 'Táncórák / Események', show: true },
               { key: 'attendance', label: 'Jelenlét & Fizetés', show: canSeeTeacher },
-              { key: 'statistics', label: canSeeAllStats ? 'Statisztikák' : 'Saját részvételeim', show: true },
+              { key: 'myattendance', label: 'Részvétel', show: true },
+              { key: 'statistics', label: 'Jelentkezések', show: canSeeAllStats },
               { key: 'profile', label: 'Profil', show: true },
               { key: 'teacher', label: 'Oktatói felület', show: canSeeTeacher },
               { key: 'admin', label: 'Adminisztráció', show: canManageUsers },
@@ -255,7 +259,9 @@ export function Dashboard() {
           <EventAttendanceManager />
         )}
 
-        {activeTab === 'statistics' && <StatisticDashboard />}
+        {activeTab === 'myattendance' && <MyAttendance userId={user?.id} />}
+
+        {activeTab === 'statistics' && canSeeAllStats && <StatisticDashboard />}
 
         {activeTab === 'profile' && <ProfileEdit userId={user?.id} />}
 

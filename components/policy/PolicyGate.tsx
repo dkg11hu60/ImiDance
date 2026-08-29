@@ -83,6 +83,43 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
     setError(null)
 
     try {
+      // 1. Ellenőrizzük, hogy létezik-e a profil, mert a "policy_acceptances" táblának "profile_id" idegen kulcsa van a "profiles" táblára.
+      const { data: profileCheck, error: checkErr } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (checkErr) throw checkErr
+
+      if (!profileCheck) {
+        // Ha nem létezik a profil (pl. manuális auth regisztráció vagy szinkronizációs hiba miatt), létrehozzuk JIT (just-in-time)
+        const { data: { user } } = await supabase.auth.getUser()
+        const meta = user?.user_metadata || {}
+        const fullName = meta.full_name || meta.name || user?.email?.split('@')[0] || 'Névtelen'
+        const gender = meta.gender || 'Fiú'
+        const danceLevel = meta.dance_level || 'Hobbi'
+
+        // Biztosítjuk az egyediséget a name mezőhöz (amely UNIQUE constraint alatt áll a sémában)
+        const uniqueName = `${fullName} (${userId.substring(0, 4)})`
+
+        const { error: profileErr } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            name: uniqueName,
+            full_name: fullName,
+            email: user?.email || '',
+            gender: gender,
+            dance_level: danceLevel,
+          })
+
+        if (profileErr) {
+          throw new Error('Sikertelen automatikus profil-létrehozás a házirend elfogadása előtt: ' + profileErr.message)
+        }
+      }
+
+      // 2. Most már biztosan létezik a profil, beszúrhatjuk az elfogadást
       const { error: insertErr } = await supabase.from('policy_acceptances').insert({
         profile_id: userId,
         policy_id: policy.id,
