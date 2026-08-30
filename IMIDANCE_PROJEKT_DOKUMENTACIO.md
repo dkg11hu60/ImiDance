@@ -1,6 +1,6 @@
 # ImiDance Alkalmazás – Projekt Dokumentáció
 
-> **Verzió: v003 (2026-08-30).** A §3 séma az élő adatbázishoz igazítva; új fejezetek: §9 pár- és jelentkezés-automatizmus, §10 statisztika-szemantika, §11 egyszeri migrációk, §12 nyitott pontok, §13 változásnapló. Részletek: §13. (v003 frissítések: időformátum, múlt/jövő szűrési bontás statisztikákban, szerepkör-szűrés, 0/0 division javítás és esemény modal bővítés).
+> **Verzió: v004 (2026-08-30).** Új fejezetek és változások: §13 változásnapló kiegészítve a v004 frissítésekkel (szerepkörválasztó gombok, mobil-reszponzív kártyák, tesztadat-szűrés a statisztikákból, "Partnered" terminológia, profil helper és "Órarend" menüpont). Részletek: §13.
 
 ## 1. A projekt áttekintése
 
@@ -377,6 +377,26 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
 
 ## 13. Változásnapló
 
+**Doc v004 (2026-08-30):**
+
+- **Szerepkörválasztó UI gombosítása és reszponzivitása (UserAdmin.tsx):**
+  - Lecseréltük a jelölőnégyzeteket (checkboxokat/pipákat) egy modern, függőlegesen rendezett gombos választófelületre.
+  - A gombok kijelölve élénkzöld (`bg-emerald-600`), kijelöletlenül szürke színűek.
+  - Magadnak az admin jog elvételét letiltottuk (faded disabled állapot).
+  - Teljesen mobil-reszponzívvá tettük az egész admin felületet: kis képernyőkön kártyás listaként jelenik meg, ahol a szerepkörök egy átlátható 2-oszlopos rácsban rendeződnek el.
+- **Rámutatási súgó (Hover helper) a jelentkezési gombon (EventList.tsx):**
+  - Hozzáadtunk egy tooltipet az "Ott leszek / Lemondom" gombhoz, amely elmagyarázza, hogy a jelentkezés és lemondás az esemény kezdetéig bármikor módosítható, és szükségtelen a tanárt külön értesíteni.
+- **Tesztadatok és Tesztfelhasználók globális kizárása a statisztikákból (useStatisticsData.ts):**
+  - Implementáltuk a tokentől független (case-insensitive) `"teszt"` mintaszűrőt, amely kiszűri a teszt profilokat és minden hozzájuk kapcsolódó jelentkezést az összesített adatokból és a részletező modalokból is.
+- **Partner terminológia és profil-helper integráció (EventList.tsx, ProfileEdit.tsx):**
+  - A „Párod” megnevezést mindenhol a professzionálisabb „Partnered” megnevezésre cseréltük.
+  - Partner hiánya esetén a letisztult „Partnered: -” gomb jelenik meg, amely rákattintva egyből a Profil szerkesztésére navigál (hover magyarázattal: „Ide kattintva beállíthatod”).
+  - A profil szerkesztési oldalon elhelyeztünk egy magyarázó súgó dobozt, amely leírja a partner-jelentkezések közös működési logikáját.
+- **Navigációs cím tisztítása (Dashboard.tsx):**
+  - Átneveztük a főmenüben lévő „Táncórák” menüpontot „Órarend”-re az egyértelműség kedvéért.
+- **Gemini CLI auto-accept automatizmus:**
+  - Beállítottuk a `.gemini/settings.json` fájlban és a `GEMINI.md` irányelvekben a `defaultApprovalMode: "auto_edit"` működést a gyorsabb és zökkenőmentes automatizált fejlesztési turn-ökért.
+
 **Doc v003 (2026-08-30):**
 
 - **Időformátum korrekció:** Az `EventList.tsx` felületen a táncórák időpontjai `HH:MM:SS` helyett immár tisztán `HH:MM` formátumban jelennek meg.
@@ -395,7 +415,7 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
 
 **Kód / DB verziók:**
 
-- `useStatisticsData` — **v008** (szerepkör-szűrés, split múlt/jövő események, 0/0 division javítás `"—"`-ra, raw adatok exponálása a modalnak).
+- `useStatisticsData` — **v009** (szerepkör-szűrés, split múlt/jövő események, 0/0 division javítás `"—"`-ra, raw adatok exponálása a modalnak, "teszt" adatok szűrése).
 - `get_event_attendees` — **v002** (`to_char(start_time,'HH24:MI')`), ÉLES.
 - `sync_partner_relationship` — **v002** (rekurzió-lánctörő, ütközés-feloldás), FÜGGŐBEN.
 - `attendance_pair_sync` — **v001** (jelentkezés-propagálás kölcsönös párra), FÜGGŐBEN.
