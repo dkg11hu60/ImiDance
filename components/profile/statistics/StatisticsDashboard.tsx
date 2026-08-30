@@ -12,7 +12,7 @@ interface StatisticsDashboardProps {
 }
 
 export default function StatisticsDashboard({ mode = 'jelentesek', userId }: StatisticsDashboardProps) {
-  const { loading, error, isAuthorized, danceStats, eventStats, personStats } = useStatisticsData()
+  const { loading, error, isAuthorized, danceStats, eventStats, personStats, rawEvents, rawAttendances, rawProfiles } = useStatisticsData()
 
   // Engedélyezett objektumok (app_objects kulcsok) tárolása
   const [allowedObjects, setAllowedObjects] = useState<string[]>([])
@@ -145,14 +145,40 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
     setAttendeeSortDirection('asc')
 
     try {
-      const { data, error: attErr } = await supabase.rpc('get_event_attendees', {
-        p_datum: datum,
-        p_idopont: idopont,
+      // Megkeressük az adott eseményhez tartozó jelentkezéseket a helyi rawAttendances táblából
+      let eventAtts = []
+      if (row.event_id) {
+        eventAtts = rawAttendances.filter((att: any) => att.event_id === row.event_id)
+      } else {
+        // Ha nincs konkrét event_id, akkor megkeressük azokat az eseményeket, amik az adott dátumra és időpontra esnek
+        const matchingEventIds = rawEvents
+          .filter((ev: any) => {
+            const evDate = ev.event_date ? new Date(ev.event_date).toISOString().split('T')[0] : ''
+            const evTime = ev.start_time ? ev.start_time.substring(0, 5) : ''
+            return evDate === datum && evTime === idopont
+          })
+          .map((ev: any) => ev.id)
+        
+        eventAtts = rawAttendances.filter((att: any) => matchingEventIds.includes(att.event_id))
+      }
+
+      // Összekötjük a profilokkal és kigyűjtjük az információkat
+      const localAttendees = eventAtts.map((att: any) => {
+        const prof = rawProfiles.find((p: any) => p.id === att.profile_id)
+        return {
+          nev: prof?.full_name || prof?.name || prof?.email || 'Névtelen',
+          nem: prof?.gender || '—',
+          par_neve: prof ? (rawProfiles.find((p: any) => p.id === prof.partner_id)?.full_name || null) : null,
+          tudasszint: prof?.dance_level || '—',
+          jelentkezett: (att.status ?? '') !== 'cancelled',
+          megjelent: att.attended === true,
+          fizetett: att.paid === true
+        }
       })
-      if (attErr) throw attErr
-      setAttendees(data || [])
+
+      setAttendees(localAttendees)
     } catch (err: any) {
-      console.error('Hiba a jelentkezők betöltésekor:', err.message)
+      console.error('Hiba a jelentkezők feldolgozásakor:', err.message)
     } finally {
       setLoadingAttendees(false)
     }
@@ -203,8 +229,8 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
     })
 
   const sortedAttendees = [...attendees].sort((a, b) => {
-    const aVal = a[attendeeSortField] || ''
-    const bVal = b[attendeeSortField] || ''
+    const aVal = String(a[attendeeSortField] || '')
+    const bVal = String(b[attendeeSortField] || '')
     return attendeeSortDirection === 'asc' ? aVal.localeCompare(bVal, 'hu') : bVal.localeCompare(aVal, 'hu')
   })
 
@@ -435,8 +461,16 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                   <td className="px-4 py-3 text-center">{row.osszes_jelentkezes}</td>
                   <td className="px-4 py-3 text-center">{row.osszes_megjelent}</td>
                   <td className="px-4 py-3 text-center">{row.osszes_fizetett_megjelent}</td>
-                  <td className="px-4 py-3 text-center font-semibold text-blue-600">{row.megjelenesi_arany}</td>
-                  <td className="px-4 py-3 text-center font-semibold text-emerald-600">{row.fizetesi_arany}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold min-w-[55px] ${getAppearanceRateStyle(row.megjelenesi_arany)}`}>
+                      {row.megjelenesi_arany}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-bold min-w-[55px] ${getPaymentRateStyle(row.fizetesi_arany)}`}>
+                      {row.fizetesi_arany}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -448,8 +482,16 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                   <td className="px-4 py-3 text-center">{totalPersonRow.osszes_jelentkezes}</td>
                   <td className="px-4 py-3 text-center">{totalPersonRow.osszes_megjelent}</td>
                   <td className="px-4 py-3 text-center">{totalPersonRow.osszes_fizetett_megjelent}</td>
-                  <td className="px-4 py-3 text-center text-blue-700 font-extrabold">{totalPersonRow.megjelenesi_arany}</td>
-                  <td className="px-4 py-3 text-center text-emerald-700 font-extrabold">{totalPersonRow.fizetesi_arany}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-extrabold min-w-[55px] ${getAppearanceRateStyle(totalPersonRow.megjelenesi_arany)}`}>
+                      {totalPersonRow.megjelenesi_arany}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-extrabold min-w-[55px] ${getPaymentRateStyle(totalPersonRow.fizetesi_arany)}`}>
+                      {totalPersonRow.fizetesi_arany}
+                    </span>
+                  </td>
                 </tr>
               </tfoot>
             )}
@@ -460,7 +502,7 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
       {/* RÉSZTVEVŐ MODAL */}
       {selectedRow && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
             <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="text-lg font-bold">Jelentkezők listája</h3>
@@ -484,7 +526,16 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                         Nem {attendeeSortField === 'nem' && (attendeeSortDirection === 'asc' ? ' ▲' : ' ▼')}
                       </th>
                       <th onClick={() => handleAttendeeSort('par_neve')} className="px-4 py-3 text-left font-semibold cursor-pointer hover:bg-slate-200 select-none">
-                        Pár neve {attendeeSortField === 'par_neve' && (attendeeSortDirection === 'asc' ? ' ▲' : ' ▼')}
+                        Párja {attendeeSortField === 'par_neve' && (attendeeSortDirection === 'asc' ? ' ▲' : ' ▼')}
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold select-none">
+                        Jelentkezett?
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold select-none">
+                        Megjelent?
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold select-none">
+                        Fizetett?
                       </th>
                       <th onClick={() => handleAttendeeSort('tudasszint')} className="px-4 py-3 text-center font-semibold cursor-pointer hover:bg-slate-200 select-none">
                         Tudásszint {attendeeSortField === 'tudasszint' && (attendeeSortDirection === 'asc' ? ' ▲' : ' ▼')}
@@ -501,6 +552,27 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                           </span>
                         </td>
                         <td className="px-4 py-3 text-slate-600 font-medium">{att.par_neve || <span className="text-slate-400 italic">Nincs párja</span>}</td>
+                        <td className="px-4 py-3 text-center">
+                          {att.jelentkezett ? (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
+                          ) : (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-600 border border-rose-200">Nem</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {att.megjelent ? (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
+                          ) : (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-600 border border-rose-200">Nem</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {att.fizetett ? (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
+                          ) : (
+                            <span className="inline-flex px-2 py-0.5 rounded font-medium bg-rose-50 text-rose-600 border border-rose-200">Nem</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-center font-semibold text-slate-800">{att.tudasszint || '—'}</td>
                       </tr>
                     ))}
@@ -518,4 +590,25 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
       )}
     </div>
   )
+}
+
+function getAppearanceRateStyle(rateStr: string): string {
+  if (!rateStr || rateStr === '—') return 'bg-slate-100 text-slate-500 border border-slate-200'
+  const val = parseInt(rateStr.replace('%', ''), 10)
+  if (isNaN(val)) return 'bg-slate-100 text-slate-500 border border-slate-200'
+
+  if (val >= 90) return 'bg-emerald-100 text-emerald-800 border border-emerald-200'  // Level 5 (90-100)
+  if (val >= 70) return 'bg-green-100 text-green-800 border border-green-200'         // Level 4 (70-89)
+  if (val >= 50) return 'bg-yellow-100 text-yellow-800 border border-yellow-200'       // Level 3 (50-69)
+  if (val >= 30) return 'bg-orange-100 text-orange-800 border border-orange-200'       // Level 2 (30-49)
+  return 'bg-red-100 text-red-800 border border-red-200'                             // Level 1 (0-29)
+}
+
+function getPaymentRateStyle(rateStr: string): string {
+  if (!rateStr || rateStr === '—') return 'bg-slate-100 text-slate-500 border border-slate-200'
+  const val = parseInt(rateStr.replace('%', ''), 10)
+  if (isNaN(val)) return 'bg-slate-100 text-slate-500 border border-slate-200'
+
+  if (val === 100) return 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+  return 'bg-red-100 text-red-800 border border-red-200'
 }

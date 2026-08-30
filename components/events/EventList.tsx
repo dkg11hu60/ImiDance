@@ -158,7 +158,7 @@ export function EventList({ userId }: { userId: string }) {
                   {formatEventDate(ev.event_date)}
                 </div>
                 <div className="text-xs sm:text-sm font-semibold text-emerald-600 mt-0.5">
-                  {ev.start_time && ev.end_time ? `${ev.start_time} - ${ev.end_time}` : 'Időpont nincs megadva'}
+                  {ev.start_time && ev.end_time ? `${ev.start_time.slice(0, 5)} - ${ev.end_time.slice(0, 5)}` : 'Időpont nincs megadva'}
                 </div>
 
                 {ev.title && <div className="text-xs text-zinc-500 mt-0.5 truncate">{ev.title}</div>}

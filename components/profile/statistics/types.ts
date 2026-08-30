@@ -16,6 +16,9 @@ export interface Attendee {
   nem: string
   par_neve: string | null
   tudasszint: string | null
+  jelentkezett?: boolean
+  megjelent?: boolean
+  fizetett?: boolean
 }
 
 export interface EventStat {

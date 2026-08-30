@@ -60,6 +60,9 @@ export function useStatisticsData() {
   const [danceStats, setDanceStats] = useState<DanceStat[]>([])
   const [eventStats, setEventStats] = useState<EventStat[]>([])
   const [personStats, setPersonStats] = useState<PersonStat[]>([])
+  const [rawEvents, setRawEvents] = useState<any[]>([])
+  const [rawAttendances, setRawAttendances] = useState<any[]>([])
+  const [rawProfiles, setRawProfiles] = useState<any[]>([])
 
   useEffect(() => {
     async function loadData() {
@@ -88,9 +91,70 @@ export function useStatisticsData() {
 
         if (globalErr) throw new Error(`Globális adatok hiba: ${globalErr.message}`)
 
+        // Lekérjük az összes szerepkört is a szűréshez
+        const { data: userRolesData, error: rolesErr } = await supabase.from('user_roles').select('user_id, role_key')
+        if (rolesErr) {
+          console.warn('Nem sikerült betölteni a szerepköröket, a fallback szerepértékeket használjuk:', rolesErr.message)
+        }
+
+        const userRolesMap: { [userId: string]: string[] } = {}
+        if (userRolesData) {
+          userRolesData.forEach((ur: any) => {
+            if (!userRolesMap[ur.user_id]) userRolesMap[ur.user_id] = []
+            userRolesMap[ur.user_id].push(ur.role_key)
+          })
+        }
+
+        const now = new Date()
+
+        // Csak a jövőbeli események a Jelentkezések (Táncesemények Összesítő) fülhöz
+        const rawEventsFuture = (globalData?.events || []).filter((ev: any) => {
+          const datePart = ev.event_date ? ev.event_date.split('T')[0] : ""
+          const timePart = ev.end_time || ev.start_time || "23:59:59"
+          const eventEnd = new Date(`${datePart}T${timePart}`)
+
+          if (isNaN(eventEnd.getTime())) return true // Ha érvénytelen a dátum, jövőbelinek tekintjük
+          return eventEnd > now
+        })
+
+        // Csak a múltbeli események a Részvételi statisztikák fülekhez (esemény & személy szerinti bontások)
+        const rawEventsPast = (globalData?.events || []).filter((ev: any) => {
+          const datePart = ev.event_date ? ev.event_date.split('T')[0] : ""
+          const timePart = ev.end_time || ev.start_time || "23:59:59"
+          const eventEnd = new Date(`${datePart}T${timePart}`)
+
+          if (isNaN(eventEnd.getTime())) return false
+          return eventEnd <= now
+        })
+
+        const pastEventIds = new Set(rawEventsPast.map((e: any) => e.id))
+        const futureEventIds = new Set(rawEventsFuture.map((e: any) => e.id))
+
+        // Csak a már befejeződött események jelentkezéseit számítjuk be a részvételi statisztikákba
+        const rawAttendancesPast = (globalData?.attendances || []).filter((att: any) => 
+          pastEventIds.has(att.event_id)
+        )
+
+        // Csak a jövőbeli események jelentkezéseit számítjuk be a jelentkezési összesítésekbe
+        const rawAttendancesFuture = (globalData?.attendances || []).filter((att: any) => 
+          futureEventIds.has(att.event_id)
+        )
+
+        // Teljes, szűretlen listák a részletező modalokhoz (amik tetszőleges múltbeli vagy jövőbeli eseményt megnyithatnak)
         const rawEvents = globalData?.events || []
         const rawAttendances = globalData?.attendances || []
-        const rawProfiles = globalData?.profiles || []
+
+        // Csak a 'user' vagy 'admin' szerepkörrel rendelkező profilokat jelenítjük meg a statisztikákban
+        const rawProfiles = (globalData?.profiles || []).filter((prof: any) => {
+          let roles = userRolesMap[prof.id] || []
+          if (roles.length === 0 && prof.role) {
+            roles = [prof.role]
+          }
+          if (roles.length === 0) {
+            roles = ['user'] // Alapértelmezett, ha semmi sincs beállítva
+          }
+          return roles.includes('user') || roles.includes('admin')
+        })
 
         const today = new Date()
         today.setHours(0, 0, 0, 0)
@@ -100,7 +164,7 @@ export function useStatisticsData() {
         // v005 — csoportonként a jelen lévő profilok, hogy utólag valódi párt tudjunk számolni
         const presentByGroup: { [key: string]: any[] } = {}
 
-        rawEvents.forEach((ev: any) => {
+        rawEventsFuture.forEach((ev: any) => {
           const dateStr = ev.event_date ? new Date(ev.event_date).toISOString().split('T')[0] : 'Ismeretlen'
           const timeStr = ev.start_time ? ev.start_time.substring(0, 5) : '00:00'
           const groupKey = `${dateStr}_${timeStr}`
@@ -122,7 +186,7 @@ export function useStatisticsData() {
           }
 
           // v007 — a Táncesemények Összesítő az ÉLŐ (nem lemondott) jelentkezéseket számolja
-          const eventAtts = rawAttendances.filter((att: any) => att.event_id === ev.id && isActiveRegistration(att))
+          const eventAtts = rawAttendancesFuture.filter((att: any) => att.event_id === ev.id && isActiveRegistration(att))
           eventAtts.forEach((att: any) => {
             const profile = rawProfiles.find((p: any) => p.id === att.profile_id)
             if (profile) {
@@ -158,9 +222,9 @@ export function useStatisticsData() {
         let totalMegjelent = 0
         let totalFizetettMegjelent = 0
 
-        const computedEventStats: EventStat[] = rawEvents.map((ev: any) => {
+        const computedEventStats: EventStat[] = rawEventsPast.map((ev: any) => {
           // v007 — jelentkező = élő (nem lemondott); megjelenés = attended; fizetés = paid
-          const eventAtts = rawAttendances.filter((att: any) => att.event_id === ev.id && isActiveRegistration(att))
+          const eventAtts = rawAttendancesPast.filter((att: any) => att.event_id === ev.id && isActiveRegistration(att))
           const jelentkezett = eventAtts.length
           const megjelent = eventAtts.filter((a: any) => a.attended === true).length
           const fizetettMegjelent = eventAtts.filter((a: any) => a.attended === true && a.paid === true).length
@@ -169,8 +233,8 @@ export function useStatisticsData() {
           totalMegjelent += megjelent
           totalFizetettMegjelent += fizetettMegjelent
 
-          const megArany = jelentkezett > 0 ? Math.round((megjelent / jelentkezett) * 100) : 0
-          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 100
+          const megAranyStr = jelentkezett > 0 ? `${Math.round((megjelent / jelentkezett) * 100)}%` : '—'
+          const fizAranyStr = megjelent > 0 ? `${Math.round((fizetettMegjelent / megjelent) * 100)}%` : '—'
           const timeStr = ev.start_time ? ev.start_time.substring(0, 5) : '00:00'
 
           return {
@@ -181,13 +245,13 @@ export function useStatisticsData() {
             jelentkezett_count: jelentkezett,
             megjelent_count: megjelent,
             fizetett_megjelent_count: fizetettMegjelent,
-            megjelenesi_arany: `${megArany}%`,
-            fizetesi_arany: `${fizArany}%`
+            megjelenesi_arany: megAranyStr,
+            fizetesi_arany: fizAranyStr
           }
         })
 
-        const totalMegArany = totalJelentkezett > 0 ? Math.round((totalMegjelent / totalJelentkezett) * 100) : 0
-        const totalFizArany = totalMegjelent > 0 ? Math.round((totalFizetettMegjelent / totalMegjelent) * 100) : 100
+        const totalMegAranyStr = totalJelentkezett > 0 ? `${Math.round((totalMegjelent / totalJelentkezett) * 100)}%` : '—'
+        const totalFizAranyStr = totalMegjelent > 0 ? `${Math.round((totalFizetettMegjelent / totalMegjelent) * 100)}%` : '—'
 
         computedEventStats.push({
           event_id: 'TOTAL',
@@ -197,8 +261,8 @@ export function useStatisticsData() {
           jelentkezett_count: totalJelentkezett,
           megjelent_count: totalMegjelent,
           fizetett_megjelent_count: totalFizetettMegjelent,
-          megjelenesi_arany: `${totalMegArany}%`,
-          fizetesi_arany: `${totalFizArany}%`
+          megjelenesi_arany: totalMegAranyStr,
+          fizetesi_arany: totalFizAranyStr
         })
 
         setEventStats(computedEventStats)
@@ -209,40 +273,23 @@ export function useStatisticsData() {
         let personTotalMegjelent = 0
         let personTotalFizetettMegjelent = 0
 
-        const computedPersonStats: PersonStat[] = rawProfiles.map((prof: any) => {
+          const computedPersonStats: PersonStat[] = rawProfiles.map((prof: any) => {
           // v007 — személyenként is: élő jelentkezés a nevező, megjelenés = attended, fizetés = paid
-          const userAtts = rawAttendances.filter((att: any) => att.profile_id === prof.id && isActiveRegistration(att))
+          const userAtts = rawAttendancesPast.filter((att: any) => att.profile_id === prof.id && isActiveRegistration(att))
           const jelentkezesek = userAtts.length
           const megjelent = userAtts.filter((a: any) => a.attended === true).length
           const fizetettMegjelent = userAtts.filter((a: any) => a.attended === true && a.paid === true).length
 
-          // Csak a múltbeli események (vagy a mai, ha már megjelent/fizetett) számítanak a megjelenési arány alapjába
-          const evaluatedAtts = userAtts.filter((a: any) => {
-            const ev = rawEvents.find((e: any) => e.id === a.event_id)
-            const rawDate = ev?.event_date || a.created_at || null
-            if (!rawDate) return false
-
-            const d = new Date(rawDate)
-            if (isNaN(d.getTime())) return false
-
-            const dd = new Date(d)
-            dd.setHours(0, 0, 0, 0)
-
-            const attended = a.attended === true
-            const paid = a.paid === true
-
-            return dd < today || (dd.getTime() === today.getTime() && (attended || paid))
-          })
-
-          const jelentkezesek_mult = evaluatedAtts.length
+          // Mivel a rawEvents és rawAttendances már eleve szűrve van, minden ide érkező jelentkezés múltbeli
+          const jelentkezesek_mult = jelentkezesek
 
           personTotalJelentkezes += jelentkezesek
           personTotalEvaluatedJelentkezes += jelentkezesek_mult
           personTotalMegjelent += megjelent
           personTotalFizetettMegjelent += fizetettMegjelent
 
-          const megArany = jelentkezesek_mult > 0 ? Math.round((megjelent / jelentkezesek_mult) * 100) : 0
-          const fizArany = megjelent > 0 ? Math.round((fizetettMegjelent / megjelent) * 100) : 100
+          const megAranyStr = jelentkezesek_mult > 0 ? `${Math.round((megjelent / jelentkezesek_mult) * 100)}%` : '—'
+          const fizAranyStr = megjelent > 0 ? `${Math.round((fizetettMegjelent / megjelent) * 100)}%` : '—'
 
           return {
             profile_id: prof.id,
@@ -251,13 +298,13 @@ export function useStatisticsData() {
             osszes_jelentkezes: jelentkezesek,
             osszes_megjelent: megjelent,
             osszes_fizetett_megjelent: fizetettMegjelent,
-            megjelenesi_arany: `${megArany}%`,
-            fizetesi_arany: `${fizArany}%`
+            megjelenesi_arany: megAranyStr,
+            fizetesi_arany: fizAranyStr
           }
         })
 
-        const personTotalMegArany = personTotalEvaluatedJelentkezes > 0 ? Math.round((personTotalMegjelent / personTotalEvaluatedJelentkezes) * 100) : 0
-        const personTotalFizArany = personTotalMegjelent > 0 ? Math.round((personTotalFizetettMegjelent / personTotalMegjelent) * 100) : 100
+        const personTotalMegAranyStr = personTotalEvaluatedJelentkezes > 0 ? `${Math.round((personTotalMegjelent / personTotalEvaluatedJelentkezes) * 100)}%` : '—'
+        const personTotalFizAranyStr = personTotalMegjelent > 0 ? `${Math.round((personTotalFizetettMegjelent / personTotalMegjelent) * 100)}%` : '—'
 
         computedPersonStats.push({
           profile_id: 'TOTAL',
@@ -266,11 +313,14 @@ export function useStatisticsData() {
           osszes_jelentkezes: personTotalJelentkezes,
           osszes_megjelent: personTotalMegjelent,
           osszes_fizetett_megjelent: personTotalFizetettMegjelent,
-          megjelenesi_arany: `${personTotalMegArany}%`,
-          fizetesi_arany: `${personTotalFizArany}%`
+          megjelenesi_arany: personTotalMegAranyStr,
+          fizetesi_arany: personTotalFizAranyStr
         })
 
         setPersonStats(computedPersonStats)
+        setRawEvents(rawEvents)
+        setRawAttendances(rawAttendances)
+        setRawProfiles(rawProfiles)
 
       } catch (err: any) {
         console.error('Hiba a useStatisticsData futása során:', err)
@@ -289,6 +339,9 @@ export function useStatisticsData() {
     isAuthorized,
     danceStats,
     eventStats,
-    personStats
+    personStats,
+    rawEvents,
+    rawAttendances,
+    rawProfiles
   }
 }

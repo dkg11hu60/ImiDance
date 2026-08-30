@@ -1,3 +1,22 @@
-{
-  "css.lint.unknownAtRules": "ignore"
+  {
+  "cSpell.ignorePaths": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.map"
+  ],
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/*.map": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.next/**": true,
+    "**/node_modules/**": true
+  },
+  "css.lint.unknownAtRules": "ignore",
+  "telemetry.telemetryLevel": "off",
+  "workbench.reduceMotion": "on"
 }
