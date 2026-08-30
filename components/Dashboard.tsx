@@ -191,7 +191,7 @@ export function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {(() => {
             const tabs: { key: TopTab; label: string; show: boolean }[] = [
-              { key: 'events', label: 'Táncórák', show: true },
+              { key: 'events', label: 'Órarend', show: true },
               { key: 'statistics', label: 'Jelentkezés', show: canSeeAllStats },
               { key: 'myattendance', label: 'Részvétel', show: true },
               { key: 'profile', label: 'Profil', show: true },
@@ -258,7 +258,7 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'events' && <EventList userId={user?.id} />}
+        {activeTab === 'events' && <EventList userId={user?.id} onNavigateProfile={() => setActiveTab('profile')} />}
         
         {activeTab === 'attendance' && canSeeTeacher && (
           <EventAttendanceManager />

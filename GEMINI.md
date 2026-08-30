@@ -17,6 +17,7 @@
 
 ## Git Workflow & Automation Rules
 
+- For Gemini CLI / Agent workflow, auto-accept (automatic tool approval, `defaultApprovalMode: auto_edit`) must be the default for all file modifications and tool executions.
 - All automated sync scripts (`START_syncPush.ps1`, `START_MasterPipeline.ps1`) must handle untracked files gracefully without exiting prematurely.
 - Staging must include modified and untracked files (`git add -A`), while strictly respecting `.gitignore`.
 - Fallback commit message: `feat: pwsh pipeline, scripts, and workspace sync`.

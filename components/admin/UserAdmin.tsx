@@ -189,7 +189,109 @@ export function UserAdmin() {
         </div>
       )}
 
-      <table className="w-full text-left text-sm border-collapse">
+      {/* MOBIL NÉZET: Kártyás elrendezés kis képernyőkre */}
+      <div className="block md:hidden space-y-4">
+        {profiles.map(p => {
+          const isSelf = p.id === myId
+          const isActive = p.is_active ?? true
+          const displayName = p.full_name || p.name || 'Névtelen'
+          const userRoles = userRolesMap[p.id] || []
+
+          return (
+            <div 
+              key={p.id} 
+              className={`p-4 rounded-xl border border-zinc-200 space-y-3 transition-colors ${
+                !isActive ? 'bg-zinc-50 opacity-75' : 'bg-white'
+              }`}
+            >
+              <div className="flex justify-between items-start gap-2">
+                <div>
+                  <h3 className="font-bold text-zinc-900">{displayName}</h3>
+                  <p className="text-xs text-zinc-500 break-all">{p.email || '-'}</p>
+                </div>
+                {!isActive && (
+                  <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full font-normal">
+                    Inaktív
+                  </span>
+                )}
+              </div>
+
+              {/* Szint választó */}
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="text-zinc-500 font-medium">Szint:</span>
+                <select
+                  value={p.dance_level || 'Haladó'}
+                  onChange={(e) => updateProfileField(p.id, 'dance_level', e.target.value)}
+                  className="border rounded px-2 py-1 bg-white text-zinc-800"
+                >
+                  {['Haladó', 'SzuperH', 'ExtraH', 'Hobbi'].map(lvl => (
+                    <option key={lvl} value={lvl}>{lvl}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Szerepkörök */}
+              <div className="space-y-1">
+                <span className="text-xs text-zinc-500 font-medium">Szerepkörök:</span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {roles.map(r => {
+                    const isChecked = userRoles.includes(r.key)
+                    const isDisabled = isSelf && r.key === 'admin'
+                    return (
+                      <button
+                        key={r.key}
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => handleRoleToggle(p.id, r.key, userRoles)}
+                        className={`w-full text-center py-1.5 rounded-lg border text-xs font-semibold transition-all duration-150 ${
+                          isDisabled
+                            ? 'opacity-50 cursor-not-allowed bg-zinc-200 border-zinc-300 text-zinc-500'
+                            : isChecked
+                              ? 'bg-emerald-600 border-emerald-700 text-white shadow-sm hover:bg-emerald-700'
+                              : 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200'
+                        }`}
+                      >
+                        {r.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Akciók */}
+              <div className="flex items-center justify-between pt-2 border-t border-zinc-100 gap-2">
+                <div>
+                  {p.email && (
+                    <button
+                      onClick={() => sendPasswordReset([p.email])}
+                      disabled={resetting}
+                      className="text-xs text-indigo-600 hover:text-indigo-800 font-medium disabled:opacity-50"
+                    >
+                      Reset link
+                    </button>
+                  )}
+                </div>
+
+                {!isSelf && (
+                  <button
+                    onClick={() => toggleUserActive(p.id, isActive, displayName)}
+                    className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
+                      !isActive
+                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                        : 'bg-red-100 text-red-700 hover:bg-red-200'
+                    }`}
+                  >
+                    {!isActive ? 'Aktiválás' : 'Tiltás'}
+                  </button>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* ASZTALI NÉZET: Hagyományos táblázat (hidden md:table) */}
+      <table className="w-full text-left text-sm border-collapse hidden md:table">
         <thead>
           <tr className="border-b">
             <th className="pb-3">Név</th>
@@ -229,28 +331,27 @@ export function UserAdmin() {
                   </select>
                 </td>
                 <td className="py-3">
-                  {/* Jelölőnégyzetek (Checkboxok) az összes elérhető szerepkörhöz */}
-                  <div className="flex flex-wrap gap-2 items-center">
+                  {/* Szerepkörválasztás egymás alatti gombokkal */}
+                  <div className="flex flex-col gap-1.5 w-full max-w-[150px]">
                     {roles.map(r => {
                       const isChecked = userRoles.includes(r.key)
+                      const isDisabled = isSelf && r.key === 'admin' // Magadnak az admin jogot ne tudd véletlenül elvenni
                       return (
-                        <label 
-                          key={r.key} 
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs cursor-pointer transition-colors ${
-                            isChecked 
-                              ? 'bg-indigo-50 border-indigo-300 text-indigo-900 font-semibold' 
-                              : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
+                        <button
+                          key={r.key}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => handleRoleToggle(p.id, r.key, userRoles)}
+                          className={`w-full text-center px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-150 ${
+                            isDisabled
+                              ? 'opacity-50 cursor-not-allowed bg-zinc-200 border-zinc-300 text-zinc-500'
+                              : isChecked
+                                ? 'bg-emerald-600 border-emerald-700 text-white shadow-sm hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1'
+                                : 'bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200 hover:border-zinc-300 hover:text-zinc-900'
                           }`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            disabled={isSelf && r.key === 'admin'} // Magadnak az admin jogot ne tudd véletlenül elvenni
-                            onChange={() => handleRoleToggle(p.id, r.key, userRoles)}
-                            className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-                          />
-                          <span>{r.label}</span>
-                        </label>
+                          {r.label}
+                        </button>
                       )
                     })}
                   </div>

@@ -52,6 +52,22 @@ function isActiveRegistration(a: any): boolean {
   return (a?.status ?? '') !== 'cancelled'
 }
 
+// v009 — kiszűri a 'Teszt' nevet vagy 'Teszt' szöveget bármely mezőjükben tartalmazó felhasználókat
+function isTestProfile(prof: any): boolean {
+  if (!prof) return false
+  const testPattern = /teszt/i
+  
+  for (const key in prof) {
+    if (Object.prototype.hasOwnProperty.call(prof, key)) {
+      const val = prof[key]
+      if (typeof val === 'string' && testPattern.test(val)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
 export function useStatisticsData() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -105,6 +121,23 @@ export function useStatisticsData() {
           })
         }
 
+        // Csak a 'user' vagy 'admin' szerepkörrel rendelkező profilokat jelenítjük meg a statisztikákban,
+        // és teljesen kihagyjuk a 'Teszt' nevet vagy 'Teszt' szöveget bármely mezőjükben tartalmazókat.
+        const rawProfiles = (globalData?.profiles || []).filter((prof: any) => {
+          if (isTestProfile(prof)) return false
+
+          let roles = userRolesMap[prof.id] || []
+          if (roles.length === 0 && prof.role) {
+            roles = [prof.role]
+          }
+          if (roles.length === 0) {
+            roles = ['user'] // Alapértelmezett, ha semmi sincs beállítva
+          }
+          return roles.includes('user') || roles.includes('admin')
+        })
+
+        const activeProfileIds = new Set(rawProfiles.map((p: any) => p.id))
+
         const now = new Date()
 
         // Csak a jövőbeli események a Jelentkezések (Táncesemények Összesítő) fülhöz
@@ -130,31 +163,21 @@ export function useStatisticsData() {
         const pastEventIds = new Set(rawEventsPast.map((e: any) => e.id))
         const futureEventIds = new Set(rawEventsFuture.map((e: any) => e.id))
 
-        // Csak a már befejeződött események jelentkezéseit számítjuk be a részvételi statisztikákba
+        // Csak a már befejeződött események jelentkezéseit számítjuk be a részvételi statisztikákba és szűrünk az aktív profilokra
         const rawAttendancesPast = (globalData?.attendances || []).filter((att: any) => 
-          pastEventIds.has(att.event_id)
+          pastEventIds.has(att.event_id) && activeProfileIds.has(att.profile_id)
         )
 
-        // Csak a jövőbeli események jelentkezéseit számítjuk be a jelentkezési összesítésekbe
+        // Csak a jövőbeli események jelentkezéseit számítjuk be a jelentkezési összesítésekbe és szűrünk az aktív profilokra
         const rawAttendancesFuture = (globalData?.attendances || []).filter((att: any) => 
-          futureEventIds.has(att.event_id)
+          futureEventIds.has(att.event_id) && activeProfileIds.has(att.profile_id)
         )
 
-        // Teljes, szűretlen listák a részletező modalokhoz (amik tetszőleges múltbeli vagy jövőbeli eseményt megnyithatnak)
+        // Teljes, szűrt listák a részletező modalokhoz (amik tetszőleges múltbeli vagy jövőbeli eseményt megnyithatnak)
         const rawEvents = globalData?.events || []
-        const rawAttendances = globalData?.attendances || []
-
-        // Csak a 'user' vagy 'admin' szerepkörrel rendelkező profilokat jelenítjük meg a statisztikákban
-        const rawProfiles = (globalData?.profiles || []).filter((prof: any) => {
-          let roles = userRolesMap[prof.id] || []
-          if (roles.length === 0 && prof.role) {
-            roles = [prof.role]
-          }
-          if (roles.length === 0) {
-            roles = ['user'] // Alapértelmezett, ha semmi sincs beállítva
-          }
-          return roles.includes('user') || roles.includes('admin')
-        })
+        const rawAttendances = (globalData?.attendances || []).filter((att: any) => 
+          activeProfileIds.has(att.profile_id)
+        )
 
         const today = new Date()
         today.setHours(0, 0, 0, 0)

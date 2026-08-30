@@ -262,6 +262,9 @@ export function ProfileEdit({ userId, onSave }: ProfileEditProps) {
               ))}
             </select>
           )}
+          <p className="text-[11px] text-zinc-500 mt-2 leading-relaxed bg-zinc-50 border border-zinc-200 p-3 rounded-lg">
+            💡 <strong>Hogyan működik?</strong> Ha jelentkezel egy eseményre, akkor a partneredet is jelentkezteted, ha pedig lemondod, akkor a partnered is lemondja a rendszer. Így mindig együtt mozogtok!
+          </p>
         </div>
 
         <button

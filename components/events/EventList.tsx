@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { loadVisibleObjects } from '@/lib/permissions'
 
-export function EventList({ userId }: { userId: string }) {
+export function EventList({ userId, onNavigateProfile }: { userId: string; onNavigateProfile?: () => void }) {
   const [events, setEvents] = useState<any[]>([])
   const [profilesMap, setProfilesMap] = useState<{ [key: string]: any }>({})
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null)
@@ -130,9 +130,20 @@ export function EventList({ userId }: { userId: string }) {
       <div className="bg-indigo-50 border border-indigo-100 p-3.5 rounded-2xl flex items-center justify-between">
         <div>
           <p className="text-[11px] text-indigo-600 font-semibold uppercase tracking-wider">Állandó partner státusz</p>
-          <p className="text-sm font-bold text-indigo-900">
-            {partner ? `Párod: ${partner.full_name || partner.name}` : 'Egyedül jössz (nincs beállítva partner a profilodban)'}
-          </p>
+          <div className="text-sm font-bold text-indigo-900 mt-0.5">
+            {partner ? (
+              <span>Partnered: {partner.full_name || partner.name}</span>
+            ) : (
+              <button
+                type="button"
+                onClick={onNavigateProfile}
+                title="Ide kattintva beállíthatod"
+                className="text-left font-bold text-indigo-600 hover:text-indigo-800 hover:underline transition-colors focus:outline-none"
+              >
+                Partnered: -
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -179,8 +190,8 @@ export function EventList({ userId }: { userId: string }) {
                 {partner && (
                   <div className="text-xs mt-1 font-medium">
                     {isPartnerAttending
-                      ? <span className="text-emerald-600">Párod ({partner.full_name || partner.name}) is jön</span>
-                      : <span className="text-zinc-400">Párod még nem jelezte</span>}
+                      ? <span className="text-emerald-600">Partnered ({partner.full_name || partner.name}) is jön</span>
+                      : <span className="text-zinc-400">Partnered még nem jelezte</span>}
                   </div>
                 )}
               </div>
@@ -190,6 +201,7 @@ export function EventList({ userId }: { userId: string }) {
                   <button
                     onClick={() => toggleAttendance(ev, !isUserAttending)}
                     disabled={busy === ev.id}
+                    title={`Az eseményekre való jelentkezést / lemondást a gombra kattintással teheted meg az esemény kezdetéig.\nÍgy nem szükséges a tanárt külön értesítened.`}
                     className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap disabled:opacity-50 transition-colors ${
                       isUserAttending ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'
                     }`}
