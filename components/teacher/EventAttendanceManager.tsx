@@ -118,7 +118,7 @@ export function EventAttendanceManager() {
 
   const isDancerRegistered = (att: any) => {
     if (!att) return false
-    return att.registered !== false && att.is_registered !== false
+    return att.status === 'registered'
   }
 
   const registeredCount = allProfiles.filter(p => isDancerRegistered(attMap.get(p.id))).length
