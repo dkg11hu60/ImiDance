@@ -9,6 +9,7 @@ export interface DanceStat {
   ex: number
   hobbi: number
   Össz: number
+  varhato?: number
 }
 
 export interface Attendee {

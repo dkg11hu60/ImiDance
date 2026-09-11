@@ -182,6 +182,36 @@ export function useStatisticsData() {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
+        // --- CREDIBILITY RATING (Megbízhatósági index) ---
+        // A múltbeli részvétel arányszáma: megjelent / jelentkezett. Fallback 1.0 (100%) ha nincs előzmény.
+        const credibilityMap = new Map<string, number>()
+        
+        // Összegyűjtjük a múltbeli részvételi adatokat személyenként
+        const userPastCounts = new Map<string, { registered: number; attended: number }>()
+
+        rawAttendancesPast.forEach((att: any) => {
+          if ((att.status ?? '') !== 'cancelled') {
+            const pid = att.profile_id
+            if (pid) {
+              if (!userPastCounts.has(pid)) {
+                userPastCounts.set(pid, { registered: 0, attended: 0 })
+              }
+              const item = userPastCounts.get(pid)!
+              item.registered += 1
+              if (att.attended === true) {
+                item.attended += 1
+              }
+            }
+          }
+        })
+
+        // Kiszámítjuk a credibility értéket (0.0 - 1.0)
+        activeProfileIds.forEach((pid: any) => {
+          const counts = userPastCounts.get(pid)
+          const rating = counts && counts.registered > 0 ? counts.attended / counts.registered : 1.0
+          credibilityMap.set(pid, rating)
+        })
+
 // --- 1. TAB: Táncesemények Összesítő (danceStats) ---
         const danceGroupMap: { [key: string]: DanceStat } = {}
         // v005 — csoportonként a jelen lévő profilok, hogy utólag valódi párt tudjunk számolni
@@ -203,13 +233,15 @@ export function useStatisticsData() {
               sz: 0,
               ex: 0,
               hobbi: 0,
-              Össz: 0
+              Össz: 0,
+              varhato: 0
             }
             presentByGroup[groupKey] = []
           }
 
           // v007 — a Táncesemények Összesítő az ÉLŐ (nem lemondott) jelentkezéseket számolja
           const eventAtts = rawAttendancesFuture.filter((att: any) => att.event_id === ev.id && isActiveRegistration(att))
+          let expectedSum = 0
           eventAtts.forEach((att: any) => {
             const profile = rawProfiles.find((p: any) => p.id === att.profile_id)
             if (profile) {
@@ -225,8 +257,13 @@ export function useStatisticsData() {
 
               danceGroupMap[groupKey].Össz++
               presentByGroup[groupKey].push(profile)
+
+              // Hozzáadjuk a valószínűséget (credibility) a várható létszámhoz
+              const rating = credibilityMap.get(profile.id) ?? 1.0
+              expectedSum += rating
             }
           })
+          danceGroupMap[groupKey].varhato = (danceGroupMap[groupKey].varhato || 0) + expectedSum
         })
 
         // v006 — csoportonként EGYSZER: P = kölcsönös, jelenlévő párok; F* = F − P, L* = L − P.

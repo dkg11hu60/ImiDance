@@ -5,6 +5,7 @@ import { supabase } from '../../../lib/supabase'
 import { useStatisticsData } from './useStatisticsData'
 import { Attendee, DanceStat, EventStat, PersonStat } from './types'
 import { MyAttendance } from '../MyAttendance'
+import { DancerAttendanceSummary } from './DancerAttendanceSummary'
 
 interface StatisticsDashboardProps {
   mode?: 'jelentesek' | 'reszvétel'
@@ -19,7 +20,7 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
   const [loadingPermissions, setLoadingPermissions] = useState<boolean>(true)
 
   const [activeTab, setActiveTab] = useState<
-    'dance_events' | 'events_breakdown' | 'persons_breakdown' | 'my_attendance'
+    'dance_events' | 'events_breakdown' | 'persons_breakdown' | 'my_attendance' | 'dancers_summary'
   >(mode === 'reszvétel' ? 'my_attendance' : 'dance_events')
   const [searchTerm, setSearchTerm] = useState<string>('')
 
@@ -76,20 +77,26 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
         {
           id: 'my_attendance',
           requiredObject: 'stats.detailed',
-          label: 'Saját részvételem',
+          label: 'Saját',
           subtitle: 'Kizárólag a te adataid'
         },
         {
           id: 'events_breakdown',
           requiredObject: 'stats.detailed',
-          label: 'Események szerinti bontás (%)',
+          label: 'Események',
           subtitle: 'Részvétel eseményenként'
         },
         {
           id: 'persons_breakdown',
           requiredObject: 'stats.detailed',
-          label: 'Személyek szerinti bontás (%)',
+          label: 'Személyek',
           subtitle: 'Részvétel személyenként'
+        },
+        {
+          id: 'dancers_summary',
+          requiredObject: 'stats.detailed',
+          label: 'Részletes',
+          subtitle: 'Összesített kimutatás szűrőkkel'
         }
       ]
     : [
@@ -266,7 +273,7 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                 : 'Részletes kimutatások a jelentkezőkről.'}
           </p>
         </div>
-        {activeTab !== 'my_attendance' && (
+        {activeTab !== 'my_attendance' && activeTab !== 'dancers_summary' && (
           <input
             type="text"
             placeholder="Keresés..."
@@ -327,6 +334,9 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                 <th onClick={() => handleSort('Össz')} className="px-4 py-3.5 text-center font-semibold bg-slate-800 text-amber-300 cursor-pointer hover:bg-slate-700 select-none">
                   Összesen {sortField === 'Össz' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
                 </th>
+                <th onClick={() => handleSort('varhato')} className="px-4 py-3.5 text-center font-semibold bg-indigo-900 text-amber-200 cursor-pointer hover:bg-indigo-800 select-none">
+                  Várható {sortField === 'varhato' && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-700">
@@ -350,6 +360,7 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                 <td className="px-4 py-3 text-center">{row.ex}</td>
                 <td className="px-4 py-3 text-center">{row.hobbi}</td>
                 <td className="px-4 py-3 text-center font-extrabold bg-slate-100 text-slate-900 shadow-inner">{row.Össz}</td>
+                <td className="px-4 py-3 text-center font-extrabold bg-indigo-50 text-indigo-900 shadow-inner">{row.varhato !== undefined ? `${row.varhato.toFixed(1)}` : '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -446,7 +457,7 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
                   Fizetett & Megjelent {personSortField === 'osszes_fizetett_megjelent' && (personSortDirection === 'asc' ? ' ▲' : ' ▼')}
                 </th>
                 <th onClick={() => handlePersonSort('megjelenesi_arany')} className="px-4 py-3.5 text-center font-semibold text-blue-400 cursor-pointer hover:bg-slate-800 select-none">
-                  Megjelenési arány {personSortField === 'megjelenesi_arany' && (personSortDirection === 'asc' ? ' ▲' : ' ▼')}
+                  Megbízhatóság (Credibility) {personSortField === 'megjelenesi_arany' && (personSortDirection === 'asc' ? ' ▲' : ' ▼')}
                 </th>
                 <th onClick={() => handlePersonSort('fizetesi_arany')} className="px-4 py-3.5 text-center font-semibold text-emerald-400 cursor-pointer hover:bg-slate-800 select-none">
                   Fizetési arány {personSortField === 'fizetesi_arany' && (personSortDirection === 'asc' ? ' ▲' : ' ▼')}
@@ -497,6 +508,15 @@ export default function StatisticsDashboard({ mode = 'jelentesek', userId }: Sta
             )}
           </table>
         </div>
+      )}
+
+      {/* TAB 4: SZEMÉLYEK BONTÁS (RÉSZLETES / SZŰRHETŐ) */}
+      {activeTab === 'dancers_summary' && allowedObjects.includes('stats.detailed') && (
+        <DancerAttendanceSummary
+          attendancesData={rawAttendances}
+          profilesData={rawProfiles}
+          eventsData={rawEvents}
+        />
       )}
 
       {/* RÉSZTVEVŐ MODAL */}

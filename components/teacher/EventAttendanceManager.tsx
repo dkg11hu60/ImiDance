@@ -19,6 +19,9 @@ interface DancerRow {
   isRegistered: boolean
   attended: boolean
   paid: boolean
+  pastRegistered?: number
+  pastAttended?: number
+  pastPaid?: number
 }
 
 type SortOrder = 'asc' | 'desc'
@@ -28,6 +31,12 @@ export function EventAttendanceManager() {
   const [selectedEventId, setSelectedEventId] = useState<string>('')
   const [allProfiles, setAllProfiles] = useState<any[]>([])
   const [attendances, setAttendances] = useState<any[]>([])
+  const [allAttendances, setAllAttendances] = useState<any[]>([])
+  const [pastEventIds, setPastEventIds] = useState<Set<string>>(new Set())
+  const [allEventsMap, setAllEventsMap] = useState<Map<string, any>>(new Map())
+  const [dancerStatsMap, setDancerStatsMap] = useState<Map<string, { registered: number; attended: number; paid: number }>>(new Map())
+  const [selectedDancerId, setSelectedDancerId] = useState<string | null>(null)
+  const [credibilityMap, setCredibilityMap] = useState<Map<string, number>>(new Map())
   const [onlyRegistered, setOnlyRegistered] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
@@ -39,15 +48,103 @@ export function EventAttendanceManager() {
     async function initData() {
       try {
         setLoadingEvents(true)
-        const [eventsRes, profilesRes] = await Promise.all([
+        const [eventsRes, profilesRes, attendancesRes, rolesRes] = await Promise.all([
           supabase.from('events').select('*').order('event_date', { ascending: true }),
-          supabase.from('profiles').select('*')
+          supabase.from('profiles').select('*'),
+          supabase.from('attendances').select('*'),
+          supabase.from('user_roles').select('user_id, role_key')
         ])
 
         if (eventsRes.error) throw eventsRes.error
         if (profilesRes.error) throw profilesRes.error
+        if (attendancesRes.error) throw attendancesRes.error
 
-        if (profilesRes.data) setAllProfiles(profilesRes.data)
+        const userRolesMap: { [userId: string]: string[] } = {}
+        if (rolesRes.data) {
+          rolesRes.data.forEach((ur: any) => {
+            if (!userRolesMap[ur.user_id]) userRolesMap[ur.user_id] = []
+            userRolesMap[ur.user_id].push(ur.role_key)
+          })
+        }
+
+        const isTestProfile = (prof: any) => {
+          const fieldsToSearch = [prof.full_name, prof.first_name, prof.last_name, prof.email, prof.name]
+          return fieldsToSearch.some((f) => f && String(f).toLowerCase().includes('teszt'))
+        }
+
+        // Kiszűrjük a tiszta tanárokat/beléptetőket és a teszt felhasználókat
+        const filteredProfiles = (profilesRes.data || []).filter((prof: any) => {
+          if (isTestProfile(prof)) return false
+
+          let roles = userRolesMap[prof.id] || []
+          if (roles.length === 0 && prof.role) {
+            roles = [prof.role]
+          }
+          if (roles.length === 0) {
+            roles = ['user']
+          }
+          return roles.includes('user') || roles.includes('admin')
+        })
+
+        setAllProfiles(filteredProfiles)
+
+        // Számoljuk ki a megbízhatósági indexeket és a múltbeli statisztikákat
+        const rawAtts = attendancesRes.data || []
+        const eventsData = eventsRes.data || []
+        const profilesData = filteredProfiles
+        setAllAttendances(rawAtts)
+
+        const now = new Date()
+
+        // Múltbeli események ID halmaza
+        const computedPastEventIds = new Set<string>(
+          eventsData
+            .filter((ev: any) => {
+              const datePart = ev.event_date ? ev.event_date.split('T')[0] : ""
+              const timePart = ev.end_time || ev.start_time || "23:59:59"
+              const eventEnd = new Date(`${datePart}T${timePart}`)
+
+              if (isNaN(eventEnd.getTime())) return false
+              return eventEnd <= now
+            })
+            .map((ev: any) => ev.id)
+        )
+        setPastEventIds(computedPastEventIds)
+
+        const evMap = new Map(eventsData.map(e => [e.id, e]))
+        setAllEventsMap(evMap)
+
+        // Múltbeli részvételi és fizetési statisztikák
+        const userPastCounts = new Map<string, { registered: number; attended: number; paid: number }>()
+        rawAtts.forEach((att: any) => {
+          const isPast = computedPastEventIds.has(att.event_id)
+          const isActive = (att.status ?? '') !== 'cancelled'
+          if (isPast && isActive) {
+            const pid = att.profile_id || att.user_id
+            if (pid) {
+              if (!userPastCounts.has(pid)) {
+                userPastCounts.set(pid, { registered: 0, attended: 0, paid: 0 })
+              }
+              const item = userPastCounts.get(pid)!
+              item.registered += 1
+              if (att.attended === true) {
+                item.attended += 1
+              }
+              if (att.paid === true) {
+                item.paid += 1
+              }
+            }
+          }
+        })
+        setDancerStatsMap(userPastCounts)
+
+        const credMap = new Map<string, number>()
+        profilesData.forEach((p: any) => {
+          const counts = userPastCounts.get(p.id)
+          const rating = counts && counts.registered > 0 ? counts.attended / counts.registered : 1.0
+          credMap.set(p.id, rating)
+        })
+        setCredibilityMap(credMap)
 
         if (eventsRes.data && eventsRes.data.length > 0) {
           const todayStr = new Date().toISOString().split('T')[0]
@@ -122,12 +219,43 @@ export function EventAttendanceManager() {
   }
 
   const registeredCount = allProfiles.filter(p => isDancerRegistered(attMap.get(p.id))).length
+  const expectedAttendance = allProfiles
+    .filter(p => isDancerRegistered(attMap.get(p.id)))
+    .reduce((sum, p) => sum + (credibilityMap.get(p.id) ?? 1.0), 0)
 
   const dancerRows: DancerRow[] = allProfiles
     .map(p => {
       const att = attMap.get(p.id)
       const name = p.full_name || (p.first_name && p.last_name ? `${p.last_name} ${p.first_name}` : p.name) || 'Névtelen'
       const danceLevel = p.dance_level || p.skill_level || '-'
+      const stats = dancerStatsMap.get(p.id) || { registered: 0, attended: 0, paid: 0 }
+
+      // Kiszámítjuk az aktív, lezáratlan hiányzások számát (kronologikus kereséssel)
+      const pastAtts = allAttendances
+        .filter(a => {
+          const pid = a.profile_id || a.user_id
+          const isPast = pastEventIds.has(a.event_id)
+          const isActive = (a.status ?? '') !== 'cancelled'
+          return pid === p.id && isPast && isActive
+        })
+        .sort((a, b) => {
+          const evA = allEventsMap.get(a.event_id)
+          const evB = allEventsMap.get(b.event_id)
+          const dateA = new Date(evA?.event_date || a.created_at || 0).getTime()
+          const dateB = new Date(evB?.event_date || b.created_at || 0).getTime()
+          return dateB - dateA
+        })
+
+      let activeAbsenceCount = 0
+      for (const a of pastAtts) {
+        if (a.attended === true && a.paid === true) {
+          // Ha megjelent és fizetett, ez lezár minden korábbi hiányzást
+          break
+        }
+        if (a.attended === false) {
+          activeAbsenceCount++
+        }
+      }
 
       return {
         attendanceId: att?.id,
@@ -136,7 +264,11 @@ export function EventAttendanceManager() {
         danceLevel,
         isRegistered: isDancerRegistered(att),
         attended: Boolean(att?.attended),
-        paid: Boolean(att?.paid)
+        paid: Boolean(att?.paid),
+        pastRegistered: stats.registered,
+        pastAttended: stats.attended,
+        pastPaid: stats.paid,
+        activeAbsences: activeAbsenceCount
       }
     })
     .filter(row => (onlyRegistered ? row.isRegistered : true))
@@ -217,6 +349,39 @@ export function EventAttendanceManager() {
       : dateStr
   }
 
+  // Csak múltbeli, érvényes jelentkezések megjelenítése az előzményekben
+  const selectedDancerHistory = selectedDancerId
+    ? allAttendances
+        .filter(a => {
+          const pid = a.profile_id || a.user_id
+          const isPast = pastEventIds.has(a.event_id)
+          const isActive = (a.status ?? '') !== 'cancelled'
+          return pid === selectedDancerId && isPast && isActive
+        })
+        .map(a => {
+          const ev = allEventsMap.get(a.event_id)
+          const rawDate = ev?.event_date || a.created_at
+          let formattedDate = 'Ismeretlen dátum'
+          if (rawDate) {
+            const d = new Date(rawDate)
+            if (!isNaN(d.getTime())) {
+              formattedDate = d.toLocaleDateString('hu-HU', { year: 'numeric', month: '2-digit', day: '2-digit' })
+            } else {
+              formattedDate = String(rawDate)
+            }
+          }
+          return {
+            id: a.id,
+            title: ev?.title || 'Táncóra',
+            date: formattedDate,
+            rawDate,
+            attended: Boolean(a.attended),
+            paid: Boolean(a.paid)
+          }
+        })
+        .sort((a, b) => new Date(b.rawDate || 0).getTime() - new Date(a.rawDate || 0).getTime())
+    : []
+
   if (loadingEvents) {
     return <div className="p-6 text-zinc-500">Események betöltése...</div>
   }
@@ -235,7 +400,10 @@ export function EventAttendanceManager() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-4">
         <div>
           <h3 className="text-lg font-bold text-zinc-900">Jelenlét & Fizetés Rögzítése</h3>
-          <p className="text-xs text-zinc-500">Válaszd ki az alkalmat a jelenléti ív kezeléséhez</p>
+          <p className="text-xs text-zinc-500">
+            Regisztrált: <span className="font-bold text-indigo-600">{registeredCount} fő</span> |{' '}
+            Várható részvétel: <span className="font-bold text-emerald-600">{expectedAttendance.toFixed(1)} fő</span>
+          </p>
         </div>
 
         <select
@@ -321,7 +489,49 @@ export function EventAttendanceManager() {
             <tbody className="divide-y divide-zinc-100 text-sm">
               {dancerRows.map((row) => (
                 <tr key={row.profileId} className="hover:bg-zinc-50 transition-colors">
-                  <td className="py-3 px-3 font-semibold text-zinc-900">{row.name}</td>
+                  <td className="py-3 px-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => setSelectedDancerId(row.profileId)}
+                        className="font-semibold text-zinc-900 text-left hover:text-indigo-600 hover:underline focus:outline-none"
+                        title="Kattints az előzmények megtekintéséhez"
+                      >
+                        {row.name}
+                      </button>
+                      {/* 1. Fizetési probléma (Tartozás/Elmaradás) */}
+                      {row.pastAttended !== undefined && row.pastPaid !== undefined && row.pastAttended > row.pastPaid && (
+                        <button
+                          onClick={() => setSelectedDancerId(row.profileId)}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-red-100 text-red-800 border border-red-200 whitespace-nowrap"
+                          title="Kattints az elszámolási részletek megtekintéséhez"
+                        >
+                          {`⚠️ Elmaradás (${row.pastAttended - row.pastPaid})`}
+                        </button>
+                      )}
+
+                      {/* 2. Túlfizetés */}
+                      {row.pastAttended !== undefined && row.pastPaid !== undefined && row.pastPaid > row.pastAttended && (
+                        <button
+                          onClick={() => setSelectedDancerId(row.profileId)}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap"
+                          title="Kattints a részletek megtekintéséhez"
+                        >
+                          {`⚠️ Túlfizetés (${row.pastPaid - row.pastAttended})`}
+                        </button>
+                      )}
+
+                      {/* 3. Távolmaradási probléma (Hiányzás) */}
+                      {row.pastRegistered !== undefined && row.pastAttended !== undefined && row.pastRegistered > row.pastAttended && (
+                        <button
+                          onClick={() => setSelectedDancerId(row.profileId)}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap"
+                          title="Kattints a mulasztási részletek megtekintéséhez"
+                        >
+                          {`⚠️ Hiányzás (${row.pastRegistered - row.pastAttended})`}
+                        </button>
+                      )}
+                    </div>
+                  </td>
                   <td className="py-3 px-3 text-xs text-zinc-500">{row.danceLevel}</td>
                   <td className="py-3 px-3 text-center text-xs">
                     {row.isRegistered ? (
@@ -368,6 +578,129 @@ export function EventAttendanceManager() {
           </table>
         </div>
       )}
+
+      {/* TÖRTÉNET MODAL */}
+      {selectedDancerId && (() => {
+        const selectedDancer = allProfiles.find(p => p.id === selectedDancerId)
+        if (!selectedDancer) return null
+        const stats = dancerStatsMap.get(selectedDancerId) || { registered: 0, attended: 0, paid: 0 }
+        
+        // Kiszámítjuk a mulasztási és fizetési arányokat
+        const missedCount = stats.registered - stats.attended
+        const absencePct = stats.registered > 0 ? Math.round((missedCount / stats.registered) * 100) : 0
+        const paymentPct = stats.attended > 0 ? Math.round((stats.paid / stats.attended) * 100) : 100
+
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-zinc-200 flex flex-col max-h-[85vh]">
+              <div className="bg-zinc-950 text-white px-6 py-4 flex items-center justify-between shrink-0">
+                <div>
+                  <h3 className="text-lg font-bold">Táncos részletes előzményei</h3>
+                  <p className="text-xs text-zinc-400">{selectedDancer.full_name || selectedDancer.name} ({selectedDancer.dance_level || '-'})</p>
+                </div>
+                <button
+                  onClick={() => setSelectedDancerId(null)}
+                  className="text-zinc-400 hover:text-white transition-colors text-xl font-bold"
+                  aria-label="Bezárás"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-5 overflow-y-auto space-y-4">
+                {/* Statisztikai összesítő */}
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <div className="text-xs text-zinc-500 font-medium">Jelentkezett</div>
+                    <div className="text-lg font-bold text-zinc-800">{stats.registered} alkalom</div>
+                  </div>
+                  <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <div className="text-xs text-indigo-600 font-medium">Részt vett</div>
+                    <div className="text-lg font-bold text-indigo-700">{stats.attended} alkalom</div>
+                  </div>
+                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div className="text-xs text-emerald-600 font-medium">Fizetett</div>
+                    <div className="text-lg font-bold text-emerald-700">{stats.paid} alkalom</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="p-3 bg-rose-50 rounded-xl border border-rose-100">
+                    <div className="text-xs text-rose-600 font-medium">Hiányzási arány</div>
+                    <div className="text-lg font-bold text-rose-700">
+                      {missedCount} / {stats.registered} ({absencePct}%)
+                    </div>
+                  </div>
+                  <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <div className="text-xs text-zinc-500 font-medium">Fizetési arány</div>
+                    <div className="text-lg font-bold text-zinc-800">
+                      {paymentPct}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Táblázat */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase">
+                        <th className="py-2.5 px-3">Dátum / Esemény</th>
+                        <th className="py-2.5 px-3 text-center">Jelentkezett</th>
+                        <th className="py-2.5 px-3 text-center">Részt vett</th>
+                        <th className="py-2.5 px-3 text-center">Fizetett</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100">
+                      {selectedDancerHistory.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="py-4 text-center text-zinc-400 italic">
+                            Nincs múltbéli, aktív jelentkezési előzmény.
+                          </td>
+                        </tr>
+                      ) : (
+                        selectedDancerHistory.map((h) => (
+                          <tr key={h.id} className="hover:bg-zinc-50 transition-colors">
+                            <td className="py-2.5 px-3">
+                              <div className="font-semibold text-zinc-800">{h.title}</div>
+                              <div className="text-[10px] text-zinc-400">{h.date}</div>
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              <span className="inline-flex px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">Igen</span>
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              {h.attended ? (
+                                <span className="inline-flex px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-50 text-indigo-800 border border-indigo-100">Igen</span>
+                              ) : (
+                                <span className="inline-flex px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-100">Nem</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              {h.paid ? (
+                                <span className="inline-flex px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-100">Igen</span>
+                              ) : (
+                                <span className="inline-flex px-1.5 py-0.2 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-100">Nem</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="bg-zinc-50 px-6 py-4 flex justify-end gap-3 shrink-0 border-t border-zinc-100">
+                <button
+                  onClick={() => setSelectedDancerId(null)}
+                  className="px-4 py-2 bg-zinc-950 text-white font-semibold rounded-xl hover:bg-zinc-800 transition-colors text-sm shadow-sm"
+                >
+                  Bezárás
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

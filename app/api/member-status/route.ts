@@ -19,7 +19,31 @@ export async function POST() {
       .select("id, full_name, dance_level, is_active")
     if (pErr) throw pErr
 
-    const activeProfiles = (profiles || []).filter((p: any) => p.is_active !== false)
+    // Szerepkörök lekérése a tanárok kiszűréséhez
+    const { data: userRoles, error: rErr } = await admin
+      .from("user_roles")
+      .select("user_id, role_key")
+    if (rErr) throw rErr
+
+    const userRolesMap = new Map<string, string[]>()
+    if (userRoles) {
+      userRoles.forEach((ur: any) => {
+        if (!userRolesMap.has(ur.user_id)) {
+          userRolesMap.set(ur.user_id, [])
+        }
+        userRolesMap.get(ur.user_id)!.push(ur.role_key)
+      })
+    }
+
+    const activeProfiles = (profiles || []).filter((p: any) => {
+      if (p.is_active === false) return false
+
+      let roles = userRolesMap.get(p.id) || []
+      if (roles.length === 0) {
+        roles = ['user']
+      }
+      return roles.includes('user') || roles.includes('admin')
+    })
 
     // Auth login-datumok, lapozva
     const authMap = new Map<string, string | null>()
