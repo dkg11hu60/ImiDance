@@ -37,7 +37,7 @@ export function EventAttendanceManager() {
   const [dancerStatsMap, setDancerStatsMap] = useState<Map<string, { registered: number; attended: number; paid: number }>>(new Map())
   const [selectedDancerId, setSelectedDancerId] = useState<string | null>(null)
   const [credibilityMap, setCredibilityMap] = useState<Map<string, number>>(new Map())
-  const [onlyRegistered, setOnlyRegistered] = useState(true)
+  const [onlyRegistered, setOnlyRegistered] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [loadingEvents, setLoadingEvents] = useState(true)
