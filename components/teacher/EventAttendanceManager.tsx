@@ -22,9 +22,11 @@ interface DancerRow {
   pastRegistered?: number
   pastAttended?: number
   pastPaid?: number
+  hasMonthlyPass: boolean
 }
 
 type SortOrder = 'asc' | 'desc'
+type SortKey = 'name' | 'danceLevel' | 'isRegistered' | 'attended' | 'paid' | 'hasMonthlyPass'
 
 export function EventAttendanceManager() {
   const [events, setEvents] = useState<EventItem[]>([])
@@ -39,10 +41,43 @@ export function EventAttendanceManager() {
   const [credibilityMap, setCredibilityMap] = useState<Map<string, number>>(new Map())
   const [onlyRegistered, setOnlyRegistered] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [loadingEvents, setLoadingEvents] = useState(true)
   const [loadingData, setLoadingData] = useState(false)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [monthlyPasses, setMonthlyPasses] = useState<any[]>([])
+  const [togglingPassId, setTogglingPassId] = useState<string | null>(null)
+
+  const selectedEvent = events.find(e => e.id === selectedEventId)
+  const eventDateStr = selectedEvent?.event_date
+  const d = eventDateStr ? new Date(eventDateStr) : null
+  const year = d && !isNaN(d.getTime()) ? d.getFullYear() : null
+  const month = d && !isNaN(d.getTime()) ? d.getMonth() + 1 : null
+
+  useEffect(() => {
+    if (!selectedEventId || !year || !month) {
+      setMonthlyPasses([])
+      return
+    }
+
+    async function loadMonthlyPasses() {
+      try {
+        const { data, error } = await supabase
+          .from('monthly_passes')
+          .select('*')
+          .eq('year', year)
+          .eq('month', month)
+
+        if (error) throw error
+        setMonthlyPasses(data || [])
+      } catch (err: any) {
+        console.error('Hiba a havi bérletek betöltésekor:', err.message)
+      }
+    }
+
+    loadMonthlyPasses()
+  }, [selectedEventId, year, month])
 
   useEffect(() => {
     async function initData() {
@@ -147,22 +182,16 @@ export function EventAttendanceManager() {
         setCredibilityMap(credMap)
 
         if (eventsRes.data && eventsRes.data.length > 0) {
-          const todayStr = new Date().toISOString().split('T')[0]
+          const activeEvents = eventsRes.data.filter((ev: any) => ev.is_active !== false)
 
-          const activeUpcomingEvents = eventsRes.data.filter((ev: any) => {
-            if (ev.is_active === false) return false
-            const dateStr = (ev.event_date || ev.day || ev.created_at || '').split('T')[0]
-            return dateStr >= todayStr
-          })
+          setEvents(activeEvents)
 
-          setEvents(activeUpcomingEvents)
-
-          if (activeUpcomingEvents.length > 0) {
+          if (activeEvents.length > 0) {
             const now = Date.now()
-            let closestId = activeUpcomingEvents[0].id
+            let closestId = activeEvents[0].id
             let minDiff = Infinity
 
-            activeUpcomingEvents.forEach((ev: any) => {
+            activeEvents.forEach((ev: any) => {
               const dateStr = (ev.event_date || ev.day || ev.created_at || '').split('T')[0]
               const timeStr = (ev.start_time || '00:00').slice(0, 5)
               const evTimestamp = new Date(`${dateStr}T${timeStr}:00`).getTime()
@@ -268,13 +297,25 @@ export function EventAttendanceManager() {
         pastRegistered: stats.registered,
         pastAttended: stats.attended,
         pastPaid: stats.paid,
-        activeAbsences: activeAbsenceCount
+        activeAbsences: activeAbsenceCount,
+        hasMonthlyPass: monthlyPasses.some(mp => mp.profile_id === p.id)
       }
     })
     .filter(row => (onlyRegistered ? row.isRegistered : true))
     .filter(row => row.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
-      const cmp = a.name.localeCompare(b.name, 'hu')
+      const valA = a[sortKey]
+      const valB = b[sortKey]
+
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        const numA = valA ? 1 : 0
+        const numB = valB ? 1 : 0
+        return sortOrder === 'asc' ? numA - numB : numB - numA
+      }
+
+      const strA = String(valA || '')
+      const strB = String(valB || '')
+      const cmp = strA.localeCompare(strB, 'hu')
       return sortOrder === 'asc' ? cmp : -cmp
     })
 
@@ -322,6 +363,60 @@ export function EventAttendanceManager() {
     }
   }
 
+  const handleToggleMonthlyPass = async (row: DancerRow) => {
+    if (!year || !month) return
+    setTogglingPassId(row.profileId)
+
+    const hadPass = row.hasMonthlyPass
+
+    try {
+      if (hadPass) {
+        // Delete the pass
+        const { error } = await supabase
+          .from('monthly_passes')
+          .delete()
+          .eq('profile_id', row.profileId)
+          .eq('year', year)
+          .eq('month', month)
+
+        if (error) throw error
+
+        setMonthlyPasses(prev => prev.filter(p => p.profile_id !== row.profileId))
+        
+        // Also update local attendances state to paid = false for this dancer in this event
+        setAttendances(prev =>
+          prev.map(a => (a.profile_id === row.profileId ? { ...a, paid: false } : a))
+        )
+      } else {
+        // Insert the pass
+        const { data, error } = await supabase
+          .from('monthly_passes')
+          .insert({
+            profile_id: row.profileId,
+            year,
+            month
+          })
+          .select()
+
+        if (error) throw error
+
+        if (data && data.length > 0) {
+          setMonthlyPasses(prev => [...prev, data[0]])
+        }
+
+        // Also update local attendances state to paid = true for this dancer in this event
+        setAttendances(prev =>
+          prev.map(a => (a.profile_id === row.profileId ? { ...a, paid: true } : a))
+        )
+      }
+    } catch (err: any) {
+      console.error('Hiba a bérlet módosításakor:', err.message)
+      alert('Hiba a bérlet módosításakor: ' + err.message)
+    } finally {
+      setTogglingPassId(null)
+    }
+  }
+
   const handleBulkSet = async (field: 'attended' | 'paid', targetValue: boolean) => {
     try {
       const { error } = await supabase
@@ -337,8 +432,19 @@ export function EventAttendanceManager() {
     }
   }
 
-  const toggleSortOrder = () => {
-    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      // Default to ascending for strings, descending for booleans
+      setSortOrder(key === 'name' || key === 'danceLevel' ? 'asc' : 'desc')
+    }
+  }
+
+  const renderSortIndicator = (key: SortKey) => {
+    if (sortKey !== key) return null
+    return sortOrder === 'asc' ? ' ▲' : ' ▼'
   }
 
   const formatEventDate = (dateStr?: string) => {
@@ -389,8 +495,8 @@ export function EventAttendanceManager() {
   if (events.length === 0) {
     return (
       <div className="bg-white p-8 rounded-2xl border border-zinc-200 shadow-sm text-center max-w-4xl mx-auto space-y-2">
-        <h3 className="text-lg font-bold text-zinc-800">Nincs aktív vagy közeledő alkalom</h3>
-        <p className="text-sm text-zinc-500">A múltbéli és inaktív események nem jelennek meg a beléptető felületen.</p>
+        <h3 className="text-lg font-bold text-zinc-800">Nincs aktív alkalom</h3>
+        <p className="text-sm text-zinc-500">Az inaktív események nem jelennek meg a beléptető felületen.</p>
       </div>
     )
   }
@@ -475,15 +581,41 @@ export function EventAttendanceManager() {
             <thead>
               <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase select-none">
                 <th
-                  onClick={toggleSortOrder}
-                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors"
+                  onClick={() => handleSort('name')}
+                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
-                  Név {sortOrder === 'asc' ? '▲ (A–Z)' : '▼ (Z–A)'}
+                  Név{renderSortIndicator('name')}
                 </th>
-                <th className="py-3 px-3">Szint</th>
-                <th className="py-3 px-3 text-center">Előzetesen regisztrált</th>
-                <th className="py-3 px-3 text-center">Részt vett</th>
-                <th className="py-3 px-3 text-center">Fizetés</th>
+                <th
+                  onClick={() => handleSort('danceLevel')}
+                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                >
+                  Szint{renderSortIndicator('danceLevel')}
+                </th>
+                <th
+                  onClick={() => handleSort('isRegistered')}
+                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                >
+                  Előzetesen regisztrált{renderSortIndicator('isRegistered')}
+                </th>
+                <th
+                  onClick={() => handleSort('attended')}
+                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                >
+                  Részt vett{renderSortIndicator('attended')}
+                </th>
+                <th
+                  onClick={() => handleSort('paid')}
+                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                >
+                  Fizetés{renderSortIndicator('paid')}
+                </th>
+                <th
+                  onClick={() => handleSort('hasMonthlyPass')}
+                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                >
+                  Havi bérlet{renderSortIndicator('hasMonthlyPass')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 text-sm">
@@ -556,7 +688,11 @@ export function EventAttendanceManager() {
                   </td>
 
                   <td className="py-3 px-3 text-center">
-                    {row.attended ? (
+                    {row.hasMonthlyPass ? (
+                      <span className="inline-flex px-3 py-1.5 rounded-xl font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        Bérlet
+                      </span>
+                    ) : row.attended ? (
                       <button
                         onClick={() => handleToggle(row, 'paid')}
                         disabled={updatingId === `${row.profileId}-paid`}
@@ -571,6 +707,17 @@ export function EventAttendanceManager() {
                     ) : (
                       <span className="text-zinc-300 font-bold text-xs">—</span>
                     )}
+                  </td>
+
+                  <td className="py-3 px-3 text-center">
+                    <input
+                      type="checkbox"
+                      checked={row.hasMonthlyPass}
+                      disabled={togglingPassId === row.profileId}
+                      onChange={() => handleToggleMonthlyPass(row)}
+                      className="w-5 h-5 text-indigo-600 rounded border-zinc-300 focus:ring-indigo-500 cursor-pointer disabled:opacity-50"
+                      title={`${year || ''}. ${month || ''}. havi bérlet`}
+                    />
                   </td>
                 </tr>
               ))}
