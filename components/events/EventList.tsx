@@ -206,7 +206,7 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                       isUserAttending ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'
                     }`}
                   >
-                    {busy === ev.id ? '...' : isUserAttending ? 'Lemondom' : 'Ott leszek'}
+                    {busy === ev.id ? '...' : isUserAttending ? 'Lemondom' : 'Regisztrálok'}
                   </button>
                   {err && busy === null && (
                     <span className="text-[11px] text-red-500">{err}</span>

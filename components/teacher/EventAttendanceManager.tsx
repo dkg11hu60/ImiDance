@@ -778,12 +778,23 @@ export function EventAttendanceManager() {
                       {missedCount} / {stats.registered} ({absencePct}%)
                     </div>
                   </div>
-                  <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                    <div className="text-xs text-zinc-500 font-medium">Fizetési arány</div>
-                    <div className="text-lg font-bold text-zinc-800">
-                      {paymentPct}%
-                    </div>
-                  </div>
+                  {(() => {
+                    const elmaradas = stats.attended - stats.paid
+                    return (
+                      <div className={`p-3 rounded-xl border transition-colors ${
+                        elmaradas > 0
+                          ? 'bg-red-50 border-red-100'
+                          : 'bg-emerald-50 border-emerald-100'
+                      }`}>
+                        <div className={`text-xs font-medium ${elmaradas > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                          Elmaradás
+                        </div>
+                        <div className={`text-lg font-bold ${elmaradas > 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                          {elmaradas} alkalom
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Táblázat */}

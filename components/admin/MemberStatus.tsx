@@ -306,6 +306,39 @@ export function MemberStatus() {
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-2 gap-3 text-center">
+                      {(() => {
+                        const registered = past.length
+                        const missed = registered - megjelent
+                        const absencePct = registered > 0 ? Math.round((missed / registered) * 100) : 0
+                        return (
+                          <div className="p-3 bg-rose-50 rounded-xl border border-rose-100">
+                            <div className="text-xs text-rose-600 font-medium">Hiányzási arány</div>
+                            <div className="text-lg font-bold text-rose-700">
+                              {missed} / {registered} ({absencePct}%)
+                            </div>
+                          </div>
+                        )
+                      })()}
+                      {(() => {
+                        const elmaradas = megjelent - fizetett
+                        return (
+                          <div className={`p-3 rounded-xl border transition-colors ${
+                            elmaradas > 0
+                              ? 'bg-red-50 border-red-100'
+                              : 'bg-emerald-50 border-emerald-100'
+                          }`}>
+                            <div className={`text-xs font-medium ${elmaradas > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                              Elmaradás
+                            </div>
+                            <div className={`text-lg font-bold ${elmaradas > 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                              {elmaradas} alkalom
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
+
                     {/* Korábbi alkalmak (múlt) */}
                     <div>
                       <h4 className="text-xs uppercase font-bold text-zinc-400 mb-2">Korábbi alkalmak</h4>

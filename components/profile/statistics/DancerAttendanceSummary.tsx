@@ -217,9 +217,9 @@ export function DancerAttendanceSummary({
         }
         return sortDirection === 'asc' ? ratioA - ratioB : ratioB - ratioA
       } else if (sortField === 'paymentRatio') {
-        const ratioA = paymentRatio(a) ?? -1
-        const ratioB = paymentRatio(b) ?? -1
-        return sortDirection === 'asc' ? ratioA - ratioB : ratioB - ratioA
+        const elmaradasA = a.attendedCount - a.paidCount
+        const elmaradasB = b.attendedCount - b.paidCount
+        return sortDirection === 'asc' ? elmaradasA - elmaradasB : elmaradasB - elmaradasA
       } else if (sortField === 'credibility') {
         const ratioA = 100 - (absenceRatio(a) ?? 0)
         const ratioB = 100 - (absenceRatio(b) ?? 0)
@@ -438,7 +438,7 @@ export function DancerAttendanceSummary({
                 Hiányzás % {renderSortIcon('attendanceRatio')}
               </th>
               <th onClick={() => handleSort('paymentRatio')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center">
-                Fiz. % {renderSortIcon('paymentRatio')}
+                Elmaradás {renderSortIcon('paymentRatio')}
               </th>
               <th onClick={() => handleSort('credibility')} className="py-2.5 px-3 cursor-pointer hover:bg-zinc-50 transition-colors text-center bg-indigo-50 text-indigo-900">
                 Megbízhatóság {renderSortIcon('credibility')}
@@ -467,8 +467,15 @@ export function DancerAttendanceSummary({
                   <td className="py-2.5 px-3 text-center tabular-nums text-zinc-700 font-semibold">
                     {attR === null ? '—' : `${d.registeredCount - d.attendedCount} / ${d.registeredCount} (${attR}%)`}
                   </td>
-                  <td className="py-2.5 px-3 text-center tabular-nums text-zinc-700">
-                    {payR === null ? '—' : `${payR}%`}
+                  <td className="py-2.5 px-3 text-center tabular-nums">
+                    {(() => {
+                      const elmaradas = d.attendedCount - d.paidCount
+                      return (
+                        <span className={`font-bold ${elmaradas > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                          {elmaradas} alkalom
+                        </span>
+                      )
+                    })()}
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     {attR === null ? (
@@ -547,12 +554,23 @@ export function DancerAttendanceSummary({
                     {absenceRatio(selectedDancer) === null ? '—' : `${absenceRatio(selectedDancer)}%`}
                   </div>
                 </div>
-                <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-100">
-                  <div className="text-xs text-zinc-500 font-medium">Fizetési arány</div>
-                  <div className="text-lg font-bold text-zinc-800">
-                    {paymentRatio(selectedDancer) === null ? '—' : `${paymentRatio(selectedDancer)}%`}
-                  </div>
-                </div>
+                {(() => {
+                  const elmaradas = (selectedDancer.attendedCount || 0) - (selectedDancer.paidCount || 0)
+                  return (
+                    <div className={`p-3 rounded-xl border transition-colors ${
+                      elmaradas > 0
+                        ? 'bg-red-50 border-red-100'
+                        : 'bg-emerald-50 border-emerald-100'
+                    }`}>
+                      <div className={`text-xs font-medium ${elmaradas > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                        Elmaradás
+                      </div>
+                      <div className={`text-lg font-bold ${elmaradas > 0 ? 'text-red-700' : 'text-emerald-700'}`}>
+                        {elmaradas} alkalom
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
 
               <div className="overflow-x-auto">
