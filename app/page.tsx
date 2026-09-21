@@ -31,22 +31,27 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-transparent flex flex-col">
+    <main className="min-h-screen bg-transparent flex flex-col justify-between">
       {!user ? (
-        <div className="flex-1 flex items-center justify-center p-4 md:p-6">
-          <div className="w-full max-w-md space-y-4">
-            <LoginForm onLoginSuccess={() => {}} />
-            <div className="text-center text-sm bg-transparent">
-              Még nincs fiókod?{' '}
-              <Link
-                href="/register"
-                className="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline"
-              >
-                Regisztrálj itt
-              </Link>
+        <>
+          <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+            <div className="w-full max-w-md space-y-4">
+              <LoginForm onLoginSuccess={() => {}} />
+              <div className="text-center text-sm bg-transparent">
+                Még nincs fiókod?{' '}
+                <Link
+                  href="/register"
+                  className="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline"
+                >
+                  Regisztrálj itt
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+          <footer className="py-4 text-center text-[11px] text-zinc-500/60 font-semibold">
+            ImiDance v26.9.21
+          </footer>
+        </>
       ) : (
         <Dashboard />
       )}

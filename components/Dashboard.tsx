@@ -152,7 +152,10 @@ export function Dashboard() {
       <header className="bg-indigo-600/90 border-b border-indigo-700 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold tracking-tight text-white hidden sm:block">ImreDance</h1>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold tracking-tight text-white hidden sm:block">ImreDance</h1>
+              <span className="text-[10px] text-indigo-200 font-bold tracking-wider hidden sm:block bg-indigo-800/60 px-1.5 py-0.5 rounded-md">v26.9.21</span>
+            </div>
             {profile && (
               <div className="flex items-center bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl shadow-sm gap-3">
                 <div className="flex flex-col">
@@ -306,6 +309,11 @@ export function Dashboard() {
 
         {activeTab === 'admin' && canManageUsers && <AdminPanel />}
       </main>
+
+      {/* Footer */}
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-zinc-400 border-t border-zinc-200/40 mt-8">
+        <p>ImiDance v26.9.21</p>
+      </footer>
     </div>
   )
 }
