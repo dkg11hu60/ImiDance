@@ -526,7 +526,8 @@ export function EventAttendanceManager() {
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Csak regisztráltak / Minden táncos szűrő - Elrejtve, de megőrizve
           <div className="inline-flex p-1 bg-zinc-200/70 rounded-xl">
             <button
               onClick={() => setOnlyRegistered(true)}
@@ -545,16 +546,18 @@ export function EventAttendanceManager() {
               Minden táncos ({allProfiles.length})
             </button>
           </div>
+          */}
 
           <input
             type="text"
             placeholder="Keresés névre..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-1 text-xs border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3.5 py-2 border border-zinc-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
           />
         </div>
 
+        {/* Csoportos műveletek - Elrejtve, de megőrizve
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleBulkSet('attended', true)}
@@ -569,6 +572,7 @@ export function EventAttendanceManager() {
             Mind fizetett
           </button>
         </div>
+        */}
       </div>
 
       {loadingData ? (
@@ -576,56 +580,50 @@ export function EventAttendanceManager() {
       ) : dancerRows.length === 0 ? (
         <div className="py-8 text-center text-zinc-400 italic">Nincs megjeleníthető táncos.</div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[460px] sm:max-h-[600px] select-none border border-zinc-200 rounded-xl shadow-sm">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-zinc-200 text-xs font-semibold text-zinc-500 uppercase select-none">
+              <tr className="sticky top-0 bg-zinc-50 border-b border-zinc-200 text-[10px] sm:text-xs font-semibold text-zinc-500 uppercase select-none z-10 shadow-sm">
                 <th
                   onClick={() => handleSort('name')}
-                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                  className="py-2.5 px-1 sm:px-3 bg-zinc-50 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
                   Név{renderSortIndicator('name')}
                 </th>
                 <th
-                  onClick={() => handleSort('danceLevel')}
-                  className="py-3 px-3 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
-                >
-                  Szint{renderSortIndicator('danceLevel')}
-                </th>
-                <th
                   onClick={() => handleSort('isRegistered')}
-                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                  className="py-2.5 px-1 sm:px-3 text-center bg-zinc-50 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
-                  Előzetesen regisztrált{renderSortIndicator('isRegistered')}
+                  <span className="hidden sm:inline">Előzetesen regisztrált</span><span className="sm:hidden">Reg.</span>{renderSortIndicator('isRegistered')}
                 </th>
                 <th
                   onClick={() => handleSort('attended')}
-                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                  className="py-2.5 px-1 sm:px-3 text-center bg-zinc-50 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
-                  Részt vett{renderSortIndicator('attended')}
+                  <span className="hidden sm:inline">Részt vett</span><span className="sm:hidden">Jelen</span>{renderSortIndicator('attended')}
                 </th>
                 <th
                   onClick={() => handleSort('paid')}
-                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                  className="py-2.5 px-1 sm:px-3 text-center bg-zinc-50 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
-                  Fizetés{renderSortIndicator('paid')}
+                  <span className="hidden sm:inline">Fizetés</span><span className="sm:hidden">Fiz.</span>{renderSortIndicator('paid')}
                 </th>
                 <th
                   onClick={() => handleSort('hasMonthlyPass')}
-                  className="py-3 px-3 text-center cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
+                  className="py-2.5 px-1 sm:px-3 text-center bg-zinc-50 cursor-pointer hover:text-indigo-600 transition-colors whitespace-nowrap"
                 >
-                  Havi bérlet{renderSortIndicator('hasMonthlyPass')}
+                  <span className="hidden sm:inline">Havi bérlet</span><span className="sm:hidden">Bérlet</span>{renderSortIndicator('hasMonthlyPass')}
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 text-sm">
+            <tbody className="divide-y divide-zinc-100 text-xs sm:text-sm">
               {dancerRows.map((row) => (
                 <tr key={row.profileId} className="hover:bg-zinc-50 transition-colors">
-                  <td className="py-3 px-3">
-                    <div className="flex flex-wrap items-center gap-2">
+                  <td className="py-2.5 px-1 sm:px-3">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <button
                         onClick={() => setSelectedDancerId(row.profileId)}
-                        className="font-semibold text-zinc-900 text-left hover:text-indigo-600 hover:underline focus:outline-none"
+                        className="font-bold text-zinc-950 text-left hover:text-indigo-600 hover:underline focus:outline-none"
                         title="Kattints az előzmények megtekintéséhez"
                       >
                         {row.name}
@@ -634,10 +632,10 @@ export function EventAttendanceManager() {
                       {row.pastAttended !== undefined && row.pastPaid !== undefined && row.pastAttended > row.pastPaid && (
                         <button
                           onClick={() => setSelectedDancerId(row.profileId)}
-                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-red-100 text-red-800 border border-red-200 whitespace-nowrap"
+                          className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-red-100 text-red-800 border border-red-200 whitespace-nowrap"
                           title="Kattints az elszámolási részletek megtekintéséhez"
                         >
-                          {`⚠️ Elmaradás (${row.pastAttended - row.pastPaid})`}
+                          {`⚠️ Tartozás (${row.pastAttended - row.pastPaid})`}
                         </button>
                       )}
 
@@ -645,7 +643,7 @@ export function EventAttendanceManager() {
                       {row.pastAttended !== undefined && row.pastPaid !== undefined && row.pastPaid > row.pastAttended && (
                         <button
                           onClick={() => setSelectedDancerId(row.profileId)}
-                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap"
+                          className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-blue-100 text-blue-800 border border-blue-200 whitespace-nowrap"
                           title="Kattints a részletek megtekintéséhez"
                         >
                           {`⚠️ Túlfizetés (${row.pastPaid - row.pastAttended})`}
@@ -656,28 +654,27 @@ export function EventAttendanceManager() {
                       {row.pastRegistered !== undefined && row.pastAttended !== undefined && row.pastRegistered > row.pastAttended && (
                         <button
                           onClick={() => setSelectedDancerId(row.profileId)}
-                          className="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap"
+                          className="text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm hover:scale-105 active:scale-95 transition-transform bg-amber-100 text-amber-800 border border-amber-200 whitespace-nowrap"
                           title="Kattints a mulasztási részletek megtekintéséhez"
                         >
-                          {`⚠️ Hiányzás (${row.pastRegistered - row.pastAttended})`}
+                          {`⚠️ Hiány (${row.pastRegistered - row.pastAttended})`}
                         </button>
                       )}
                     </div>
                   </td>
-                  <td className="py-3 px-3 text-xs text-zinc-500">{row.danceLevel}</td>
-                  <td className="py-3 px-3 text-center text-xs">
+                  <td className="py-2.5 px-1 sm:px-3 text-center text-xs">
                     {row.isRegistered ? (
-                      <span className="inline-flex px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
+                      <span className="inline-flex px-1.5 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
                     ) : (
-                      <span className="text-zinc-400">Nem</span>
+                      <span className="text-zinc-400">—</span>
                     )}
                   </td>
 
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-2.5 px-1 sm:px-3 text-center">
                     <button
                       onClick={() => handleToggle(row, 'attended')}
                       disabled={updatingId === `${row.profileId}-attended`}
-                      className={`px-4 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                      className={`px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs transition-all ${
                         row.attended
                           ? 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700'
                           : 'bg-zinc-100 text-zinc-400 hover:bg-zinc-200'
@@ -687,16 +684,16 @@ export function EventAttendanceManager() {
                     </button>
                   </td>
 
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-2.5 px-1 sm:px-3 text-center">
                     {row.hasMonthlyPass ? (
-                      <span className="inline-flex px-3 py-1.5 rounded-xl font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      <span className="inline-flex px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs bg-emerald-100 text-emerald-800 border border-emerald-200">
                         Bérlet
                       </span>
                     ) : row.attended ? (
                       <button
                         onClick={() => handleToggle(row, 'paid')}
                         disabled={updatingId === `${row.profileId}-paid`}
-                        className={`px-4 py-1.5 rounded-xl font-bold text-xs transition-all shadow-sm ${
+                        className={`px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-lg sm:rounded-xl font-bold text-xs transition-all shadow-sm ${
                           row.paid
                             ? 'bg-emerald-600 text-white hover:bg-emerald-700'
                             : 'bg-rose-600 text-white hover:bg-rose-700'
@@ -709,7 +706,7 @@ export function EventAttendanceManager() {
                     )}
                   </td>
 
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-2.5 px-1 sm:px-3 text-center">
                     <input
                       type="checkbox"
                       checked={row.hasMonthlyPass}
