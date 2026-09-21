@@ -33,6 +33,13 @@ export async function POST(request: Request) {
       process.env.NEXT_PUBLIC_SITE_URL ||
       'http://localhost:3000';
 
+    // Retrieve the client IP address securely on the server
+    const ip =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+    const clientIp = ip.split(',')[0].trim();
+
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
       email,
@@ -42,6 +49,9 @@ export async function POST(request: Request) {
           full_name: fullName,
           gender,
           dance_level: danceLevel,
+          privacy_accepted_at: new Date().toISOString(),
+          privacy_accepted_ip: clientIp,
+          privacy_accepted_version: 1, // Store that they accepted version 1
         },
         redirectTo: `${origin}/auth/confirm`,
       },

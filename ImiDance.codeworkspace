@@ -28,10 +28,16 @@
           "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_MasterPipeline.ps1"
         },
         {
-          "name": "| $(sync) SYNC & PUSH |",
-          "color": "white",
+          "name": "$(sparkle) Gemini CLI",
           "singleInstance": true,
-          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./START_syncPush.ps1"
+          "focus": true,
+          "command": "gemini"
+        },
+        {
+          "name": "| $(rocket) DEPLOY STATIC |",
+          "color": "yellow",
+          "singleInstance": true,
+          "command": "powershell -NoProfile -ExecutionPolicy Bypass -File ./DEPLOY_StaticSite.ps1"
         }
       ]
     },

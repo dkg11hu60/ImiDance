@@ -32,3 +32,4 @@ ImiDance.code-workspace
 # --- Node / Next build ---
 node_modules/
 .next/
+.static_build/

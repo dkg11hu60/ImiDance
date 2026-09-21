@@ -99,6 +99,9 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
         const fullName = meta.full_name || meta.name || user?.email?.split('@')[0] || 'Névtelen'
         const gender = meta.gender || 'Fiú'
         const danceLevel = meta.dance_level || 'Hobbi'
+        const privacyAcceptedAt = meta.privacy_accepted_at || null
+        const privacyAcceptedIp = meta.privacy_accepted_ip || null
+        const privacyAcceptedVersion = meta.privacy_accepted_version || 0
 
         // Biztosítjuk az egyediséget a name mezőhöz (amely UNIQUE constraint alatt áll a sémában)
         const uniqueName = `${fullName} (${userId.substring(0, 4)})`
@@ -112,6 +115,9 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
             email: user?.email || '',
             gender: gender,
             dance_level: danceLevel,
+            privacy_accepted_at: privacyAcceptedAt,
+            privacy_accepted_ip: privacyAcceptedIp,
+            privacy_accepted_version: privacyAcceptedVersion,
           })
 
         if (profileErr) {

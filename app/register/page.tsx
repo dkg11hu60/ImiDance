@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [gdprAccepted, setGdprAccepted] = useState(false)
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,6 +33,11 @@ export default function RegisterPage() {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{10,}$/
     if (!passwordRegex.test(password)) {
       setErrorMsg('A jelszónak legalább 10 karakter hosszúnak kell lennie, és tartalmaznia kell kisbetűt, nagybetűt, számot, valamint speciális karaktert!')
+      return
+    }
+
+    if (!gdprAccepted) {
+      setErrorMsg('A regisztrációhoz el kell fogadnod az Adatkezelési tájékoztatót / Privacy Policy!')
       return
     }
 
@@ -201,6 +207,20 @@ export default function RegisterPage() {
               placeholder="••••••••••"
               className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-300 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+
+          <div className="flex items-start gap-2.5 pt-1">
+            <input
+              id="gdpr-consent"
+              type="checkbox"
+              required
+              checked={gdprAccepted}
+              onChange={(e) => setGdprAccepted(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+            />
+            <label htmlFor="gdpr-consent" className="text-xs text-zinc-600 select-none leading-relaxed cursor-pointer">
+              Elolvastam és elfogadom az <a href="/adatkezelesi_tajekoztato.html" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">Adatkezelési tájékoztatót</a> / I have read and accept the <a href="/privacy_policy.html" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">Privacy Policy</a>. *
+            </label>
           </div>
 
           <button

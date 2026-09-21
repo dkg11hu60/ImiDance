@@ -13,6 +13,7 @@ import { LocationManagement } from '@/components/teacher/LocationManagement'
 import { AdminPanel } from '@/components/admin/AdminPanel'
 import { MemberStatus } from '@/components/admin/MemberStatus'
 import { PolicyGate } from '@/components/policy/PolicyGate'
+import { PrivacyGate } from '@/components/policy/PrivacyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
 import { EventAttendanceManager } from '@/components/teacher/EventAttendanceManager'
 
@@ -29,6 +30,7 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const [policyOk, setPolicyOk] = useState(false)
+  const [privacyOk, setPrivacyOk] = useState(false)
 
   useEffect(() => {
     async function loadUserData() {
@@ -146,6 +148,9 @@ export function Dashboard() {
     <div className="min-h-screen bg-transparent text-zinc-900">
       {user && !policyOk && (
         <PolicyGate userId={user.id} onAccepted={() => setPolicyOk(true)} />
+      )}
+      {user && policyOk && !privacyOk && (
+        <PrivacyGate userId={user.id} onAccepted={() => setPrivacyOk(true)} />
       )}
 
       {/* Header */}

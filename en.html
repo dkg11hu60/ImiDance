@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#171018">
+
+<title>Imredance – Competitive Dance Technique in Budapest | Imre Balázs Dance Teacher</title>
+<meta name="description" content="Standard and Latin movement technique development course in Budapest with dance teacher Imre Balázs. For advanced, super-advanced, hobby, and competitive dancers. Roxy Studio, on Saturdays.">
+<link rel="canonical" href="https://imredance.hu/en.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Imredance">
+<meta property="og:title" content="Imredance – Competitive Dance Technique in Budapest | Imre Balázs">
+<meta property="og:description" content="Standard and Latin movement technique development course. Technique is what gives your dance quality.">
+<meta property="og:url" content="https://imredance.hu/en.html">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23171018'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' fill='%23C7A15A' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DanceSchool",
+  "name": "Imredance – Imre Balázs",
+  "description": "Competitive Ballroom Standard and Latin movement technique development course in Budapest.",
+  "url": "https://imredance.hu/en.html",
+  "email": "imredance@gmail.com",
+  "telephone": "+36707097529",
+  "founder": { "@type": "Person", "name": "Imre Balázs", "jobTitle": "Dance Teacher" },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Tátra u. 4.",
+    "addressLocality": "Budapest",
+    "addressCountry": "HU"
+  },
+  "location": { "@type": "Place", "name": "Roxy Studio", "address": "Budapest, Tátra u. 4." }
+}
+</script>
+
+<style>
+  :root{
+    --ink:#171018;
+    --ink-2:#231A26;
+    --paper:#FAF7F2;
+    --paper-2:#F3EDE4;
+    --text:#241E22;
+    --muted:#6E655F;
+    --gold:#C7A15A;
+    --gold-deep:#A9832F;
+    --wine:#7C2E3A;
+    --line:#E3DAcd;
+    --line-ink:rgba(199,161,90,.22);
+    --measure:64ch;
+    --pad:clamp(1.25rem,5vw,2.5rem);
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:4.5rem;-webkit-text-size-adjust:100%}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:"Mulish",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:clamp(1rem,.95rem + .3vw,1.12rem);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-weight:600;line-height:1.08;letter-spacing:.005em;margin:0}
+  p{margin:0 0 1rem}
+  a{color:inherit}
+  .wrap{max-width:74rem;margin-inline:auto;padding-inline:var(--pad)}
+  .measure{max-width:var(--measure)}
+
+  /* ---- Header ---- */
+  header{position:sticky;top:0;z-index:50;background:rgba(23,16,24,.92);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid var(--line-ink)}
+  .nav{display:flex;align-items:center;gap:1rem;height:4.5rem;color:var(--paper)}
+  .brand{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:600;letter-spacing:.02em;text-decoration:none;color:var(--paper);white-space:nowrap}
+  .brand b{color:var(--gold);font-weight:600}
+  .nav-links{display:flex;gap:1.6rem;margin-left:auto;font-size:.95rem}
+  .nav-links a{color:var(--paper);opacity:.82;text-decoration:none;padding:.25rem 0}
+  .nav-links a:hover{opacity:1;color:var(--gold)}
+  .nav-cta{margin-left:1.4rem}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.95rem;text-decoration:none;border-radius:999px;padding:.65rem 1.2rem;transition:transform .15s ease,background .2s ease,color .2s ease}
+  .btn-gold{background:var(--gold);color:var(--ink)}
+  .btn-gold:hover{background:#d8b672;transform:translateY(-1px)}
+  .btn-outline{border:1px solid var(--line-ink);color:var(--paper)}
+  .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+  .btn-dark{background:var(--ink);color:var(--paper)}
+  .btn-dark:hover{background:var(--ink-2);transform:translateY(-1px)}
+  .menu-toggle{display:none}
+
+  /* ---- Hero ---- */
+  .hero{position:relative;background:var(--ink);color:var(--paper);overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:
+     radial-gradient(120% 90% at 72% 8%, rgba(199,161,90,.20), transparent 55%),
+     radial-gradient(90% 70% at 20% 100%, rgba(124,46,58,.28), transparent 60%);pointer-events:none}
+  .hero-inner{position:relative;padding-block:clamp(3.5rem,10vw,6.5rem)}
+  .kicker{font-size:.9rem;letter-spacing:.04em;color:var(--gold);margin-bottom:1.1rem;font-weight:600}
+  .hero h1{font-size:clamp(2.6rem,7.5vw,5rem);max-width:16ch;color:#fdfaf4}
+  .hero h1 em{font-style:italic;color:var(--gold)}
+  .hero-sub{margin-top:1.4rem;max-width:52ch;font-size:clamp(1.05rem,1rem + .4vw,1.25rem);color:#e7ded4}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2rem}
+  .tagline{margin-top:2.6rem;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:1.35rem;color:var(--gold);opacity:.9}
+
+  /* ---- Sections ---- */
+  section{padding-block:clamp(3rem,8vw,5.5rem)}
+  .eyebrow{color:var(--gold-deep);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.8rem}
+  h2{font-size:clamp(2rem,4.5vw,3.1rem);margin-bottom:.4rem}
+  h2 + .lead{font-size:clamp(1.1rem,1rem + .5vw,1.3rem);color:var(--muted);max-width:var(--measure);margin-bottom:2rem}
+  .section-alt{background:var(--paper-2)}
+
+  /* course layout */
+  .course-grid{display:grid;grid-template-columns:1fr;gap:2.5rem}
+  @media(min-width:900px){.course-grid{grid-template-columns:1.5fr .9fr;gap:3.5rem;align-items:start}}
+  .block{margin-bottom:2rem}
+  .block h3{font-size:1.7rem;color:var(--wine);margin-bottom:.6rem}
+  ul.ticks{list-style:none;padding:0;margin:0;display:grid;gap:.55rem}
+  ul.ticks li{position:relative;padding-left:1.7rem}
+  ul.ticks li::before{content:"";position:absolute;left:0;top:.62em;width:.7rem;height:.7rem;border:1.5px solid var(--gold-deep);border-right:0;border-top:0;transform:rotate(-45deg) translateY(-2px);border-radius:0}
+
+  /* facts panel */
+  .facts{position:sticky;top:6rem;background:var(--ink);color:var(--paper);border-radius:18px;padding:1.8rem;box-shadow:0 24px 60px -30px rgba(23,16,24,.6)}
+  .facts h3{font-family:"Mulish",sans-serif;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:1.2rem}
+  .facts dl{margin:0;display:grid;gap:1rem}
+  .facts dt{font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:#a99f95;margin-bottom:.15rem}
+  .facts dd{margin:0;font-size:1.05rem;color:#f4ede3}
+  .facts .divider{height:1px;background:var(--line-ink)}
+  .facts .btn{width:100%;justify-content:center;margin-top:.4rem}
+  .facts .btn + .btn{margin-top:.6rem}
+  .price-note{font-size:.9rem;color:#a99f95;line-height:1.5}
+
+  /* about */
+  .highlights{list-style:none;padding:0;margin:2rem 0 0;display:grid;gap:0;border-top:1px solid var(--line)}
+  .highlights li{display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.05rem 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .highlights .yr{font-family:"Cormorant Garamond",serif;font-size:1.5rem;color:var(--gold-deep);font-weight:600;min-width:4.2rem}
+  .highlights .what{color:var(--text)}
+  blockquote{margin:2.5rem 0 0;padding:1.6rem 1.8rem;border-left:3px solid var(--gold);background:var(--paper-2);border-radius:0 12px 12px 0}
+  blockquote p{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(1.4rem,1.2rem + 1vw,1.9rem);line-height:1.3;color:var(--ink);margin:0}
+  blockquote cite{display:block;margin-top:.8rem;font-family:"Mulish",sans-serif;font-style:normal;font-size:.9rem;color:var(--muted)}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:1fr;gap:2.5rem}
+  @media(min-width:820px){.contact-grid{grid-template-columns:1fr 1fr;gap:3.5rem}}
+  .contact-lines{display:grid;gap:1.2rem;margin-bottom:1.5rem}
+  .cline{display:flex;align-items:center;gap:.9rem;font-size:1.15rem;text-decoration:none}
+  .cline .ic{width:2.6rem;height:2.6rem;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:var(--gold)}
+  .cline span{font-weight:600}
+  .cline small{display:block;font-weight:400;font-size:.82rem;color:var(--muted)}
+  form{display:grid;gap:1rem}
+  label{font-size:.85rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.35rem}
+  input,textarea{width:100%;font:inherit;padding:.8rem .9rem;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text)}
+  input:focus,textarea:focus{outline:2px solid var(--gold-deep);outline-offset:1px;border-color:var(--gold-deep)}
+  textarea{min-height:8rem;resize:vertical}
+  .consent{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;color:var(--muted)}
+  .consent input{width:auto;margin-top:.2rem}
+  .consent a{color:var(--wine)}
+  .form-note{font-size:.82rem;color:var(--muted)}
+
+  /* footer */
+  footer{background:var(--ink);color:#cdc4ba;padding-block:3rem}
+  footer .fgrid{display:flex;flex-wrap:wrap;gap:1.5rem 3rem;align-items:center;justify-content:space-between}
+  footer a{color:var(--gold);text-decoration:none}
+  footer .fbrand{font-family:"Cormorant Garamond",serif;font-size:1.5rem;color:var(--paper)}
+  footer .ftag{font-style:italic;font-family:"Cormorant Garamond",serif;color:var(--gold)}
+  footer small{display:block;width:100%;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--line-ink);font-size:.8rem;color:#8f867c}
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:3px}
+
+  /* reveal (reduced-motion safe) */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+  /* mobile nav */
+  @media(max-width:760px){
+    .nav-links{position:fixed;inset:4.5rem 0 auto 0;flex-direction:column;gap:0;background:var(--ink);padding:.5rem var(--pad) 1.2rem;border-bottom:1px solid var(--line-ink);transform:translateY(-120%);transition:transform .28s ease;box-shadow:0 20px 40px -20px rgba(0,0,0,.6)}
+    .nav-links.open{transform:none}
+    .nav-links a{padding:.85rem 0;border-bottom:1px solid var(--line-ink);font-size:1.05rem}
+    .nav-cta{display:none}
+    .menu-toggle{display:inline-flex;margin-left:auto;background:none;border:0;color:var(--paper);cursor:pointer;padding:.5rem;font-size:1.4rem;line-height:1}
+  }
+
+  /* Language switch and about-grid */
+  .lang-switch-desktop { display: flex; align-items: center; gap: 0.5rem; }
+  .lang-switch-mobile { display: none; }
+  .lang-switch-desktop a, .lang-switch-mobile a { transition: transform 0.15s ease; display: inline-block; }
+  .lang-switch-desktop a:hover, .lang-switch-mobile a:hover { transform: scale(1.1); }
+  .about-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+  @media(min-width:900px){
+    .about-grid { grid-template-columns: 1.4fr 1fr; gap: 3.5rem; align-items: center; }
+    .lang-switch-desktop { display: flex !important; }
+    .lang-switch-mobile { display: none !important; }
+  }
+  @media(max-width:760px){
+    .lang-switch-desktop { display: none !important; }
+    .lang-switch-mobile { display: flex !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav wrap" aria-label="Main Navigation">
+    <a class="brand" href="#top"><b>Imre</b>dance</a>
+    <button class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navlinks">☰</button>
+    <div class="nav-links" id="navlinks">
+      <a href="#course">Course</a>
+      <a href="#registration" style="color: var(--gold); font-weight: 700;">Registration</a>
+      <a href="#aboutme">About Me</a>
+      <a href="#contact">Contact</a>
+      <!-- Mobile Language Switch inside Menu -->
+      <div class="lang-switch-mobile" style="display: none; align-items: center; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--line-ink); margin-top: 1rem; width: 100%;">
+        <a href="index.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.05rem;">
+          <img src="https://imredance.hu/images/Hungarian_flag_80x50j.jpg" alt="HU" style="width: 24px; height: 15px; border-radius: 2px;" /> Magyar
+        </a>
+        <a href="en.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 1.05rem;">
+          <img src="https://imredance.hu/images/english_flag_80x50.jpg" alt="EN" style="width: 24px; height: 15px; border-radius: 2px;" /> English
+        </a>
+      </div>
+    </div>
+
+    <!-- Desktop Language Switch -->
+    <div class="lang-switch-desktop" style="margin-left: auto;">
+      <a href="index.html" title="Magyar" style="margin-right: 0.3rem;"><img src="https://imredance.hu/images/Hungarian_flag_80x50j.jpg" alt="Magyar" style="width: 28px; height: 18px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.2);" /></a>
+      <a href="en.html" title="English"><img src="https://imredance.hu/images/english_flag_80x50.jpg" alt="English" style="width: 28px; height: 18px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.2);" /></a>
+    </div>
+
+    <a class="btn btn-gold nav-cta" href="tel:+36707097529" style="margin-left: 1.2rem;">+36 70 709 7529</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Introduction">
+    <div class="hero-inner wrap">
+      <p class="kicker">Imre Balázs · Dance Teacher · Budapest</p>
+      <h1 class="reveal">Technique is what gives your dance <em>quality</em>.</h1>
+      <p class="hero-sub reveal">Standard and Latin movement technique development for advanced, super-advanced, hobby, and competitive dancers — backed by over 30 years of competitive and coaching experience.</p>
+      <div class="hero-actions reveal">
+        <a class="btn btn-gold" href="#course">Course Details</a>
+        <a class="btn btn-outline" href="tel:+36707097529">Call: +36 70 709 7529</a>
+      </div>
+      <p class="tagline">May the dance be with you.</p>
+    </div>
+  </section>
+
+  <!-- COURSE -->
+  <section id="course" aria-labelledby="course-title">
+    <div class="wrap">
+      <p class="eyebrow">Course</p>
+      <h2 id="course-title">Standard &amp; Latin Movement Technique Development Course</h2>
+      <p class="lead">Do you feel like you already know the figures, but your movement is not yet quite what you want it to be? It's time to return to the basics. The best dancers are distinguished not by the number of figures they know, but by the quality of their technique — a well-constructed movement provides more stable balance, more efficient power transfer, and a more confident performance.</p>
+
+      <div class="course-grid">
+        <div>
+          <div class="block">
+            <h3>Course Objectives</h3>
+            <ul class="ticks">
+              <li>Conscious development of Standard and Latin-American techniques.</li>
+              <li>Correct body placement, weight transfer, footwork, and spin techniques.</li>
+              <li>Practical application of technical elements through figures.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>Syllabus</h3>
+            <ul class="ticks">
+              <li>Standard and Latin walk and step techniques.</li>
+              <li>Spin technique fundamentals and refinement.</li>
+              <li>Integration of learned elements into figures and choreographies.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h3>What to Expect</h3>
+            <ul class="ticks">
+              <li>An easy-to-understand, logical teaching system.</li>
+              <li>Detailed, crystal-clear technical explanations.</li>
+              <li>Immediately applicable exercises with many useful details.</li>
+              <li>Continuous correction and personalized feedback.</li>
+            </ul>
+          </div>
+        </div>
+
+        <aside class="facts" aria-label="Practical course details">
+          <img src="https://imredance.hu/images/Learn-Masters_01.jpg" alt="Ballroom Standard and Latin technique" style="width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.5rem; display: block; border: 1px solid rgba(199,161,90,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.25);" />
+          <h3>Practical Details</h3>
+          <dl>
+            <div><dt>Recommended Level</dt><dd>Advanced · Super-Advanced · Hobby · Competitive Dancers</dd></div>
+            <div class="divider"></div>
+            <div><dt>Location</dt><dd>Roxy Studio<br>Budapest, Tátra u. 4.</dd></div>
+            <div class="divider"></div>
+            <div><dt>Schedule</dt><dd>From September 2026<br>Every Saturday 16:00–18:00</dd></div>
+            <div class="divider"></div>
+            <div><dt>Participation Fee</dt><dd class="price-note">Please request an offer using the provided contact details — I am happy to discuss details with you.</dd></div>
+          </dl>
+          <a class="btn btn-gold" href="tel:+36707097529">Call: +36 70 709 7529</a>
+          <a class="btn btn-outline" style="border-color:var(--line-ink)" href="mailto:imredance@gmail.com?subject=Registration%20-%20movement%20technique%20course">Register via Email</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- JELENTKEZÉS APP -->
+  <section id="registration" style="background: var(--ink); color: var(--paper); border-top: 1px solid var(--line-ink); border-bottom: 1px solid var(--line-ink);" aria-labelledby="registration-title">
+    <div class="wrap">
+      <p class="eyebrow" style="color: var(--gold);">ImiDance System</p>
+      <h2 id="registration-title" style="color: var(--paper); margin-bottom: 0.5rem;">Online Registration &amp; Members Portal</h2>
+      <p class="lead" style="color: #cdc4ba; max-width: var(--measure); margin-bottom: 2.5rem;">Registration and class schedule management are done through the modern, mobile-friendly <strong>ImiDance</strong> application. Register, log in, and track your attendance live!</p>
+
+      <div class="course-grid">
+        <div style="display: flex; gap: 2rem; flex-direction: column; justify-content: center;">
+          <div style="background: rgba(255,255,255,0.04); padding: 1.8rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+            <h3 style="font-size: 1.5rem; color: var(--gold); margin-bottom: 1rem; font-family: 'Mulish', sans-serif;">Why use the ImiDance app?</h3>
+            <ul class="ticks" style="--gold-deep: var(--gold); margin-bottom: 1.5rem;">
+              <li style="color: #cdc4ba;"><strong style="color: var(--paper);">Instant Registration:</strong> Sign up for Saturday technique classes with a single click.</li>
+              <li style="color: #cdc4ba;"><strong style="color: var(--paper);">Partner Linking:</strong> If you have a dance partner, link your profiles for seamless administration.</li>
+              <li style="color: #cdc4ba;"><strong style="color: var(--paper);">Schedule &amp; Attendance:</strong> Keep track of the class schedule, see your own attendances, and check your paid sessions.</li>
+              <li style="color: #cdc4ba;"><strong style="color: var(--paper);">Paperless Administration:</strong> All your data is securely, neatly, and transparently accessible, even from your mobile.</li>
+            </ul>
+            <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.8rem;">
+              <a class="btn btn-gold" href="https://imi-dance.vercel.app" target="_blank" rel="noopener noreferrer">
+                Open in Full Screen ↗
+              </a>
+              <a class="btn btn-outline" style="border-color: rgba(255,255,255,0.15);" href="#aboutme">Continue to About Me</a>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(199,161,90,0.3); background: #fff;">
+          <iframe src="https://imi-dance.vercel.app" style="width: 100%; height: 500px; border: none; display: block;" title="ImiDance Application"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="aboutme" class="section-alt" aria-labelledby="aboutme-title">
+    <div class="wrap">
+      <p class="eyebrow">About Me</p>
+      
+      <div class="about-grid" style="margin-bottom: 2rem;">
+        <div>
+          <h2 id="aboutme-title">Imre Balázs — Dance Teacher</h2>
+          <p class="lead" style="margin-top: 1rem;">I started over 30 years ago as a competitive dancer. After ten successful years of competing, I earned my dance teacher degree at the Hungarian Dance Academy. Since then, I have been training competitors, art school students, and adult/senior couples — both in Hungary and the United Kingdom.</p>
+
+          <div class="measure">
+            <p>My primary profile is the 10 dance disciplines of ballroom dancing: Standard — English Waltz, Tango, Quickstep, Slow Foxtrot, Viennese Waltz; Latin-American — Samba, Cha-Cha-Cha, Rumba, Paso Doble, Jive. Throughout my career, I have always emphasized correct technical foundations and requirements, and consistent hard work has brought its rewards year after year.</p>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center;">
+          <img src="https://imredance.hu/images/Balazs_Imi_photo_medium.jpg" alt="Imre Balázs" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 15px 35px rgba(23,16,24,0.3); border: 4px solid var(--paper);" />
+        </div>
+      </div>
+
+      <ul class="highlights">
+        <li><span class="yr">2003</span><span class="what">My competitive couple (Szabolcs Marton &amp; Petra Darók) won 2nd place in the Hungarian Championship in JUN-II Latin; they were delegated by the Hungarian DanceSport Association to the WDSF JUN-II Latin World Championship in Riga.</span></li>
+        <li><span class="yr">2002–08</span><span class="what">Awarded "Coach of Student Olympiad Champions" in Szolnok for six consecutive years; competitors of Pelikán TSE achieved consistent podium finishes.</span></li>
+        <li><span class="yr">2004</span><span class="what">Zánka Student Olympiad — 6 gold medals; Pelikán TSE placed 2nd nationwide out of more than 100 clubs.</span></li>
+        <li><span class="yr">2011</span><span class="what">Both of my girls' formation groups (Smile, ZÚZ-Dance) achieved gold qualification at the Performing Arts Schools Dance Festival in Túrkeve.</span></li>
+        <li><span class="yr">2014–24</span><span class="what">Based in England, I held courses, private lessons, and led Standard and Latin workshops for adult and senior couples.</span></li>
+      </ul>
+
+      <blockquote>
+        <p>“Without technique, your dance has no quality; without quality, your dance is valueless.”</p>
+        <cite>— Edita Daniūtė – Mirko Gozzoli</cite>
+      </blockquote>
+
+      <div class="measure" style="margin-top:2rem">
+        <p>Technique is the "grammar" of dance. Many dancers fall into the trap of believing that the more steps they know, the better they dance — but a crowd of steps leads astray. Dance fewer figures, but with proper technique and style, and put quality into your dance. Wherever you go, everyone will notice the difference.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="eyebrow">Contact</p>
+      <h2 id="contact-title">Let's Talk About Dance</h2>
+      <p class="lead">Have a question about the course, or would you like to try a lesson? Call, write, or send a message — I'll get back to you soon.</p>
+
+      <div class="contact-grid">
+        <div>
+          <div class="contact-lines">
+            <a class="cline" href="tel:+36707097529">
+              <span class="ic" aria-hidden="true">☎</span>
+              <span>+36 70 709 7529<small>Phone</small></span>
+            </a>
+            <a class="cline" href="mailto:imredance@gmail.com">
+              <span class="ic" aria-hidden="true">✉</span>
+              <span>imredance@gmail.com<small>E-mail</small></span>
+            </a>
+            <div class="cline">
+              <span class="ic" aria-hidden="true">📍</span>
+              <span>Roxy Studio<small>Budapest, Tátra u. 4.</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <form id="contact-form" novalidate>
+            <div>
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div>
+              <label for="email">Email Address</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div>
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <label class="consent">
+              <input id="consent" type="checkbox" required>
+              <span>I consent to Imre Balázs handling my provided data for the purpose of responding to my inquiry. <a href="privacy_policy.html" target="_blank">Privacy Policy</a></span>
+            </label>
+            <button class="btn btn-dark" type="submit">Send Message</button>
+            <p class="form-note">The form opens your default email client with the entered text. If you would prefer to receive messages directly in your inbox, a free service (e.g., Web3Forms) can be connected in just a few minutes.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap fgrid">
+    <span class="fbrand">Imredance</span>
+    <span class="ftag">May the dance be with you.</span>
+    <span>
+      <a href="tel:+36707097529">+36 70 709 7529</a> ·
+      <a href="mailto:imredance@gmail.com">imredance@gmail.com</a>
+    </span>
+    <small>© <span id="year"></span> Imre Balázs — Imredance. All rights reserved.</small>
+  </div>
+</footer>
+
+<script>
+  // year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // mobile menu
+  const toggle = document.querySelector('.menu-toggle');
+  const links = document.getElementById('navlinks');
+  toggle.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    links.classList.remove('open'); toggle.setAttribute('aria-expanded', false);
+  }));
+
+  // reveal on load
+  const reveals = document.querySelectorAll('.reveal');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    reveals.forEach(el => el.classList.add('in'));
+  } else {
+    requestAnimationFrame(() => reveals.forEach((el, i) => setTimeout(() => el.classList.add('in'), 90 * i)));
+  }
+
+  // contact form -> mailto fallback (no backend needed)
+  document.getElementById('contact-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!this.checkValidity()) { this.reportValidity(); return; }
+    const name = encodeURIComponent(document.getElementById('name').value.trim());
+    const email = encodeURIComponent(document.getElementById('email').value.trim());
+    const msg = encodeURIComponent(document.getElementById('message').value.trim());
+    const body = `Name: ${decodeURIComponent(name)}%0D%0AE-mail: ${decodeURIComponent(email)}%0D%0A%0D%0A${msg}`;
+    window.location.href = `mailto:imredance@gmail.com?subject=${encodeURIComponent('Message from the imredance.hu English website')}&body=${body}`;
+  });
+</script>
+</body>
+</html>
