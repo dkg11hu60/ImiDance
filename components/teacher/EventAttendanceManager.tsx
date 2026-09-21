@@ -339,7 +339,7 @@ export function EventAttendanceManager() {
         const newRecord: any = {
           profile_id: row.profileId,
           event_id: selectedEventId,
-          registered: false,
+          event_name: selectedEvent?.title || 'Táncóra',
           attended: field === 'attended' ? newValue : false,
           paid: field === 'paid' ? newValue : false
         }
