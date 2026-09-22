@@ -44,7 +44,10 @@ export function ProfileEdit({ userId, onSave }: ProfileEditProps) {
           setDanceLevel(data.dance_level || '')
           setPartnerId(data.partner_id || '')
         }
-        if (partnersRes.data) setAvailablePartners(partnersRes.data)
+        if (partnersRes.data) {
+          const activePartners = partnersRes.data.filter((p: any) => p.is_active !== false)
+          setAvailablePartners(activePartners)
+        }
       } catch (err: unknown) {
         console.error('Error fetching profile:', err)
       } finally {

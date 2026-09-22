@@ -47,7 +47,8 @@ export function AttendanceTracker({ eventId }: AttendanceTrackerProps) {
             full_name,
             first_name,
             last_name,
-            name
+            name,
+            is_active
           )
         `)
         .eq('event_id', eventId)
@@ -55,7 +56,8 @@ export function AttendanceTracker({ eventId }: AttendanceTrackerProps) {
       if (error) {
         console.error('Error fetching attendances:', error.message)
       } else if (data) {
-        setRegistrations(data as unknown as AttendanceRecord[])
+        const activeRegistrations = (data as any[]).filter(reg => reg.profiles?.is_active !== false)
+        setRegistrations(activeRegistrations)
       }
     } catch (err) {
       console.error('Unexpected error loading attendance list:', err)

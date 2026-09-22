@@ -107,9 +107,10 @@ export function EventAttendanceManager() {
           return fieldsToSearch.some((f) => f && String(f).toLowerCase().includes('teszt'))
         }
 
-        // Kiszűrjük a tiszta tanárokat/beléptetőket és a teszt felhasználókat
+        // Kiszűrjük a tiszta tanárokat/beléptetőket, a teszt felhasználókat és az inaktívakat
         const filteredProfiles = (profilesRes.data || []).filter((prof: any) => {
           if (isTestProfile(prof)) return false
+          if (prof.is_active === false) return false
 
           let roles = userRolesMap[prof.id] || []
           if (roles.length === 0 && prof.role) {

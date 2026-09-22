@@ -18,7 +18,33 @@ export async function POST(req: Request) {
     }
     const admin = createClient(supabaseUrl, serviceKey)
 
-    // 1) Profil-flag (a felület és a lekérdezések ezt olvassák)
+    // 1) Ha inaktiválás történik, elvágjuk a partnerkapcsolatot (partner_id nullázása mindkét oldalon),
+    // de az aktív tag minden jelentkezése és részvétele érintetlen marad.
+    if (!active) {
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('partner_id')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (profile?.partner_id) {
+        const partnerId = profile.partner_id
+
+        // Partner oldalán lecsatoljuk
+        await admin
+          .from('profiles')
+          .update({ partner_id: null })
+          .eq('id', partnerId)
+
+        // Saját oldalunkon lecsatoljuk
+        await admin
+          .from('profiles')
+          .update({ partner_id: null })
+          .eq('id', userId)
+      }
+    }
+
+    // 2) Profil-flag (a felület és a lekérdezések ezt olvassák)
     const { error: pErr } = await admin
       .from('profiles')
       .update({ is_active: active })
@@ -27,7 +53,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Profil frissítési hiba: ' + pErr.message }, { status: 500 })
     }
 
-    // 2) Auth-szintű tiltás: inaktiválásnál ban, visszakapcsolásnál feloldás.
+    // 3) Auth-szintű tiltás: inaktiválásnál ban, visszakapcsolásnál feloldás.
     const { error: aErr } = await admin.auth.admin.updateUserById(userId, {
       ban_duration: active ? 'none' : '876000h', // ~100 év = „végleges”, visszakapcsolható
     })

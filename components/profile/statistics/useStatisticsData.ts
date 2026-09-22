@@ -122,9 +122,11 @@ export function useStatisticsData() {
         }
 
         // Csak a 'user' vagy 'admin' szerepkörrel rendelkező profilokat jelenítjük meg a statisztikákban,
-        // és teljesen kihagyjuk a 'Teszt' nevet vagy 'Teszt' szöveget bármely mezőjükben tartalmazókat.
+        // és teljesen kihagyjuk a 'Teszt' nevet vagy 'Teszt' szöveget bármely mezőjükben tartalmazókat,
+        // valamint kihagyjuk az inaktív felhasználókat.
         const rawProfiles = (globalData?.profiles || []).filter((prof: any) => {
           if (isTestProfile(prof)) return false
+          if (prof.is_active === false) return false
 
           let roles = userRolesMap[prof.id] || []
           if (roles.length === 0 && prof.role) {

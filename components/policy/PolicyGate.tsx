@@ -24,6 +24,8 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const CURRENT_PRIVACY_VERSION = 1
+
   useEffect(() => {
     async function loadPolicy() {
       setLoading(true)
@@ -42,19 +44,29 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
         return
       }
 
-      // 2. Ellenőrzés: a felhasználó elfogadta-e már ezt a verziót?
-      const { data: acceptance } = await supabase
-        .from('policy_acceptances')
-        .select('id')
-        .eq('profile_id', userId)
-        .eq('policy_version', currentPolicy.version)
-        .maybeSingle()
+      // 2. Ellenőrzés: a felhasználó elfogadta-e már ezt a verziót ÉS az adatkezelési tájékoztató aktuális verzióját?
+      const [acceptanceRes, profileRes] = await Promise.all([
+        supabase
+          .from('policy_acceptances')
+          .select('id')
+          .eq('profile_id', userId)
+          .eq('policy_version', currentPolicy.version)
+          .maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('privacy_accepted_version')
+          .eq('id', userId)
+          .maybeSingle()
+      ])
 
-      if (acceptance) {
-        // Már elfogadta az aktuális verziót -> kapu nyitva
+      const hasAcceptedPolicy = !!acceptanceRes.data
+      const hasAcceptedPrivacy = profileRes.data && profileRes.data.privacy_accepted_version >= CURRENT_PRIVACY_VERSION
+
+      if (hasAcceptedPolicy && hasAcceptedPrivacy) {
+        // Mindkettő el van fogadva az aktuális verziókkal -> kapu nyitva
         onAccepted()
       } else {
-        // Még nem fogadta el -> megjelenítjük a modált
+        // Legalább az egyik hiányzik vagy elavult -> meg kell jeleníteni a Házirend elfogadó modált
         setPolicy(currentPolicy as Policy)
       }
 
@@ -125,7 +137,14 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
         }
       }
 
-      // 2. Most már biztosan létezik a profil, beszúrhatjuk az elfogadást
+      // 2. Most már biztosan létezik a profil, beszúrhatjuk az elfogadást.
+      // Először töröljük az esetleges korábbi elfogadást ugyanehhez a verzióhoz, elkerülve a unique constraint hibát.
+      await supabase
+        .from('policy_acceptances')
+        .delete()
+        .eq('profile_id', userId)
+        .eq('policy_version', policy.version)
+
       const { error: insertErr } = await supabase.from('policy_acceptances').insert({
         profile_id: userId,
         policy_id: policy.id,
@@ -133,6 +152,17 @@ export function PolicyGate({ userId, onAccepted }: PolicyGateProps) {
       })
 
       if (insertErr) throw insertErr
+
+      // 3. Ha változott bármelyik dokumentum, mindkettőt el kell fogadni!
+      // Mivel most fogadta el a Házirendet, de a Privacy-t is újra el kell fogadnia (ha az is inaktív/elavult volt),
+      // az adatkezelési tájékoztató verzióját visszaállítjuk nullára a profilban.
+      const { error: resetPrivacyErr } = await supabase
+        .from('profiles')
+        .update({ privacy_accepted_version: 0 })
+        .eq('id', userId)
+
+      if (resetPrivacyErr) throw resetPrivacyErr
+
       onAccepted()
     } catch (e: any) {
       setError(e?.message || 'Hiba történt az elfogadás során.')
