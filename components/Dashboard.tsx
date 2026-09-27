@@ -32,54 +32,165 @@ export function Dashboard() {
   const [policyOk, setPolicyOk] = useState(false)
   const [privacyOk, setPrivacyOk] = useState(false)
 
-  useEffect(() => {
-    async function loadUserData() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+  // Real authenticated user state (never lost during impersonation)
+  const [realUser, setRealUser] = useState<any>(null)
+  const [realProfile, setRealProfile] = useState<any>(null)
+  const [realCanManageUsers, setRealCanManageUsers] = useState(false)
 
-      if (user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
+  // Impersonation state
+  const [impersonatedUserId, setImpersonatedUserId] = useState<string | null>(null)
+  const [impersonatedProfile, setImpersonatedProfile] = useState<any>(null)
 
-        setProfile(profileData)
-
-        const { data: userRolesData } = await supabase
-          .from('user_roles')
-          .select('role_key')
-          .eq('user_id', user.id)
-
-        let roleKeys = userRolesData?.map(r => r.role_key) || []
-
-        if (roleKeys.length === 0 && profileData?.role) {
-          roleKeys = [profileData.role]
-        }
-
-        if (roleKeys.length > 0) {
-          const { data: rolesMeta } = await supabase
-            .from('roles')
-            .select('key, label, name')
-            .in('key', roleKeys)
-
-          if (rolesMeta && rolesMeta.length > 0) {
-            setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
-          } else {
-            setRoleLabels(roleKeys)
-          }
-        }
-
-        const visibleSet = await loadVisibleObjects(user.id)
-        setVisible(visibleSet)
-      }
+  async function loadUserData(targetUserId?: string | null) {
+    setLoading(true)
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) {
+      setUser(null)
+      setRealUser(null)
       setLoading(false)
+      return
     }
 
+    setRealUser(authUser)
+
+    // Load real profile and real permissions to verify admin privileges
+    const { data: realProf } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+    setRealProfile(realProf)
+
+    const realVisible = await loadVisibleObjects(authUser.id)
+    const isAdmin = realVisible.has('admin.users')
+    setRealCanManageUsers(isAdmin)
+
+    // Determine if impersonation is active
+    let activeImpersonateId: string | null = null
+    if (isAdmin) {
+      if (typeof targetUserId !== 'undefined') {
+        activeImpersonateId = targetUserId
+      } else {
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search)
+          if (urlParams.get('exit_impersonation') || urlParams.get('clear_impersonation')) {
+            sessionStorage.removeItem('imidance_impersonated_user_id')
+            activeImpersonateId = null
+          } else {
+            activeImpersonateId = sessionStorage.getItem('imidance_impersonated_user_id')
+          }
+        }
+      }
+    } else {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('imidance_impersonated_user_id')
+      }
+      activeImpersonateId = null
+    }
+
+    setImpersonatedUserId(activeImpersonateId)
+    const effectiveId = activeImpersonateId || authUser.id
+
+    if (activeImpersonateId) {
+      const { data: impProf } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', activeImpersonateId)
+        .single()
+      setImpersonatedProfile(impProf)
+    } else {
+      setImpersonatedProfile(null)
+    }
+
+    // Load profile for effective user
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', effectiveId)
+      .single()
+
+    setProfile(profileData)
+
+    const { data: userRolesData } = await supabase
+      .from('user_roles')
+      .select('role_key')
+      .eq('user_id', effectiveId)
+
+    let roleKeys = userRolesData?.map(r => r.role_key) || []
+
+    if (roleKeys.length === 0 && profileData?.role) {
+      roleKeys = [profileData.role]
+      // Auto-heal: add missing user_role entry
+      supabase.from('user_roles').insert([{ user_id: effectiveId, role_key: profileData.role }]).then()
+    } else if (roleKeys.length === 0) {
+      roleKeys = ['user']
+      supabase.from('user_roles').insert([{ user_id: effectiveId, role_key: 'user' }]).then()
+    }
+
+    if (roleKeys.length > 0) {
+      const { data: rolesMeta } = await supabase
+        .from('roles')
+        .select('key, label, name')
+        .in('key', roleKeys)
+
+      if (rolesMeta && rolesMeta.length > 0) {
+        setRoleLabels(rolesMeta.map(r => r.label || r.name || r.key))
+      } else {
+        setRoleLabels(roleKeys)
+      }
+    } else {
+      setRoleLabels([])
+    }
+
+    const visibleSet = await loadVisibleObjects(effectiveId)
+    setVisible(visibleSet)
+
+    // Reset policy and privacy gates so they re-evaluate for the effective user
+    setPolicyOk(false)
+    setPrivacyOk(false)
+
+    setUser({ ...authUser, id: effectiveId })
+    setLoading(false)
+  }
+
+  useEffect(() => {
     loadUserData()
   }, [])
 
+  const handleStartImpersonation = (targetId: string) => {
+    if (!realCanManageUsers) return
+    sessionStorage.setItem('imidance_impersonated_user_id', targetId)
+    setActiveTab('events')
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    loadUserData(targetId)
+  }
+
+  const handleStopImpersonation = () => {
+    sessionStorage.removeItem('imidance_impersonated_user_id')
+    setImpersonatedUserId(null)
+    setImpersonatedProfile(null)
+    setActiveTab('admin')
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    loadUserData(null)
+  }
+
+  // Keyboard shortcut listener for foolproof emergency exit: Escape or Ctrl+Alt+A
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (impersonatedUserId && (e.key === 'Escape' || (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'a'))) {
+        handleStopImpersonation()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [impersonatedUserId, realCanManageUsers])
+
   const handleLogout = async () => {
+    sessionStorage.removeItem('imidance_impersonated_user_id')
     await supabase.auth.signOut()
     window.location.reload()
   }
@@ -145,7 +256,59 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-zinc-900">
+    <div className={`min-h-screen bg-transparent text-zinc-900 ${impersonatedUserId ? 'pt-12 sm:pt-11' : ''}`}>
+      {/* Impersonation Banner: Fixed at the very top with maximum z-index (z-[100000]) so modals never block it */}
+      {impersonatedUserId && (
+        <aside 
+          aria-label="Megszemélyesítés figyelmeztetés"
+          className="fixed top-0 left-0 right-0 z-[100000] bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-zinc-950 px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl border-b-2 border-amber-600 flex items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm animate-in fade-in duration-150"
+        >
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <span className="flex h-2.5 w-2.5 relative shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+            </span>
+            <span className="font-extrabold uppercase tracking-wide text-[11px] bg-black text-amber-400 px-2 py-0.5 rounded shadow-sm shrink-0">
+              Megszemélyesítés aktív
+            </span>
+            <span className="truncate">
+              Nézet:{' '}
+              <strong className="text-black font-bold">
+                {impersonatedProfile?.name || impersonatedProfile?.full_name || 'Kiválasztott tag'}
+              </strong>{' '}
+              <span className="text-zinc-800 hidden md:inline">
+                ({impersonatedProfile?.email || impersonatedProfile?.dance_level || 'profil'})
+              </span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleStopImpersonation}
+              className="bg-black hover:bg-zinc-900 active:scale-95 text-white font-bold px-3 sm:px-4 py-1.5 rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer ring-2 ring-white/60 hover:ring-white"
+              title="Kilépés és azonnali visszatérés a Rendszergazda felületre (billentyű: Escape)"
+            >
+              <span>✕</span>
+              <span>Vissza az Adminba</span>
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* Floating emergency exit button in the bottom right corner (never hidden by modals or scroll) */}
+      {impersonatedUserId && (
+        <button
+          type="button"
+          onClick={handleStopImpersonation}
+          className="fixed bottom-4 right-4 z-[100000] bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-2.5 px-3.5 rounded-2xl shadow-2xl text-xs flex items-center gap-2 cursor-pointer border-2 border-white ring-4 ring-red-600/30"
+          title="Visszatérés Rendszergazda módba (vagy nyomj Escape gombot)"
+        >
+          <span className="text-base">🛡️</span>
+          <span>Kilépés (Vissza Adminba)</span>
+        </button>
+      )}
+
       {user && !policyOk && (
         <PolicyGate userId={user.id} onAccepted={() => setPolicyOk(true)} />
       )}
@@ -312,7 +475,7 @@ export function Dashboard() {
           </div>
         )}
 
-        {activeTab === 'admin' && canManageUsers && <AdminPanel />}
+        {activeTab === 'admin' && canManageUsers && <AdminPanel onImpersonate={handleStartImpersonation} />}
       </main>
 
       {/* Footer */}

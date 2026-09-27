@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 
-export function UserAdmin() {
+interface UserAdminProps {
+  onImpersonate?: (userId: string) => void
+}
+
+export function UserAdmin({ onImpersonate }: UserAdminProps) {
   const [profiles, setProfiles] = useState<any[]>([])
   const [roles, setRoles] = useState<any[]>([])
   const [userRolesMap, setUserRolesMap] = useState<{ [userId: string]: string[] }>({})
@@ -11,6 +15,7 @@ export function UserAdmin() {
   const [loading, setLoading] = useState(true)
   const [resetting, setResetting] = useState(false)
   const [resetStatus, setResetStatus] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     loadData()
@@ -170,6 +175,15 @@ export function UserAdmin() {
 
   const allEmails = profiles.map(p => p.email).filter((email): email is string => Boolean(email))
 
+  const filteredProfiles = profiles.filter(p => {
+    if (!searchTerm.trim()) return true
+    const term = searchTerm.toLowerCase()
+    const name = (p.name || '').toLowerCase()
+    const fullName = (p.full_name || '').toLowerCase()
+    const email = (p.email || '').toLowerCase()
+    return name.includes(term) || fullName.includes(term) || email.includes(term)
+  })
+
   return (
     <div className="bg-white p-6 rounded-2xl border border-zinc-200 overflow-x-auto space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -183,6 +197,31 @@ export function UserAdmin() {
         </button>
       </div>
 
+      {/* Keresés / szűrés */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-zinc-50 p-3 rounded-xl border border-zinc-200">
+        <div className="relative flex-1 max-w-md">
+          <input
+            type="text"
+            placeholder="Keresés név vagy e-mail alapján..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3.5 py-2 pl-9 text-sm border border-zinc-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+          />
+          <span className="absolute left-3 top-2.5 text-zinc-400">🔍</span>
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-2.5 text-xs text-zinc-400 hover:text-zinc-600 cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <div className="text-xs text-zinc-600 font-medium">
+          Találatok: <strong className="text-zinc-900">{filteredProfiles.length}</strong> / {profiles.length} felhasználó
+        </div>
+      </div>
+
       {resetStatus && (
         <div className="p-3 bg-zinc-100 text-zinc-800 rounded-xl text-xs font-medium">
           {resetStatus}
@@ -191,11 +230,11 @@ export function UserAdmin() {
 
       {/* MOBIL NÉZET: Kártyás elrendezés kis képernyőkre */}
       <div className="block md:hidden space-y-4">
-        {profiles.map(p => {
+        {filteredProfiles.map(p => {
           const isSelf = p.id === myId
           const isActive = p.is_active ?? true
           const displayName = p.full_name || p.name || 'Névtelen'
-          const userRoles = userRolesMap[p.id] || []
+          const userRoles = (userRolesMap[p.id] && userRolesMap[p.id].length > 0) ? userRolesMap[p.id] : (p.role ? [p.role] : ['user'])
 
           return (
             <div 
@@ -259,7 +298,7 @@ export function UserAdmin() {
               </div>
 
               {/* Akciók */}
-              <div className="flex items-center justify-between pt-2 border-t border-zinc-100 gap-2">
+              <div className="flex flex-wrap items-center justify-between pt-2 border-t border-zinc-100 gap-2">
                 <div>
                   {p.email && (
                     <button
@@ -272,18 +311,32 @@ export function UserAdmin() {
                   )}
                 </div>
 
-                {!isSelf && (
-                  <button
-                    onClick={() => toggleUserActive(p.id, isActive, displayName)}
-                    className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
-                      !isActive
-                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                        : 'bg-red-100 text-red-700 hover:bg-red-200'
-                    }`}
-                  >
-                    {!isActive ? 'Aktiválás' : 'Tiltás'}
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {!isSelf && onImpersonate && (
+                    <button
+                      type="button"
+                      onClick={() => onImpersonate(p.id)}
+                      className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 shadow-sm transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Megszemélyesítés"
+                    >
+                      <span>👤</span>
+                      <span>Megszemélyesítés</span>
+                    </button>
+                  )}
+
+                  {!isSelf && (
+                    <button
+                      onClick={() => toggleUserActive(p.id, isActive, displayName)}
+                      className={`text-xs font-medium px-3 py-1.5 rounded transition-colors ${
+                        !isActive
+                          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                          : 'bg-red-100 text-red-700 hover:bg-red-200'
+                      }`}
+                    >
+                      {!isActive ? 'Aktiválás' : 'Tiltás'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           )
@@ -302,11 +355,11 @@ export function UserAdmin() {
           </tr>
         </thead>
         <tbody className="divide-y">
-          {profiles.map(p => {
+          {filteredProfiles.map(p => {
             const isSelf = p.id === myId
             const isActive = p.is_active ?? true
             const displayName = p.full_name || p.name || 'Névtelen'
-            const userRoles = userRolesMap[p.id] || []
+            const userRoles = (userRolesMap[p.id] && userRolesMap[p.id].length > 0) ? userRolesMap[p.id] : (p.role ? [p.role] : ['user'])
 
             return (
               <tr key={p.id} className={!isActive ? 'bg-zinc-50 opacity-75' : ''}>
@@ -357,7 +410,19 @@ export function UserAdmin() {
                   </div>
                 </td>
                 <td className="py-3 text-right whitespace-nowrap">
-                  <div className="flex items-center justify-end gap-3 whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-2.5 whitespace-nowrap">
+                    {!isSelf && onImpersonate && (
+                      <button
+                        type="button"
+                        onClick={() => onImpersonate(p.id)}
+                        className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-zinc-950 shadow-sm transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Megszemélyesítés: a weboldal megtekintése úgy, ahogy ez a személy látja"
+                      >
+                        <span>👤</span>
+                        <span>Megszemélyesítés</span>
+                      </button>
+                    )}
+
                     {p.email && (
                       <button
                         onClick={() => sendPasswordReset([p.email])}
@@ -369,7 +434,7 @@ export function UserAdmin() {
                     )}
 
                     {!isSelf && (
-                      <div className="border-l border-zinc-200 pl-3 flex items-center">
+                      <div className="border-l border-zinc-200 pl-2.5 flex items-center">
                         <button
                           onClick={() => toggleUserActive(p.id, isActive, displayName)}
                           className={`text-xs font-medium px-2.5 py-1 rounded transition-colors whitespace-nowrap ${

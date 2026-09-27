@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       if (table === "profiles") {
         // Explicitly clean up dependent records in exact schema tables prior to user deletion
         await admin.from("attendances").delete().eq("user_id", id);
-        await admin.from("policy_acceptances").delete().eq("user_id", id);
+        await admin.from("policy_acceptances").delete().eq("profile_id", id);
         await admin.from("activity_logs").delete().eq("user_id", id);
         await admin.from("object_roles").delete().eq("user_id", id);
 

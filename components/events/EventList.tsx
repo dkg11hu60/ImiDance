@@ -71,14 +71,16 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
       setCurrentUserProfile(myProfile)
     }
 
-    setCanAttend((await loadVisibleObjects(userId)).has('event.attend'))
+    const visibleObjects = await loadVisibleObjects(userId)
+    setCanAttend(visibleObjects.size === 0 || visibleObjects.has('event.attend'))
 
     if (attsRes.data) {
       const attMap: { [key: string]: boolean } = {}
       attsRes.data.forEach((a: any) => {
         const pId = a.profile_id || a.user_id
         const eId = a.event_id || a.event
-        if (pId && eId) {
+        const isActive = (a.status ?? '') !== 'cancelled'
+        if (pId && eId && isActive) {
           attMap[`${pId}_${eId}`] = true
         }
       })
@@ -196,7 +198,7 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                 )}
               </div>
 
-              {canAttend ? (
+              {canAttend && (
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <button
                     onClick={() => toggleAttendance(ev, !isUserAttending)}
@@ -212,8 +214,6 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                     <span className="text-[11px] text-red-500">{err}</span>
                   )}
                 </div>
-              ) : (
-                <span className="text-xs text-zinc-400 italic whitespace-nowrap shrink-0">Állandó résztvevő</span>
               )}
             </div>
           </div>

@@ -1,0 +1,227 @@
+# =====================================================================
+# ImiDance - Dinamikus Menürendszer és Navigációs Konfiguráció (YAML)
+# =====================================================================
+# Ez a konfiguráció összefogja a rendszerben lévő navigációt (Top-level menü, 
+# Almenük, Szerepkörök és Adatbázis Jogosultságok), így egy menükezelő vagy 
+# egyedi adminisztrációs addon könnyen fel tudja dolgozni, módosítani tudja.
+
+meta:
+  app_id: "imidance"
+  app_name: "ImiDance"
+  version: "v26.9.21"
+  description: "Dinamikus, szerepkör és adatbázis-jogosultság alapú menürendszer"
+  default_tab: "events"
+
+# Adatbázis alapú jogosultság-objektumok (app_objects tábla)
+permissions:
+  - key: "event.create"
+    label: "Alkalmak és helyszínek kezelése"
+    description: "Új alkalmak, helyszínek létrehozása, meglévők kezelése."
+  - key: "members.status"
+    label: "Tagok aktivitásának megtekintése"
+    description: "Tagok be- és kijelentkezési státuszának ellenőrzése."
+  - key: "policy.admin"
+    label: "Házirend szerkesztése"
+    description: "Házirend és adatvédelmi nyilatkozatok közzététele."
+  - key: "stats.all"
+    label: "Összesített statisztikák elérése"
+    description: "Az összes táncos és óra összesített jelentkezéseinek elérése."
+  - key: "stats.detailed"
+    label: "Részletes részvételi adatok"
+    description: "Saját és részletes esemény/személy bontású statisztikák megtekintése."
+  - key: "admin.users"
+    label: "Felhasználók és szerepkörök adminisztrációja"
+    description: "Felhasználói fiókok tiltása/aktiválása, globális szerepkörök osztása."
+
+# Fő menüpontok (Dashboard.tsx - TopTab)
+menu_items:
+  - id: "events"
+    label:
+      hu: "Órarend"
+      en: "Schedule"
+    icon: "calendar"
+    route: "/events"
+    visible_for: "everyone"
+    style:
+      color: "blue"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-blue-100 text-blue-900 hover:bg-blue-200 border border-blue-300 font-bold shadow-sm"
+
+  - id: "statistics"
+    label:
+      hu: "Jelentkezés"
+      en: "Registrations"
+    icon: "file-text"
+    route: "/statistics"
+    visible_for: "permission_required"
+    required_permissions:
+      - "stats.all"
+    style:
+      color: "cyan"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-cyan-100 text-cyan-900 hover:bg-cyan-200 border border-cyan-300 font-bold shadow-sm"
+
+  - id: "myattendance"
+    label:
+      hu: "Részvétel"
+      en: "My Attendance"
+    icon: "check-square"
+    route: "/myattendance"
+    visible_for: "everyone" # Mindenki látja, de a belső füleihez kellhet jogosultság
+    style:
+      color: "teal"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-teal-100 text-teal-900 hover:bg-teal-200 border border-teal-300 font-bold shadow-sm"
+    # Alfülek (StatisticsDashboard.tsx - mode: 'reszvétel')
+    sub_tabs:
+      - id: "my_attendance"
+        label:
+          hu: "Saját"
+          en: "My Own"
+        subtitle: "Kizárólag a te adataid"
+        required_permissions:
+          - "stats.detailed"
+      - id: "events_breakdown"
+        label:
+          hu: "Események"
+          en: "Events Breakdown"
+        subtitle: "Részvétel eseményenként"
+        required_permissions:
+          - "stats.detailed"
+      - id: "persons_breakdown"
+        label:
+          hu: "Személyek"
+          en: "People Breakdown"
+        subtitle: "Részvétel személyenként"
+        required_permissions:
+          - "stats.detailed"
+      - id: "dancers_summary"
+        label:
+          hu: "Részletes"
+          en: "Detailed Summary"
+        subtitle: "Összesített kimutatás szűrőkkel"
+        required_permissions:
+          - "stats.detailed"
+
+  - id: "profile"
+    label:
+      hu: "Profil"
+      en: "Profile"
+    icon: "user"
+    route: "/profile"
+    visible_for: "everyone"
+    style:
+      color: "slate"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-slate-200 text-slate-900 hover:bg-slate-300 border border-slate-300 font-bold shadow-sm"
+
+  - id: "attendance"
+    label:
+      hu: "Beléptetés"
+      en: "Check-in"
+    icon: "key"
+    route: "/attendance"
+    visible_for: "role_or_permission_required"
+    # canSeeTeacher check: ha az alábbiak közül bármelyik jogosultság megvan
+    required_any_permissions:
+      - "event.create"
+      - "members.status"
+      - "policy.admin"
+    style:
+      color: "red"
+      tailwind_active: "bg-red-700 text-white shadow-lg ring-2 ring-red-600 ring-offset-2 font-bold border border-red-800"
+      tailwind_inactive: "bg-red-600 text-white hover:bg-red-700 font-bold border border-red-700 shadow-sm"
+
+  - id: "teacher"
+    label:
+      hu: "Oktató"
+      en: "Instructor"
+    icon: "award"
+    route: "/teacher"
+    visible_for: "role_or_permission_required"
+    required_any_permissions:
+      - "event.create"
+      - "members.status"
+      - "policy.admin"
+    style:
+      color: "purple"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-purple-100 text-purple-900 hover:bg-purple-200 border border-purple-300 font-bold shadow-sm"
+    # Oktatói almenük (Dashboard.tsx - TeacherSubTab)
+    sub_tabs:
+      - id: "manage"
+        label:
+          hu: "Alkalmak kezelése"
+          en: "Manage Events"
+        required_permissions:
+          - "event.create"
+      - id: "create"
+        label:
+          hu: "Új alkalom"
+          en: "New Event"
+        required_permissions:
+          - "event.create"
+      - id: "locations"
+        label:
+          hu: "Helyszínek"
+          en: "Locations"
+        required_permissions:
+          - "event.create"
+      - id: "members"
+        label:
+          hu: "Tagok aktivitása"
+          en: "Members Activity"
+        required_permissions:
+          - "members.status"
+      - id: "policy"
+        label:
+          hu: "Házirend"
+          en: "House Rules"
+        required_permissions:
+          - "policy.admin"
+
+  - id: "admin"
+    label:
+      hu: "Adminisztráció"
+      en: "Administration"
+    icon: "settings"
+    route: "/admin"
+    visible_for: "permission_required"
+    required_permissions:
+      - "admin.users"
+    style:
+      color: "amber"
+      tailwind_active: "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 font-bold"
+      tailwind_inactive: "bg-amber-100 text-amber-950 hover:bg-amber-200 border border-amber-300 font-bold shadow-sm"
+    # Adminisztrációs alszekciók (AdminPanel.tsx - activeSection)
+    sub_tabs:
+      - id: "users"
+        label:
+          hu: "Felhasználók"
+          en: "Users"
+        required_permissions:
+          - "admin.users"
+      - id: "roles"
+        label:
+          hu: "Szerepek"
+          en: "Roles"
+        required_permissions:
+          - "admin.users"
+      - id: "email"
+        label:
+          hu: "E-mail teszt"
+          en: "Email Test"
+        required_permissions:
+          - "admin.users"
+      - id: "events"
+        label:
+          hu: "Események"
+          en: "Events"
+        required_permissions:
+          - "admin.users"
+      - id: "maintenance"
+        label:
+          hu: "Karbantartás"
+          en: "Maintenance"
+        required_permissions:
+          - "admin.users"

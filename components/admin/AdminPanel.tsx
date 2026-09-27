@@ -7,7 +7,11 @@ import { RoleAdmin } from "./RoleAdmin";
 import { EmailTester } from "./EmailTester";
 import { EventAdmin } from "./EventAdmin";
 
-export function AdminPanel() {
+interface AdminPanelProps {
+  onImpersonate?: (userId: string) => void;
+}
+
+export function AdminPanel({ onImpersonate }: AdminPanelProps) {
   const [activeSection, setActiveSection] = useState<
     "users" | "roles" | "email" | "events" | "maintenance"
   >("users");
@@ -156,7 +160,7 @@ export function AdminPanel() {
       </div>
 
       {/* Section Renders */}
-      {activeSection === "users" && <UserAdmin />}
+      {activeSection === "users" && <UserAdmin onImpersonate={onImpersonate} />}
       {activeSection === "roles" && <RoleAdmin />}
       {activeSection === "email" && <EmailTester />}
       {activeSection === "events" && <EventAdmin />}

@@ -12,9 +12,24 @@ export async function loadVisibleObjects(userId: string | null | undefined): Pro
     .select('role_key')
     .eq('user_id', userId)
 
-  if (roleError || !userRoles || userRoles.length === 0) return new Set()
+  let roleKeys = (!roleError && userRoles && userRoles.length > 0)
+    ? userRoles.map((r: any) => r.role_key)
+    : []
 
-  const roleKeys = userRoles.map((r: any) => r.role_key)
+  // Fallback: ha a user_roles táblában még nincs hozzárendelt szerep, lekérjük a profilból vagy 'user' alapértelmezést adunk
+  if (roleKeys.length === 0) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (profile?.role) {
+      roleKeys = [profile.role]
+    } else {
+      roleKeys = ['user']
+    }
+  }
 
   const { data, error } = await supabase
     .from('object_roles')
