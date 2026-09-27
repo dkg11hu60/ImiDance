@@ -1,4 +1,5 @@
 import './globals.css'
+import { HelpButton } from '@/components/help/HelpButton'
 
 export const metadata = {
   title: 'Imi Társastánc',
@@ -21,7 +22,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hu" suppressHydrationWarning>
-      <body className="dance-bg">{children}</body>
+      <body className="dance-bg">
+        {children}
+        <HelpButton />
+      </body>
     </html>
   )
 }

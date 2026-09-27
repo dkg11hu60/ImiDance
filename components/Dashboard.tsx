@@ -16,6 +16,7 @@ import { PolicyGate } from '@/components/policy/PolicyGate'
 import { PrivacyGate } from '@/components/policy/PrivacyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
 import { EventAttendanceManager } from '@/components/teacher/EventAttendanceManager'
+import { openHelpModal } from '@/components/help/HelpButton'
 
 type TopTab = 'events' | 'attendance' | 'myattendance' | 'statistics' | 'profile' | 'teacher' | 'admin'
 type TeacherSubTab = 'manage' | 'create' | 'locations' | 'members' | 'policy'
@@ -346,10 +347,19 @@ export function Dashboard() {
               </div>
             )}
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
+              type="button"
+              onClick={openHelpModal}
+              className="text-xs sm:text-sm font-semibold text-indigo-100 hover:text-white transition-colors px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-1.5 cursor-pointer"
+              title="Segítség kérése vagy hiba bejelentése a fejlesztőnek"
+            >
+              <span>🆘</span>
+              <span className="hidden xs:inline sm:inline">Segítség</span>
+            </button>
             <button
               onClick={handleLogout}
-              className="text-sm font-medium text-indigo-100 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-indigo-700"
+              className="text-xs sm:text-sm font-medium text-indigo-100 hover:text-white transition-colors px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-indigo-700"
             >
               Kijelentkezés
             </button>

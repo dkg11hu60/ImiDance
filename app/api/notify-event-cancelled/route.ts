@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import nodemailer from 'nodemailer'
+import { getMailSender } from '@/lib/email'
 
 interface AttendanceRecord {
   profile_id?: string | null
@@ -165,7 +166,7 @@ export async function POST(req: Request) {
 
         try {
           await transporter.sendMail({
-            from: `"ImiDance" <${fromEmail}>`,
+            from: getMailSender(),
             to: email,
             subject: subject || 'Esemény törölve',
             text: customizedBody,

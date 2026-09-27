@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { getMailSender } from '@/lib/email'
 
 export async function POST(req: Request) {
   try {
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
 
     // 2. Teszt levél kiküldése
     const info = await transporter.sendMail({
-      from: `"ImiDance Teszt" <${fromEmail}>`,
+      from: getMailSender('Test'),
       to: targetEmail,
       subject: 'ImiDance - SMTP Teszt E-mail',
       text: 'Ez egy teszt üzenet az ImiDance rendszertől. Az SMTP beállítások megfelelően működnek!',

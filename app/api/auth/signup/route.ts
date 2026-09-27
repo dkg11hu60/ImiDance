@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
+import { getMailSender } from '@/lib/email';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
     const confirmUrl = `${origin}/auth/confirm?token_hash=${tokenHash}&type=signup`;
 
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: getMailSender(),
       to: email,
       subject: 'Regisztráció megerősítése - ImiDance',
       html: `
