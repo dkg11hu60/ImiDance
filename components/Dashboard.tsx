@@ -17,6 +17,7 @@ import { PrivacyGate } from '@/components/policy/PrivacyGate'
 import { PolicyEditor } from '@/components/policy/PolicyEditor'
 import { EventAttendanceManager } from '@/components/teacher/EventAttendanceManager'
 import { openHelpModal } from '@/components/help/HelpButton'
+import { APP_VERSION } from '@/lib/version'
 
 type TopTab = 'events' | 'attendance' | 'myattendance' | 'statistics' | 'profile' | 'teacher' | 'admin'
 type TeacherSubTab = 'manage' | 'create' | 'locations' | 'members' | 'policy'
@@ -323,7 +324,7 @@ export function Dashboard() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <h1 className="text-xl font-bold tracking-tight text-white hidden sm:block">ImreDance</h1>
-              <span className="text-[10px] text-indigo-200 font-bold tracking-wider hidden sm:block bg-indigo-800/60 px-1.5 py-0.5 rounded-md">v26.9.21</span>
+              <span className="text-[10px] text-indigo-200 font-bold tracking-wider hidden sm:block bg-indigo-800/60 px-1.5 py-0.5 rounded-md">{APP_VERSION}</span>
             </div>
             {profile && (
               <div className="flex items-center bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl shadow-sm gap-3">
@@ -490,7 +491,7 @@ export function Dashboard() {
 
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-zinc-400 border-t border-zinc-200/40 mt-8">
-        <p>ImiDance v26.9.21</p>
+        <p>ImiDance {APP_VERSION}</p>
       </footer>
     </div>
   )

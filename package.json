@@ -1,9 +1,10 @@
 {
   "name": "imidance",
-  "version": "26.9.21",
+  "version": "260927.201959",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/update-version.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

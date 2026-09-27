@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function RegisterPage() {
@@ -15,6 +15,34 @@ export default function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
   const [gdprAccepted, setGdprAccepted] = useState(false)
+
+  // CAPTCHA and anti-bot state
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaSvg, setCaptchaSvg] = useState<string | null>(null)
+  const [captchaAnswer, setCaptchaAnswer] = useState('')
+  const [captchaLoading, setCaptchaLoading] = useState(false)
+  const [honeypot, setHoneypot] = useState('')
+
+  async function fetchCaptcha() {
+    setCaptchaLoading(true)
+    try {
+      const res = await fetch('/api/auth/captcha', { cache: 'no-store' })
+      const data = await res.json()
+      if (data.ok) {
+        setCaptchaToken(data.token)
+        setCaptchaSvg(data.svgDataUri)
+        setCaptchaAnswer('')
+      }
+    } catch (err) {
+      console.error('Failed to load CAPTCHA:', err)
+    } finally {
+      setCaptchaLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchCaptcha()
+  }, [])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +69,11 @@ export default function RegisterPage() {
       return
     }
 
+    if (!captchaAnswer.trim()) {
+      setErrorMsg('Kérlek, add meg a képen látható ellenőrző kódot!')
+      return
+    }
+
     const sanitizedEmail = email.trim().toLowerCase()
 
     setLoading(true)
@@ -48,7 +81,7 @@ export default function RegisterPage() {
     setSuccessMsg(null)
 
     try {
-      // Saját SMTP-t használó API útvonal hívása a közvetlen Supabase Auth helyett
+      // Saját SMTP-t használó API útvonal hívása CAPTCHA ellenőrzéssel
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -58,12 +91,17 @@ export default function RegisterPage() {
           fullName: fullName.trim(),
           gender,
           danceLevel,
+          captchaToken,
+          captchaAnswer: captchaAnswer.trim(),
+          honeypot,
         }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
+        // Refresh CAPTCHA on error so bot or user can retry with fresh token
+        fetchCaptcha()
         throw new Error(data.error || 'A regisztráció nem sikerült.')
       }
 
@@ -221,6 +259,57 @@ export default function RegisterPage() {
             <label htmlFor="gdpr-consent" className="text-xs text-zinc-600 select-none leading-relaxed cursor-pointer">
               Elolvastam és elfogadom az <a href="/adatkezelesi_tajekoztato.html" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">Adatkezelési tájékoztatót</a> / I have read and accept the <a href="/privacy_policy.html" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">Privacy Policy</a>. *
             </label>
+          </div>
+
+          {/* Biztonsági ellenőrzés (CAPTCHA a robotok és DDoS ellen) */}
+          <div className="pt-2 border-t border-zinc-100 space-y-2">
+            <label className="block text-xs font-semibold uppercase text-zinc-600">
+              Biztonsági ellenőrzés (CAPTCHA) *
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-zinc-100 rounded-xl overflow-hidden flex items-center justify-center p-1 border border-zinc-200 min-h-[54px]">
+                {captchaSvg ? (
+                  <img
+                    src={captchaSvg}
+                    alt="Biztonsági ellenőrző kód"
+                    className="h-12 w-full object-contain select-none pointer-events-none"
+                  />
+                ) : (
+                  <span className="text-xs text-zinc-400">Kód betöltése...</span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={fetchCaptcha}
+                disabled={captchaLoading}
+                className="p-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl border border-zinc-200 transition-colors cursor-pointer text-sm font-bold disabled:opacity-50"
+                title="Új kód kérése"
+              >
+                🔄
+              </button>
+            </div>
+            <input
+              type="text"
+              required
+              autoCapitalize="characters"
+              autoComplete="off"
+              value={captchaAnswer}
+              onChange={(e) => setCaptchaAnswer(e.target.value.toUpperCase())}
+              placeholder="Írd be a képen látható 5 karaktert"
+              className="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-300 rounded-lg text-sm text-zinc-900 font-mono tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Hidden honeypot to catch automated spam bots */}
+          <div style={{ position: 'absolute', opacity: 0, zIndex: -1, height: 0, width: 0, overflow: 'hidden' }}>
+            <input
+              type="text"
+              name="b_extra_verification"
+              tabIndex={-1}
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              autoComplete="off"
+            />
           </div>
 
           <button

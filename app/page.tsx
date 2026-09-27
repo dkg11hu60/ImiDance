@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { LoginForm } from '../components/auth/LoginForm'
 import { Dashboard } from '../components/Dashboard'
+import { APP_VERSION } from '../lib/version'
 
 export default function Home() {
   const [user, setUser] = useState<any>(null)
@@ -49,7 +50,7 @@ export default function Home() {
             </div>
           </div>
           <footer className="py-4 text-center text-[11px] text-zinc-500/60 font-semibold">
-            ImiDance v26.9.21
+            ImiDance {APP_VERSION}
           </footer>
         </>
       ) : (

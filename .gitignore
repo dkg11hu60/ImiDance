@@ -33,3 +33,5 @@ ImiDance.code-workspace
 node_modules/
 .next/
 .static_build/
+*.tsbuildinfo
+tsconfig.tsbuildinfo

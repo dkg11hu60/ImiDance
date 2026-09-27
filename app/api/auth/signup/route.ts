@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import { getMailSender } from '@/lib/email';
+import { verifyCaptcha, checkIpRateLimit } from '@/lib/captcha';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,8 +21,50 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
   try {
-    const { email, password, fullName, gender, danceLevel } = await request.json();
+    const {
+      email,
+      password,
+      fullName,
+      gender,
+      danceLevel,
+      captchaToken,
+      captchaAnswer,
+      honeypot
+    } = await request.json();
 
+    // 1. Bot honeypot check
+    if (honeypot) {
+      return NextResponse.json(
+        { error: 'Automatizált kitöltés észlelve.' },
+        { status: 400 }
+      );
+    }
+
+    // 2. IP-based rate limiting (DDoS / automated flood mitigation)
+    const ip =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+    const clientIp = ip.split(',')[0].trim();
+
+    const rateLimit = checkIpRateLimit(clientIp);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Túl sok regisztrációs kísérlet erről az IP címről. Kérjük, várj 15 percet az újabb próbálkozás előtt.' },
+        { status: 429 }
+      );
+    }
+
+    // 3. CAPTCHA verification
+    const captchaCheck = verifyCaptcha(captchaToken, captchaAnswer);
+    if (!captchaCheck.valid) {
+      return NextResponse.json(
+        { error: captchaCheck.reason || 'Helytelen vagy lejárt biztonsági kód.' },
+        { status: 400 }
+      );
+    }
+
+    // 4. Input validation
     if (!email || !password || !fullName) {
       return NextResponse.json(
         { error: 'A hiányzó kötelező mezők miatt a regisztráció nem folytatható.' },
@@ -33,13 +76,6 @@ export async function POST(request: Request) {
       request.headers.get('origin') ||
       process.env.NEXT_PUBLIC_SITE_URL ||
       'http://localhost:3000';
-
-    // Retrieve the client IP address securely on the server
-    const ip =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      '127.0.0.1';
-    const clientIp = ip.split(',')[0].trim();
 
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'signup',
