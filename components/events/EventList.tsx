@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { loadVisibleObjects } from '@/lib/permissions'
+import { isRegistrationOpen, formatRegistrationDeadline } from '@/lib/utils'
 
 export function EventList({ userId, onNavigateProfile }: { userId: string; onNavigateProfile?: () => void }) {
   const [events, setEvents] = useState<any[]>([])
@@ -159,6 +160,8 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
         const isUserAttending = !!attendances[`${userId}_${ev.id}`]
         const isPartnerAttending = partner ? !!attendances[`${partner.id}_${ev.id}`] : false
         const loc = ev.locations
+        const isOpen = isRegistrationOpen(ev.event_date)
+        const deadlineText = formatRegistrationDeadline(ev.event_date)
 
         return (
           <div
@@ -189,6 +192,19 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                   <div className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1"><span>📍</span> Helyszín nincs megadva</div>
                 )}
 
+                {/* Regisztrációs határidő / Lezárult státusz */}
+                <div className="mt-1">
+                  {isOpen ? (
+                    <span className="text-[11px] text-zinc-500 font-medium">
+                      ⏳ Határidő: <span className="text-zinc-700">{deadlineText}</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      🔒 A regisztráció lezárult
+                    </span>
+                  )}
+                </div>
+
                 {partner && (
                   <div className="text-xs mt-1 font-medium">
                     {isPartnerAttending
@@ -200,16 +216,36 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
 
               {canAttend && (
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  <button
-                    onClick={() => toggleAttendance(ev, !isUserAttending)}
-                    disabled={busy === ev.id}
-                    title={`Az eseményekre való jelentkezést / lemondást a gombra kattintással teheted meg az esemény kezdetéig.\nÍgy nem szükséges a tanárt külön értesítened.`}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap disabled:opacity-50 transition-colors ${
-                      isUserAttending ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                    }`}
-                  >
-                    {busy === ev.id ? '...' : isUserAttending ? 'Lemondom' : 'Regisztrálok'}
-                  </button>
+                  {!isOpen ? (
+                    isUserAttending ? (
+                      <button
+                        disabled
+                        title={`A lemondási határidő lezárult (${deadlineText}). Minden eseményre a megelőző nap 18:00 óráig lehetett lemondani.`}
+                        className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed"
+                      >
+                        ✓ Jelentkezve (Lezárult)
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        title={`A regisztrációs határidő lezárult (${deadlineText}). Minden eseményre a megelőző nap 18:00 óráig lehetett regisztrálni.`}
+                        className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200"
+                      >
+                        Lezárult
+                      </button>
+                    )
+                  ) : (
+                    <button
+                      onClick={() => toggleAttendance(ev, !isUserAttending)}
+                      disabled={busy === ev.id}
+                      title={`A regisztráció és lemondás a megelőző nap 18:00-ig lehetséges (${deadlineText}).`}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap disabled:opacity-50 transition-colors ${
+                        isUserAttending ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      }`}
+                    >
+                      {busy === ev.id ? '...' : isUserAttending ? 'Lemondom' : 'Regisztrálok'}
+                    </button>
+                  )}
                   {err && busy === null && (
                     <span className="text-[11px] text-red-500">{err}</span>
                   )}

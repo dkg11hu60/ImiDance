@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isRegistrationOpen } from '@/lib/utils'
 
 export const runtime = 'nodejs'
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
 
     const { data: ev, error: evError } = await admin
       .from('events')
-      .select('id, title, is_active')
+      .select('id, title, is_active, event_date')
       .eq('id', eventId)
       .maybeSingle()
 
@@ -41,6 +42,17 @@ export async function POST(req: Request) {
 
     if (ev.is_active === false && attend) {
       return NextResponse.json({ error: 'Erre az alkalomra már nem lehet jelentkezni.' }, { status: 400 })
+    }
+
+    if (!isRegistrationOpen(ev.event_date)) {
+      return NextResponse.json(
+        {
+          error: attend
+            ? 'A regisztráció lezárult. Minden eseményre a megelőző nap 18:00 óráig lehet regisztrálni.'
+            : 'A lemondási határidő lezárult. Minden eseményre a megelőző nap 18:00 óráig lehet lemondani a részvételt.',
+        },
+        { status: 400 }
+      )
     }
 
     const { data: me, error: meError } = await admin
@@ -65,12 +77,15 @@ export async function POST(req: Request) {
 
     if (attend) {
       const eventName = ev.title || 'Táncóra'
+      const nowIso = new Date().toISOString()
 
       const rows = ids.map((pid) => ({
         profile_id: pid,
         event_id: eventId,
         event_name: eventName,
         status: 'registered',
+        created_at: nowIso,
+        cancelled_at: null,
       }))
 
       const { error: upsertError } = await admin
@@ -81,16 +96,47 @@ export async function POST(req: Request) {
         console.error('[SET-ATTENDANCE UPSERT ERROR]:', upsertError)
         return NextResponse.json({ error: `Mentési hiba: ${upsertError.message}` }, { status: 500 })
       }
+
+      // Log attend action
+      for (const pid of ids) {
+        try {
+          await admin.from('activity_logs').insert({
+            profile_id: pid,
+            action: 'attend',
+            event_id: eventId,
+          })
+        } catch (err: unknown) {
+          console.error('[ACTIVITY-LOG ATTEND ERROR]:', err)
+        }
+      }
     } else {
-      const { error: deleteError } = await admin
+      const nowIso = new Date().toISOString()
+
+      const { error: updateError } = await admin
         .from('attendances')
-        .delete()
+        .update({
+          status: 'cancelled',
+          cancelled_at: nowIso,
+        })
         .in('profile_id', ids)
         .eq('event_id', eventId)
 
-      if (deleteError) {
-        console.error('[SET-ATTENDANCE DELETE ERROR]:', deleteError)
-        return NextResponse.json({ error: `Törlési hiba: ${deleteError.message}` }, { status: 500 })
+      if (updateError) {
+        console.error('[SET-ATTENDANCE CANCEL ERROR]:', updateError)
+        return NextResponse.json({ error: `Lemondási hiba: ${updateError.message}` }, { status: 500 })
+      }
+
+      // Log cancel action
+      for (const pid of ids) {
+        try {
+          await admin.from('activity_logs').insert({
+            profile_id: pid,
+            action: 'cancel',
+            event_id: eventId,
+          })
+        } catch (err: unknown) {
+          console.error('[ACTIVITY-LOG CANCEL ERROR]:', err)
+        }
       }
     }
 

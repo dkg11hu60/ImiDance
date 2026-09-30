@@ -377,6 +377,43 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
 
 ## 13. Változásnapló
 
+**Doc v005 (2026-09-30):**
+
+- **Regisztrációs és lemondási határidő szigorítása: Megelőző nap 18:00 óra (`lib/utils.ts`, `app/api/set-attendance/route.ts`, `EventList.tsx`):**
+  - **Üzleti szabály:** Minden eseményre kizárólag a megelőző nap 18:00 óráig lehet regisztrálni, és **lemondani is kizárólag addig lehet**. Ezt követően a feliratkozás és a lemondás is lezárul.
+  - **Szerver oldali védelem:** A `set-attendance` API végpont (`app/api/set-attendance/route.ts`) érvényesíti az `isRegistrationOpen(ev.event_date)` ellenőrzést; határidőn túli kísérlet esetén 400-as hibát ad vissza:
+    - Jelentkezésnél: *"A regisztráció lezárult. Minden eseményre a megelőző nap 18:00 óráig lehet regisztrálni."*
+    - Lemondásnál: *"A lemondási határidő lezárult. Minden eseményre a megelőző nap 18:00 óráig lehet lemondani a részvételt."*
+  - **Kliens oldali felület (`EventList.tsx`):**
+    - Minden óránál megjelenik a pontos határidő (pl. *⏳ Határidő: péntek 18:00*).
+    - Határidő lejárta után a még nem regisztráltaknál letiltott „Lezárult” gomb, a már regisztráltaknál letiltott „✓ Jelentkezve (Lezárult)” gomb jelenik meg.
+  - **Összefüggés a Napi Riporttal:** Mivel a másnapi táncórára a jelentkezés és lemondás aznap 18:00-kor véglegesen lezárul, a 18:01-kor kiküldött napi riport immár a másnapi óra **végleges, lezárt létszámát és névsorát** tartalmazza Imre számára.
+- **Lemondások rögzítése és időpontja (`attendances.cancelled_at`, `005_cancellation_tracking.sql`, `activity_logs`):**
+  - Az `attendances` táblába bevezetésre került a `cancelled_at` (timestamptz) oszlop.
+  - Lemondáskor a sor nem törlődik az adatbázisból, hanem `status = 'cancelled'` és `cancelled_at = now()` értékeket kap, valamint az `activity_logs` táblába is bejegyzés kerül (`action = 'cancel'`).
+  - Újrajelentkezéskor a `status` visszavált `'registered'`-re, a `created_at` frissül az új időbélyegre, a `cancelled_at` pedig visszaáll `NULL`-ra.
+  - A Tanári felületen (`EventAttendanceManager.tsx`) a lemondott táncosoknál piros `Lemondva` jelvény és a lemondás pontos ideje látható.
+- **Jelentkezések időpontjának rögzítése (`set-attendance/route.ts`):**
+  - Az eseményre jelentkezéskor (`attend: true`) a rendszer explicit elmenti a pontos időbélyeget (`created_at: new Date().toISOString()`), így pontosan nyomon követhető a feliratkozás pillanata.
+- **Regisztrációs időbélyeg megjelenítése a Tanári felületen (`EventAttendanceManager.tsx`):**
+  - Az „Előzetesen regisztrált” oszlopban az „Igen” jelvény alatt megjelenik a jelentkezés dátuma és pontos ideje (`HH:MM`, tooltipben teljes dátummal).
+  - Az oszlop fejlécre kattintva a táncosok a regisztráció időpontja szerint is sorba rendezhetők.
+  - Kézi beléptetésnél / adminisztrátori rögzítésnél szintén explicit rögzítésre kerül a timestamp.
+- **Napi 18:01 Jelentkezési Riport Cronjob és API (`app/api/cron/daily-report/route.ts`, `lib/dailyReport.ts`):**
+  - Automatikus napi jelentés generálása és kiküldése minden nap pontosan 18:01-kor:
+    - **Címzett (To):** `imredance@gmail.com`
+    - **Másolat (CC):** `dkg11hu@gmail.com`
+  - Vercel Cron integráció (`vercel.json`: `"1 16,17 * * *"`), intelligens Budapest időzóna (`Europe/Budapest`) óra-ellenőrzéssel, amely automatikusan kezeli a téli (CET, UTC+1) és nyári (CEST, UTC+2) időszámításváltást kézi beavatkozás nélkül.
+  - **Riport tartalma:**
+    - Fókuszban a mai táncóra (vagy ha ma nincs, a legközelebbi kitűzött alkalom).
+    - Metrikák: Összes jelentkező, hölgyek száma, urak száma, megerősített táncospárok száma, egyéni jelentkezők, nemi egyensúly állapota, havi bérletesek száma.
+    - Teljes névsorszámozott táblázat: Név, nem, táncszint, partner státusz, bérlet, és a pontos jelentkezési időpont.
+    - Előretekintés: Következő 5 jövőbeli alkalom létszáma (fiú/lány bontásban).
+    - Friss aktivitás: Az elmúlt 24 óra új jelentkezéseinek listája (ki, melyik órára, mikor).
+- **Tesztelési és adminisztrációs felület (`EmailTester.tsx`, `scripts/test-daily-report.js`):**
+  - Az adminisztrációs felületen (`EmailTester.tsx`) dedikált „Napi Riport Tesztelése” kártya és „Napi Riport Küldése Most” gomb kapott helyet, amellyel a riport azonnal lepróbálható bármilyen tetszőleges címzettre is.
+  - Node.js alapú parancssori tesztelő script (`scripts/test-daily-report.js`) az azonnali ellenőrzéshez.
+
 **Doc v004 (2026-08-30):**
 
 - **Szerepkörválasztó UI gombosítása és reszponzivitása (UserAdmin.tsx):**

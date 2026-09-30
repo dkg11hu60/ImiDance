@@ -16,12 +16,16 @@ interface DancerRow {
   profileId: string
   name: string
   danceLevel: string
+  status?: string
   isRegistered: boolean
+  registeredAt?: string
+  cancelledAt?: string
   attended: boolean
   paid: boolean
   pastRegistered?: number
   pastAttended?: number
   pastPaid?: number
+  activeAbsences?: number
   hasMonthlyPass: boolean
 }
 
@@ -292,7 +296,10 @@ export function EventAttendanceManager() {
         profileId: p.id,
         name,
         danceLevel,
+        status: att?.status,
         isRegistered: isDancerRegistered(att),
+        registeredAt: att?.created_at,
+        cancelledAt: att?.cancelled_at,
         attended: Boolean(att?.attended),
         paid: Boolean(att?.paid),
         pastRegistered: stats.registered,
@@ -305,6 +312,17 @@ export function EventAttendanceManager() {
     .filter(row => (onlyRegistered ? row.isRegistered : true))
     .filter(row => row.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
+      if (sortKey === 'isRegistered') {
+        const numA = a.isRegistered ? 1 : 0
+        const numB = b.isRegistered ? 1 : 0
+        if (numA !== numB) {
+          return sortOrder === 'asc' ? numA - numB : numB - numA
+        }
+        const timeA = a.registeredAt ? new Date(a.registeredAt).getTime() : 0
+        const timeB = b.registeredAt ? new Date(b.registeredAt).getTime() : 0
+        return sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+      }
+
       const valA = a[sortKey]
       const valB = b[sortKey]
 
@@ -341,8 +359,10 @@ export function EventAttendanceManager() {
           profile_id: row.profileId,
           event_id: selectedEventId,
           event_name: selectedEvent?.title || 'Táncóra',
+          status: 'registered',
           attended: field === 'attended' ? newValue : false,
-          paid: field === 'paid' ? newValue : false
+          paid: field === 'paid' ? newValue : false,
+          created_at: new Date().toISOString()
         }
 
         const { data, error } = await supabase
@@ -665,7 +685,35 @@ export function EventAttendanceManager() {
                   </td>
                   <td className="py-2.5 px-1 sm:px-3 text-center text-xs">
                     {row.isRegistered ? (
-                      <span className="inline-flex px-1.5 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Igen</span>
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="inline-flex px-1.5 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Igen
+                        </span>
+                        {row.registeredAt && (
+                          <span
+                            className="text-[10px] text-zinc-500 mt-0.5 font-mono whitespace-nowrap"
+                            title={`Jelentkezés ideje: ${new Date(row.registeredAt).toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' })}`}
+                          >
+                            {new Date(row.registeredAt).toLocaleDateString('hu-HU', { month: '2-digit', day: '2-digit', timeZone: 'Europe/Budapest' })}{' '}
+                            {new Date(row.registeredAt).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' })}
+                          </span>
+                        )}
+                      </div>
+                    ) : row.status === 'cancelled' ? (
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="inline-flex px-1.5 py-0.5 rounded font-medium bg-red-50 text-red-700 border border-red-200">
+                          Lemondva
+                        </span>
+                        {row.cancelledAt && (
+                          <span
+                            className="text-[10px] text-red-500 mt-0.5 font-mono whitespace-nowrap"
+                            title={`Lemondás ideje: ${new Date(row.cancelledAt).toLocaleString('hu-HU', { timeZone: 'Europe/Budapest' })}`}
+                          >
+                            {new Date(row.cancelledAt).toLocaleDateString('hu-HU', { month: '2-digit', day: '2-digit', timeZone: 'Europe/Budapest' })}{' '}
+                            {new Date(row.cancelledAt).toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Budapest' })}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-zinc-400">—</span>
                     )}
