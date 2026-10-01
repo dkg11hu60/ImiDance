@@ -8,7 +8,14 @@ interface EventItem {
   title?: string
   event_date: string
   start_time?: string
+  end_time?: string
   is_active?: boolean
+  locations?: {
+    id: string
+    name: string
+    address?: string
+    maps_url?: string
+  }
 }
 
 interface DancerRow {
@@ -88,7 +95,7 @@ export function EventAttendanceManager() {
       try {
         setLoadingEvents(true)
         const [eventsRes, profilesRes, attendancesRes, rolesRes] = await Promise.all([
-          supabase.from('events').select('*').order('event_date', { ascending: true }),
+          supabase.from('events').select('*, locations(*)').order('event_date', { ascending: true }),
           supabase.from('profiles').select('*'),
           supabase.from('attendances').select('*'),
           supabase.from('user_roles').select('user_id, role_key')
@@ -527,10 +534,29 @@ export function EventAttendanceManager() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-100 pb-4">
         <div>
           <h3 className="text-lg font-bold text-zinc-900">Jelenlét & Fizetés Rögzítése</h3>
-          <p className="text-xs text-zinc-500">
-            Regisztrált: <span className="font-bold text-indigo-600">{registeredCount} fő</span> |{' '}
-            Várható részvétel: <span className="font-bold text-emerald-600">{expectedAttendance.toFixed(1)} fő</span>
-          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-zinc-600">
+            {selectedEvent && (
+              <>
+                <span className="font-semibold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                  <span>🕒</span>
+                  <span>{selectedEvent.start_time?.slice(0, 5)}{selectedEvent.end_time ? ` – ${selectedEvent.end_time.slice(0, 5)}` : ''}</span>
+                </span>
+                <span className="font-medium text-zinc-800 flex items-center gap-1 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200">
+                  <span>📍</span>
+                  <span>{selectedEvent.locations?.name || 'Roxy Stúdió'}</span>
+                  {selectedEvent.locations?.address && (
+                    <span className="text-zinc-400 font-normal">({selectedEvent.locations.address})</span>
+                  )}
+                </span>
+              </>
+            )}
+            <span className="font-semibold text-zinc-700 bg-indigo-50 text-indigo-900 px-2 py-0.5 rounded border border-indigo-100">
+              👥 Regisztrált: <strong className="font-extrabold">{registeredCount} fő</strong>
+            </span>
+            <span className="text-zinc-500">
+              Várható: <span className="font-bold text-emerald-600">{expectedAttendance.toFixed(1)} fő</span>
+            </span>
+          </div>
         </div>
 
         <select
@@ -540,7 +566,7 @@ export function EventAttendanceManager() {
         >
           {events.map((ev) => (
             <option key={ev.id} value={ev.id}>
-              {formatEventDate(ev.event_date)} — {ev.title || 'Táncóra'}
+              {formatEventDate(ev.event_date)} ({ev.start_time?.slice(0, 5) || '16:00'}) — {ev.locations?.name || 'Roxy'}
             </option>
           ))}
         </select>

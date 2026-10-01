@@ -59,7 +59,7 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
 
     const now = new Date()
     const upcoming = (evsRes.data || []).filter(
-      (ev: any) => ev.is_active !== false && eventStart(ev).getTime() >= now.getTime()
+      (ev: any) => eventStart(ev).getTime() >= now.getTime()
     )
     setEvents(upcoming)
 
@@ -93,7 +93,10 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
 
   async function toggleAttendance(ev: any, willAttend: boolean) {
     if (!userId || !canAttend) return
-    if (ev.is_active === false) return
+    if (ev.is_active === false) {
+      setErr('Erre az eseményre nem lehet jelentkezni, mert az óra elmarad / törölve van.')
+      return
+    }
     setBusy(ev.id)
     setErr(null)
 
@@ -157,8 +160,10 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
       )}
 
       {events.map(ev => {
-        const isUserAttending = !!attendances[`${userId}_${ev.id}`]
-        const isPartnerAttending = partner ? !!attendances[`${partner.id}_${ev.id}`] : false
+        const isCancelled = ev.is_active === false
+        const isUserAttending = !isCancelled && !!attendances[`${userId}_${ev.id}`]
+        const wasUserAttendingBeforeCancel = isCancelled && !!attendances[`${userId}_${ev.id}`]
+        const isPartnerAttending = !isCancelled && partner ? !!attendances[`${partner.id}_${ev.id}`] : false
         const loc = ev.locations
         const isOpen = isRegistrationOpen(ev.event_date)
         const deadlineText = formatRegistrationDeadline(ev.event_date)
@@ -166,23 +171,58 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
         return (
           <div
             key={ev.id}
-            className="border rounded-2xl bg-white/20 backdrop-blur-sm shadow-sm overflow-hidden border-zinc-200"
+            className={`border rounded-2xl backdrop-blur-sm shadow-sm overflow-hidden transition-all ${
+              isCancelled
+                ? 'border-red-300 bg-red-50/30'
+                : 'border-zinc-200 bg-white/20'
+            }`}
           >
+            {isCancelled && (
+              <div className="bg-red-600 px-4 py-1.5 text-white font-black text-xs tracking-widest uppercase flex items-center justify-between shadow-sm">
+                <span className="flex items-center gap-1.5">
+                  <span className="text-sm">⚠️</span>
+                  <span>TÖRÖLVE – AZ ÓRA ELMARAD</span>
+                </span>
+                <span className="text-[10px] font-bold bg-black/20 px-2 py-0.5 rounded tracking-normal">
+                  Nem látogatható
+                </span>
+              </div>
+            )}
             <div className="p-3.5 flex items-center justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold text-zinc-900 capitalize text-sm sm:text-base leading-snug">
+              <div className={`min-w-0 flex-1 ${isCancelled ? 'opacity-60' : ''}`}>
+                <div
+                  className={`font-semibold capitalize text-sm sm:text-base leading-snug ${
+                    isCancelled ? 'text-zinc-500 line-through' : 'text-zinc-900'
+                  }`}
+                >
                   {formatEventDate(ev.event_date)}
                 </div>
-                <div className="text-xs sm:text-sm font-semibold text-emerald-600 mt-0.5">
+                <div
+                  className={`text-xs sm:text-sm font-semibold mt-0.5 ${
+                    isCancelled ? 'text-zinc-400 line-through' : 'text-emerald-600'
+                  }`}
+                >
                   {ev.start_time && ev.end_time ? `${ev.start_time.slice(0, 5)} - ${ev.end_time.slice(0, 5)}` : 'Időpont nincs megadva'}
                 </div>
 
-                {ev.title && <div className="text-xs text-zinc-500 mt-0.5 truncate">{ev.title}</div>}
+                {ev.title && (
+                  <div
+                    className={`text-xs mt-0.5 truncate ${
+                      isCancelled ? 'text-zinc-400 line-through' : 'text-zinc-500'
+                    }`}
+                  >
+                    {ev.title}
+                  </div>
+                )}
 
                 {loc ? (
-                  <div className="text-xs text-zinc-700 mt-0.5 flex items-center gap-1 font-medium">
+                  <div
+                    className={`text-xs mt-0.5 flex items-center gap-1 font-medium ${
+                      isCancelled ? 'text-zinc-400 line-through' : 'text-zinc-700'
+                    }`}
+                  >
                     <span>📍</span>
-                    {loc.maps_url ? (
+                    {loc.maps_url && !isCancelled ? (
                       <a href={loc.maps_url} target="_blank" rel="noopener noreferrer" className="hover:underline text-indigo-600 font-semibold truncate">{loc.name}</a>
                     ) : (
                       <span className="font-semibold truncate">{loc.name}</span>
@@ -192,9 +232,13 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                   <div className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1"><span>📍</span> Helyszín nincs megadva</div>
                 )}
 
-                {/* Regisztrációs határidő / Lezárult státusz */}
-                <div className="mt-1">
-                  {isOpen ? (
+                {/* Regisztrációs határidő / Lezárult státusz / Törölve jelzés */}
+                <div className="mt-1.5">
+                  {isCancelled ? (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-100/90 px-2.5 py-0.5 rounded border border-red-200">
+                      ✕ Ez az alkalom törölve lett
+                    </span>
+                  ) : isOpen ? (
                     <span className="text-[11px] text-zinc-500 font-medium">
                       ⏳ Határidő: <span className="text-zinc-700">{deadlineText}</span>
                     </span>
@@ -205,18 +249,31 @@ export function EventList({ userId, onNavigateProfile }: { userId: string; onNav
                   )}
                 </div>
 
-                {partner && (
+                {!isCancelled && partner && (
                   <div className="text-xs mt-1 font-medium">
                     {isPartnerAttending
                       ? <span className="text-emerald-600">Partnered ({partner.full_name || partner.name}) is jön</span>
                       : <span className="text-zinc-400">Partnered még nem jelezte</span>}
                   </div>
                 )}
+                {isCancelled && wasUserAttendingBeforeCancel && (
+                  <div className="text-xs mt-1 font-semibold text-red-600">
+                    Jelentkezve voltál (az óra elmarad)
+                  </div>
+                )}
               </div>
 
               {canAttend && (
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  {!isOpen ? (
+                  {isCancelled ? (
+                    <button
+                      disabled
+                      title="Ez az esemény törölve van / elmarad, így nem lehet rá jelentkezni."
+                      className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-red-100 text-red-700 border border-red-300 cursor-not-allowed uppercase tracking-wider shadow-none"
+                    >
+                      ✕ Törölve
+                    </button>
+                  ) : !isOpen ? (
                     isUserAttending ? (
                       <button
                         disabled

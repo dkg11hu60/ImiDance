@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     if (ev.is_active === false && attend) {
-      return NextResponse.json({ error: 'Erre az alkalomra már nem lehet jelentkezni.' }, { status: 400 })
+      return NextResponse.json({ error: 'Ez az esemény törölve van / elmarad, így nem lehet rá jelentkezni.' }, { status: 400 })
     }
 
     if (!isRegistrationOpen(ev.event_date)) {

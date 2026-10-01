@@ -1,6 +1,6 @@
 # ImiDance Alkalmazás – Projekt Dokumentáció
 
-> **Verzió: v004 (2026-08-30).** Új fejezetek és változások: §13 változásnapló kiegészítve a v004 frissítésekkel (szerepkörválasztó gombok, mobil-reszponzív kártyák, tesztadat-szűrés a statisztikákból, "Partnered" terminológia, profil helper és "Órarend" menüpont). Részletek: §13.
+> **Verzió: v005 (2026-10-01).** Új fejezetek és változások: §13 változásnapló kiegészítve a v005 frissítésekkel (határidős jelentkezés és lemondás előző nap 18:00-ig, lemondáskövetés és timestamp rögzítés, napi automata riport Vercel Cron integrációval nyáron 19:01-kor, télen 18:01-kor lefutva UTC 17:01-es ütemezéssel). Részletek: §13.
 
 ## 1. A projekt áttekintése
 
@@ -387,7 +387,7 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
   - **Kliens oldali felület (`EventList.tsx`):**
     - Minden óránál megjelenik a pontos határidő (pl. *⏳ Határidő: péntek 18:00*).
     - Határidő lejárta után a még nem regisztráltaknál letiltott „Lezárult” gomb, a már regisztráltaknál letiltott „✓ Jelentkezve (Lezárult)” gomb jelenik meg.
-  - **Összefüggés a Napi Riporttal:** Mivel a másnapi táncórára a jelentkezés és lemondás aznap 18:00-kor véglegesen lezárul, a 18:01-kor kiküldött napi riport immár a másnapi óra **végleges, lezárt létszámát és névsorát** tartalmazza Imre számára.
+  - **Összefüggés a Napi Riporttal:** Mivel a másnapi táncórára a jelentkezés és lemondás aznap 18:00-kor véglegesen lezárul, a naponta kiküldött napi riport immár a másnapi óra **végleges, lezárt létszámát és névsorát** tartalmazza Imre számára.
 - **Lemondások rögzítése és időpontja (`attendances.cancelled_at`, `005_cancellation_tracking.sql`, `activity_logs`):**
   - Az `attendances` táblába bevezetésre került a `cancelled_at` (timestamptz) oszlop.
   - Lemondáskor a sor nem törlődik az adatbázisból, hanem `status = 'cancelled'` és `cancelled_at = now()` értékeket kap, valamint az `activity_logs` táblába is bejegyzés kerül (`action = 'cancel'`).
@@ -399,17 +399,38 @@ A korábbi mohó `level.includes('h')` mindent a H oszlopba vitt (mind a négy �
   - Az „Előzetesen regisztrált” oszlopban az „Igen” jelvény alatt megjelenik a jelentkezés dátuma és pontos ideje (`HH:MM`, tooltipben teljes dátummal).
   - Az oszlop fejlécre kattintva a táncosok a regisztráció időpontja szerint is sorba rendezhetők.
   - Kézi beléptetésnél / adminisztrátori rögzítésnél szintén explicit rögzítésre kerül a timestamp.
-- **Napi 18:01 Jelentkezési Riport Cronjob és API (`app/api/cron/daily-report/route.ts`, `lib/dailyReport.ts`):**
-  - Automatikus napi jelentés generálása és kiküldése minden nap pontosan 18:01-kor:
+- **Napi Jelentkezési Riport Cronjob és API (`app/api/cron/daily-report/route.ts`, `lib/dailyReport.ts`):**
+  - Automatikus napi jelentés generálása és kiküldése minden nap:
     - **Címzett (To):** `imredance@gmail.com`
     - **Másolat (CC):** `dkg11hu@gmail.com`
-  - Vercel Cron integráció (`vercel.json`: `"1 16,17 * * *"`), intelligens Budapest időzóna (`Europe/Budapest`) óra-ellenőrzéssel, amely automatikusan kezeli a téli (CET, UTC+1) és nyári (CEST, UTC+2) időszámításváltást kézi beavatkozás nélkül.
+  - **Vercel Cron ütemezés (`vercel.json`: `"1 17 * * *"`):**
+    - A Vercel Hobby csomag korlátja miatt (amely szigorúan legfeljebb **napi 1 lefutást** engedélyez és az óra-listát `16,17` hibával elutasítja), a cron UTC 17:01-re lett időzítve.
+    - Ez automatikusan garantálja a napi egyszeri lefutást a megfelelő esti időpontokban:
+      - **Nyári időszámítás (CEST, UTC+2):** UTC 17:01 + 2 = **19:01 Budapest idő (este 7-kor)**.
+      - **Téli időszámítás (CET, UTC+1):** UTC 17:01 + 1 = **18:01 Budapest idő (este 6-kor)**.
+    - A `lib/dailyReport.ts` intelligens időzóna-ellenőrzéssel mindkét idősávban (`18:00` és `19:00` órakor) engedélyezi a lefutást, és dinamikusan jeleníti meg a tényleges küldési időt a tárgyban és a fejlécben.
   - **Riport tartalma:**
     - Fókuszban a mai táncóra (vagy ha ma nincs, a legközelebbi kitűzött alkalom).
     - Metrikák: Összes jelentkező, hölgyek száma, urak száma, megerősített táncospárok száma, egyéni jelentkezők, nemi egyensúly állapota, havi bérletesek száma.
     - Teljes névsorszámozott táblázat: Név, nem, táncszint, partner státusz, bérlet, és a pontos jelentkezési időpont.
     - Előretekintés: Következő 5 jövőbeli alkalom létszáma (fiú/lány bontásban).
     - Friss aktivitás: Az elmúlt 24 óra új jelentkezéseinek listája (ki, melyik órára, mikor).
+- **Törölt (inaktivált) események feltűnő megjelenítése és a jelentkezés letiltása (`EventList.tsx`, `set-attendance/route.ts`):**
+  - **Megjelenítés jövőbeli eseményeknél:** A lemondott/inaktivált (`is_active === false`) események nem tűnnek el némán az Órarendből, hanem a jövőbeli időpontjuk elmúltáig láthatóak maradnak (vagy amíg az adminisztrátor véglegesen ki nem takarítja azokat az adatbázisból).
+  - **Feltűnő piros megkülönböztetés:** Az inaktív esemény kártyája felső piros figyelmeztető sávot kap (`⚠️ TÖRÖLVE – AZ ÓRA ELMARAD | Nem látogatható`), a szöveges adatok (dátum, idő, helyszín) áthúzásra kerülnek, a keret piros hangsúlyt kap, és külön státuszjelvény jelzi: `✕ Ez az alkalom törölve lett`.
+  - **Jelentkezés és módosítás szigorú letiltása:**
+    - Kliens oldalon a zöld „Regisztrálok” gomb helyett egy inaktív, kattinthatatlan `✕ Törölve` gomb jelenik meg.
+    - Ha a táncos korábban jelentkezett, piros tájékoztató szöveg jelenik meg: *„Jelentkezve voltál (az óra elmarad)”*.
+    - Szerver oldalon az `app/api/set-attendance/route.ts` 400-as hibával utasít vissza bármely jelentkezési kísérletet az inaktív alkalmakra (*„Ez az esemény törölve van / elmarad, így nem lehet rá jelentkezni.”*).
+- **Oktatói felület esemény-részletezése (`EventManageList.tsx`, `EventAttendanceManager.tsx`):**
+  - **Alkalmak kezelése (`EventManageList.tsx`):**
+    - Minden esemény kártyáján részletesen, formázva megjelenik a teljes dátum (a hét napjával, pl. *2026. október 3., szombat*).
+    - Pontos idősáv (`🕒 Időpont: 16:00 – 18:00`).
+    - Valós helyszínnév a `locations` relációból cím- és térkép-hivatkozással (`📍 Helyszín: Roxy Stúdió (cím)`).
+    - Kiemelt számláló jelvény az **eddig jelentkezettek pontos számával** (`👥 Eddig jelentkezett: X fő`).
+  - **Beléptetés (`EventAttendanceManager.tsx`):**
+    - A fejlécben a kiválasztott alkalom időpontja, helyszíne és címe, valamint a regisztráltak és a várható részvétel száma egyszerre kiírásra került.
+    - A legördülő választóban a dátum mellett az óra kezdési időpontja és a helyszín is látható.
 - **Tesztelési és adminisztrációs felület (`EmailTester.tsx`, `scripts/test-daily-report.js`):**
   - Az adminisztrációs felületen (`EmailTester.tsx`) dedikált „Napi Riport Tesztelése” kártya és „Napi Riport Küldése Most” gomb kapott helyet, amellyel a riport azonnal lepróbálható bármilyen tetszőleges címzettre is.
   - Node.js alapú parancssori tesztelő script (`scripts/test-daily-report.js`) az azonnali ellenőrzéshez.
