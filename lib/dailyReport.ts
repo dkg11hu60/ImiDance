@@ -123,7 +123,7 @@ export async function generateAndSendDailyReport(
 ): Promise<DailyReportResult> {
   const now = new Date()
 
-  // 1. Check time zone and target hour (18:01 Budapest time)
+  // 1. Check time zone and target hour (17:01 UTC = 19:01 CEST in summer, 18:01 CET in winter)
   const budapestHour = parseInt(
     new Intl.DateTimeFormat('hu-HU', {
       timeZone: 'Europe/Budapest',
@@ -147,12 +147,12 @@ export async function generateAndSendDailyReport(
     day: '2-digit',
   }).format(now) // Format: YYYY-MM-DD
 
-  // When triggered via cron without force flag, only execute during the 18:00 hour
-  if (!options.force && budapestHour !== 18) {
+  // When triggered via cron without force flag, only execute during the 18:00 or 19:00 hour (winter vs summer time)
+  if (!options.force && budapestHour !== 18 && budapestHour !== 19) {
     return {
       ok: true,
       skipped: true,
-      reason: `Jelenlegi budapesti idő: ${budapestTimeStr}. A napi automatikus riport csak 18:01-kor fut le (óra = 18).`,
+      reason: `Jelenlegi budapesti idő: ${budapestTimeStr}. A napi automatikus riport 18:01-kor (télen) vagy 19:01-kor (nyáron) fut le.`,
       budapestDate: budapestDateStr,
       budapestTime: budapestTimeStr,
     }
@@ -510,10 +510,10 @@ export async function generateAndSendDailyReport(
   const focusDeadlineText = focusEvent ? formatRegistrationDeadline(focusEvent.event_date) : ''
 
   const subject = isTodayClass
-    ? `[ImiDance Riport] Mai táncóra jelentkezések - ${budapestDateStr} (18:01)`
+    ? `[ImiDance Riport] Mai táncóra jelentkezések - ${budapestDateStr} (${budapestTimeStr})`
     : isTomorrowClass
-    ? `[ImiDance Riport] Holnapi táncóra végleges létszáma - ${tomorrowDateStr} (18:01)`
-    : `[ImiDance Riport] Napi jelentkezési összesítő - ${budapestDateStr} (18:01)`
+    ? `[ImiDance Riport] Holnapi táncóra végleges létszáma - ${tomorrowDateStr} (${budapestTimeStr})`
+    : `[ImiDance Riport] Napi jelentkezési összesítő - ${budapestDateStr} (${budapestTimeStr})`
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -537,13 +537,13 @@ export async function generateAndSendDailyReport(
                 <tr>
                   <td>
                     <span style="display: inline-block; background-color: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">
-                      Napi Automata Riport • 18:01
+                      Napi Automata Riport • ${budapestTimeStr}
                     </span>
                     <h1 style="margin: 10px 0 4px 0; font-size: 22px; font-weight: 800; line-height: 1.3;">
                       ImiDance Táncóra Jelentkezések
                     </h1>
                     <p style="margin: 0; font-size: 13px; color: #c7d2fe;">
-                      Készült: ${budapestDateStr} 18:01 (Budapesti idő)
+                      Készült: ${budapestDateStr} ${budapestTimeStr} (Budapesti idő)
                     </p>
                   </td>
                 </tr>
@@ -872,7 +872,7 @@ export async function generateAndSendDailyReport(
                 ImiDance Rendszer Megnyitása
               </a>
               <p style="margin: 16px 0 0 0; font-size: 11px; color: #94a3b8; line-height: 1.5;">
-                Ez az e-mail automatikusan generálódott minden nap 18:01-kor a táncórák jelentkezéseinek nyomon követésére.<br>
+                Ez az e-mail automatikusan generálódott a táncórák jelentkezéseinek nyomon követésére.<br>
                 Címzett: <strong>${escapeHtml(recipient)}</strong>${cc ? ` • Másolat (CC): <strong>${escapeHtml(cc)}</strong>` : ''} • ImiDance Riport Rendszer
               </p>
             </td>
