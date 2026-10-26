@@ -1,5 +1,6 @@
 import './globals.css'
 import { HelpButton } from '@/components/help/HelpButton'
+import { LangOffer } from '@/components/i18n/LangOffer'
 
 export const metadata = {
   title: 'Imi Társastánc',
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="dance-bg">
         {children}
         <HelpButton />
+        <LangOffer />
       </body>
     </html>
   )
