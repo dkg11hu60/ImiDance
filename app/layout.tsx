@@ -1,6 +1,6 @@
 import './globals.css'
 import { HelpButton } from '@/components/help/HelpButton'
-import { LangOffer } from '@/components/i18n/LangOffer'
+import { TranslateBootstrap } from '@/components/i18n/TranslateBootstrap'
 
 export const metadata = {
   title: 'Imi Társastánc',
@@ -23,10 +23,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hu" suppressHydrationWarning>
-      <body className="dance-bg">
-        {children}
-        <HelpButton />
-        <LangOffer />
+      {/* A dance-bg egy belső wrapperen van, NEM a <body>-n: így a Google-fordító
+          body-manipulációja nem tudja elvinni a háttérképet. */}
+      <body>
+        <div className="dance-bg min-h-screen">
+          {/* Láthatatlan fordító-motor minden oldalon — a nyitó oldalon választott
+              nyelvet érvényesíti a cookie alapján, bárhol jár a felhasználó. */}
+          <TranslateBootstrap />
+          {children}
+          <HelpButton />
+        </div>
       </body>
     </html>
   )

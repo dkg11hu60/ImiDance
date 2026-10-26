@@ -1,6 +1,6 @@
 {
   "name": "imidance",
-  "version": "261026.124054",
+  "version": "261026.132208",
   "private": true,
   "scripts": {
     "dev": "next dev",

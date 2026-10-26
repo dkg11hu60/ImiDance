@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { supabase } from '../lib/supabase'
 import { LoginForm } from '../components/auth/LoginForm'
 import { Dashboard } from '../components/Dashboard'
-import { APP_VERSION } from '../lib/version'
+import { LangOffer } from '../components/i18n/LangOffer'
 
 export default function Home() {
   const [user, setUser] = useState<any>(null)
@@ -25,34 +25,34 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-transparent">
+      <div className="min-h-screen flex items-center justify-center bg-transparent text-zinc-500">
         Betöltés...
       </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-transparent flex flex-col justify-between">
+    <main className="min-h-screen bg-transparent flex flex-col">
       {!user ? (
-        <>
-          <div className="flex-1 flex items-center justify-center p-4 md:p-6">
-            <div className="w-full max-w-md space-y-4">
-              <LoginForm onLoginSuccess={() => {}} />
-              <div className="text-center text-sm bg-transparent">
-                Még nincs fiókod?{' '}
-                <Link
-                  href="/register"
-                  className="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline"
-                >
-                  Regisztrálj itt
-                </Link>
-              </div>
+        <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+          <div className="w-full max-w-md">
+            {/* Nyelvválasztó — csak a nyitó oldalon, szorosan a login fölött */}
+            <div className="mb-3">
+              <LangOffer />
+            </div>
+
+            <LoginForm onLoginSuccess={() => {}} />
+            <div className="mt-4 text-center text-sm text-zinc-600">
+              Még nincs fiókod?{' '}
+              <Link
+                href="/register"
+                className="text-indigo-600 hover:text-indigo-800 font-semibold hover:underline"
+              >
+                Regisztrálj itt
+              </Link>
             </div>
           </div>
-          <footer className="py-4 text-center text-[11px] text-zinc-500/60 font-semibold">
-            ImiDance {APP_VERSION}
-          </footer>
-        </>
+        </div>
       ) : (
         <Dashboard />
       )}

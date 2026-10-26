@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 
-// Böngészős (Google) oldalfordító felajánló — CSAK a nyitó (login) oldalra szánva.
-// Egy kattintással lefordítja az egész oldalt magyarról a választott nyelvre.
-// A választást a googtrans cookie őrzi, ami újratöltéskor magától érvényesül,
-// így a korábbi választás lesz az alapértelmezett, de váltható marad.
-// Eredeti nyelv: magyar (pageLanguage: 'hu').
+// Látható nyelvválasztó — CSAK a nyitó (login) oldalra. A választást a googtrans
+// cookie őrzi; a tényleges fordítást a layoutban futó TranslateBootstrap végzi
+// minden oldalon, így a nyitó oldalon választott nyelv onnantól mindenhol érvényes.
+// A választás emlékezete = a cookie, ami újratöltéskor magától érvényesül.
 
 interface LangDef {
   code: string   // googtrans célnyelv-kód ('hu' = eredeti)
@@ -25,7 +24,6 @@ const FlagHU = () => (
 )
 
 const FlagEN = () => (
-  // Egyszerűsített Union Jack
   <svg viewBox="0 0 60 30" className="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
     <clipPath id="langoffer-uk-s"><path d="M0 0v30h60V0z" /></clipPath>
     <clipPath id="langoffer-uk-t"><path d="M30 15h30v15zv15H0zH0V0zV0h30z" /></clipPath>
@@ -39,8 +37,22 @@ const FlagEN = () => (
   </svg>
 )
 
+const FlagDE = () => (
+  <svg viewBox="0 0 9 6" className="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="9" height="2" y="0" fill="#000000" />
+    <rect width="9" height="2" y="2" fill="#dd0000" />
+    <rect width="9" height="2" y="4" fill="#ffce00" />
+  </svg>
+)
+
+const FlagUA = () => (
+  <svg viewBox="0 0 9 6" className="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="9" height="3" y="0" fill="#0057b7" />
+    <rect width="9" height="3" y="3" fill="#ffd700" />
+  </svg>
+)
+
 const FlagZH = () => (
-  // Kína: piros mező, sárga csillagok (★ glyph, nem emoji → Windowson is rendereli)
   <svg viewBox="0 0 30 20" className="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
     <rect width="30" height="20" fill="#de2910" />
     <g fill="#ffde00" fontFamily="serif">
@@ -54,7 +66,6 @@ const FlagZH = () => (
 )
 
 const FlagVI = () => (
-  // Vietnám: piros mező, középen egy nagy sárga ötágú csillag
   <svg viewBox="0 0 30 20" className="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
     <rect width="30" height="20" fill="#da251d" />
     <text x="15" y="15.5" fontSize="15" fill="#ffff00" textAnchor="middle" fontFamily="serif">★</text>
@@ -64,6 +75,8 @@ const FlagVI = () => (
 const LANGS: LangDef[] = [
   { code: 'hu', label: 'Magyar', Flag: FlagHU },
   { code: 'en', label: 'English', Flag: FlagEN },
+  { code: 'de', label: 'Deutsch', Flag: FlagDE },
+  { code: 'uk', label: 'Українська', Flag: FlagUA },
   { code: 'zh-CN', label: '中文', Flag: FlagZH },
   { code: 'vi', label: 'Tiếng Việt', Flag: FlagVI }
 ]
@@ -90,59 +103,17 @@ export function LangOffer() {
 
   useEffect(() => {
     setCurrent(readCurrentLang())
-
-    // Google-sáv elrejtése, hogy ne tolja el az oldalt
-    if (!document.getElementById('langoffer-style')) {
-      const style = document.createElement('style')
-      style.id = 'langoffer-style'
-      style.textContent = `
-        .goog-te-banner-frame.skiptranslate { display: none !important; }
-        .goog-te-gadget { display: none !important; }
-        body { top: 0 !important; position: static !important; }
-        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
-        .goog-text-highlight { background: none !important; box-shadow: none !important; }
-      `
-      document.head.appendChild(style)
-    }
-
-    if (!document.getElementById('google_translate_element')) {
-      const div = document.createElement('div')
-      div.id = 'google_translate_element'
-      div.style.display = 'none'
-      document.body.appendChild(div)
-    }
-
-    if (!document.getElementById('google-translate-script')) {
-      ;(window as any).googleTranslateElementInit = () => {
-        try {
-          const g = (window as any).google
-          if (g?.translate?.TranslateElement) {
-            // eslint-disable-next-line no-new
-            new g.translate.TranslateElement(
-              { pageLanguage: 'hu', autoDisplay: false },
-              'google_translate_element'
-            )
-          }
-        } catch {
-          // csendes: ha nem elérhető, marad az eredeti nyelv
-        }
-      }
-      const s = document.createElement('script')
-      s.id = 'google-translate-script'
-      s.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
-      document.body.appendChild(s)
-    }
   }, [])
 
   const translateTo = (target: string) => {
     if (target === current) return
     setGoogTransCookie(target)
-    // A googtrans cookie a betöltéskor érvényesül a fordító-elemmel
+    // A cookie minden oldalon érvényesül a layout TranslateBootstrap elemével
     location.reload()
   }
 
   return (
-    <div className="w-full max-w-md mx-auto flex items-center justify-center gap-2" translate="no">
+    <div className="w-full max-w-md mx-auto flex flex-wrap items-center justify-center gap-2" translate="no">
       {LANGS.map((l) => {
         const active = current === l.code
         const Flag = l.Flag
